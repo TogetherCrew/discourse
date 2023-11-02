@@ -10,8 +10,8 @@ import {
 import { TRANSFORM_JOB } from '../../constants/jobs.contants';
 import { Logger } from '@nestjs/common';
 
-export class BadgeExtractHandler extends Handler {
-  private readonly logger = new Logger(BadgeExtractHandler.name);
+export class BadgesExtractHandler extends Handler {
+  private readonly logger = new Logger(BadgesExtractHandler.name);
 
   constructor(
     private readonly discourseService: DiscourseService,
@@ -24,7 +24,7 @@ export class BadgeExtractHandler extends Handler {
   }
 
   async process(job: Job<any, any, string>): Promise<any> {
-    this.logger.log('BadgeExtractHandler', job.id);
+    this.logger.log('BadgesExtractHandler', job.id);
     const { forum } = job.data;
     const { data } = await this.discourseService.getBadges(forum.endpoint);
     const { badges, badge_types, badge_groupings } = data;

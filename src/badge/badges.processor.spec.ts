@@ -1,39 +1,39 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BadgeExtractHandler } from './handlers/badge-extract.handler';
-import { BadgeLoadHandler } from './handlers/badge-load.handler';
-import { BadgeTransformHandler } from './handlers/badge-transform.handler';
+import { BadgesExtractHandler } from './handlers/badges-extract.handler';
+import { BadgesLoadHandler } from './handlers/badges-load.handler';
+import { BadgesTransformHandler } from './handlers/badges-transform.handler';
 import { Job } from 'bullmq';
 import {
   EXTRACT_JOB,
   LOAD_JOB,
   TRANSFORM_JOB,
 } from '../constants/jobs.contants';
-import { BadgeProcessor } from './badge.processor';
+import { BadgesProcessor } from './badges.processor';
 
-describe('BadgeProcessor', () => {
-  let processor: BadgeProcessor;
-  let extractHandler: jest.Mocked<BadgeExtractHandler>;
-  let transformHandler: jest.Mocked<BadgeTransformHandler>;
-  let loadHandler: jest.Mocked<BadgeLoadHandler>;
+describe('BadgesProcessor', () => {
+  let processor: BadgesProcessor;
+  let extractHandler: jest.Mocked<BadgesExtractHandler>;
+  let transformHandler: jest.Mocked<BadgesTransformHandler>;
+  let loadHandler: jest.Mocked<BadgesLoadHandler>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        BadgeProcessor,
+        BadgesProcessor,
         {
-          provide: BadgeExtractHandler,
+          provide: BadgesExtractHandler,
           useValue: {
             process: jest.fn(),
           },
         },
         {
-          provide: BadgeTransformHandler,
+          provide: BadgesTransformHandler,
           useValue: {
             process: jest.fn(),
           },
         },
         {
-          provide: BadgeLoadHandler,
+          provide: BadgesLoadHandler,
           useValue: {
             process: jest.fn(),
           },
@@ -41,10 +41,10 @@ describe('BadgeProcessor', () => {
       ],
     }).compile();
 
-    processor = module.get<BadgeProcessor>(BadgeProcessor);
-    extractHandler = module.get(BadgeExtractHandler);
-    transformHandler = module.get(BadgeTransformHandler);
-    loadHandler = module.get(BadgeLoadHandler);
+    processor = module.get<BadgesProcessor>(BadgesProcessor);
+    extractHandler = module.get(BadgesExtractHandler);
+    transformHandler = module.get(BadgesTransformHandler);
+    loadHandler = module.get(BadgesLoadHandler);
   });
 
   it('should process EXTRACT_JOB', async () => {

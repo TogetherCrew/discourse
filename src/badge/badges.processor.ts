@@ -6,16 +6,16 @@ import {
   LOAD_JOB,
   TRANSFORM_JOB,
 } from '../constants/jobs.contants';
-import { BadgeExtractHandler } from './handlers/badge-extract.handler';
-import { BadgeLoadHandler } from './handlers/badge-load.handler';
-import { BadgeTransformHandler } from './handlers/badge-transform.handler';
+import { BadgesExtractHandler } from './handlers/badges-extract.handler';
+import { BadgesLoadHandler } from './handlers/badges-load.handler';
+import { BadgesTransformHandler } from './handlers/badges-transform.handler';
 
 @Processor(BADGE_QUEUE)
-export class BadgeProcessor extends WorkerHost {
+export class BadgesProcessor extends WorkerHost {
   constructor(
-    private readonly extractHandler: BadgeExtractHandler,
-    private readonly transformHandler: BadgeTransformHandler,
-    private readonly loadHandler: BadgeLoadHandler,
+    private readonly extractHandler: BadgesExtractHandler,
+    private readonly transformHandler: BadgesTransformHandler,
+    private readonly loadHandler: BadgesLoadHandler,
   ) {
     super();
   }

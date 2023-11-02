@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Queue } from 'bullmq';
 import { DiscourseService } from '@app/discourse';
-import { BadgeExtractHandler } from './badge-extract.handler';
+import { BadgesExtractHandler } from './badges-extract.handler';
 import {
   BADGE_GROUPING_QUEUE,
   BADGE_QUEUE,
@@ -15,8 +15,8 @@ const BullQueue_BADGE_QUEUE = `BullQueue_${BADGE_QUEUE}`;
 const BullQueue_BADGE_TYPE_QUEUE = `BullQueue_${BADGE_TYPE_QUEUE}`;
 const BullQueue_BADGE_GROUPING_QUEUE = `BullQueue_${BADGE_GROUPING_QUEUE}`;
 
-describe('BadgeExtractHandler', () => {
-  let handler: BadgeExtractHandler;
+describe('BadgesExtractHandler', () => {
+  let handler: BadgesExtractHandler;
   let discourseService: jest.Mocked<DiscourseService>;
   let badgeQueue: jest.Mocked<Queue>;
   let badgeTypeQueue: jest.Mocked<Queue>;
@@ -25,7 +25,7 @@ describe('BadgeExtractHandler', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        BadgeExtractHandler,
+        BadgesExtractHandler,
         {
           provide: DiscourseService,
           useValue: {
@@ -53,7 +53,7 @@ describe('BadgeExtractHandler', () => {
       ],
     }).compile();
 
-    handler = module.get<BadgeExtractHandler>(BadgeExtractHandler);
+    handler = module.get<BadgesExtractHandler>(BadgesExtractHandler);
     discourseService = module.get(DiscourseService);
     badgeQueue = module.get(BullQueue_BADGE_QUEUE);
     badgeTypeQueue = module.get(BullQueue_BADGE_TYPE_QUEUE);

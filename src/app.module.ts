@@ -7,7 +7,7 @@ import baseConfig from './config/base.config';
 import neo4jConfig from './config/neo4j.config';
 import { Neo4jModule } from 'nest-neo4j';
 import { BullModule } from '@nestjs/bullmq';
-import { BadgeModule } from './badge/badge.module';
+import { BadgesModule } from './badge/badges.module';
 
 @Module({
   imports: [
@@ -28,7 +28,7 @@ import { BadgeModule } from './badge/badge.module';
       }),
       inject: [ConfigService],
     }),
-    BadgeModule,
+    BadgesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
