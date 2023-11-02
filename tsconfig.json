@@ -16,6 +16,14 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@app/discourse": [
+        "libs/discourse/src"
+      ],
+      "@app/discourse/*": [
+        "libs/discourse/src/*"
+      ]
+    }
   }
 }
