@@ -7,7 +7,7 @@ import baseConfig from './config/base.config';
 import neo4jConfig from './config/neo4j.config';
 import { Neo4jModule } from 'nest-neo4j';
 import { BullModule } from '@nestjs/bullmq';
-import { BadgesModule } from './badge/badges.module';
+import { BadgesModule } from './badges/badges.module';
 
 @Module({
   imports: [
