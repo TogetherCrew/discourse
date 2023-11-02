@@ -18,16 +18,13 @@ import { BadgeModule } from './badge/badge.module';
     }),
     Neo4jModule.forRootAsync({
       import: [ConfigModule],
-      useFactory: (config: ConfigService) => config.get('neo4j'),
+      useFactory: (configService: ConfigService) => configService.get('neo4j'),
       inject: [ConfigService],
     }),
     BullModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
-        connection: {
-          host: configService.get<string>('REDIS_HOST'),
-          port: configService.get<number>('REDIS_PORT'),
-        },
+        connection: configService.get('redis'),
       }),
       inject: [ConfigService],
     }),
