@@ -1,9 +1,18 @@
 import { Job } from 'bullmq';
 import { Handler } from '../../abstracts/handler.abstract';
+import { LoadBadgesDto } from '../dto/load-badges.dto';
+import { BadgesService } from '../badges.service';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class BadgesLoadHandler extends Handler {
-  process(job: Job<any, any, string>): Promise<any> {
+  constructor(public readonly badgeService: BadgesService) {
+    super();
+  }
+
+  async process(job: Job<LoadBadgesDto, any, string>): Promise<any> {
     console.log('BadgesLoadHandler', job.id);
-    throw new Error('Method not implemented.');
+    const { badges } = job.data;
+    await this.badgeService.insertMany(badges);
   }
 }
