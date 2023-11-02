@@ -12,6 +12,18 @@ export class DiscourseService {
     private bottleneckService: BottleneckService,
   ) {}
 
+  async getBadges(endpoint: string): Promise<AxiosResponse<BadgesResponse>> {
+    const path = '/badges.json';
+    return this.get(endpoint, path);
+  }
+
+  async getCategories(
+    endpoint: string,
+  ): Promise<AxiosResponse<CategoriesResponse>> {
+    const path = '/categories.json';
+    return this.get(endpoint, path);
+  }
+
   private async get(endpoint: string, path: string, scheme = 'https') {
     try {
       const limiter: Bottleneck = this.getLimiter(endpoint);
@@ -20,11 +32,6 @@ export class DiscourseService {
     } catch (error) {
       throw error;
     }
-  }
-
-  async getBadges(endpoint: string): Promise<AxiosResponse<BadgesResponse>> {
-    const path = '/badges.json';
-    return this.get(endpoint, path);
   }
 
   private getLimiter(id: string, options = null): Bottleneck {

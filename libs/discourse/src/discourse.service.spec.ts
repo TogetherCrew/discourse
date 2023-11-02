@@ -64,17 +64,34 @@ describe('DiscourseService', () => {
       );
       expect(result).toEqual(mockResponse);
     });
+  });
 
-    // it('should handle errors gracefully', async () => {
-    //   const endpoint = 'test.endpoint';
-    //   mockHttpService.get.mockRejectedValueOnce(
-    //     new AxiosError('Network error'),
-    //   );
+  describe('getCategories', () => {
+    let mockLimiter: Bottleneck;
 
-    //   await expect(service.getBadges(endpoint)).rejects.toThrow(
-    //     'Network error',
-    //   );
-    // });
+    beforeEach(() => {
+      mockLimiter = new Bottleneck();
+      mockBottleneckService.getLimiter.mockReturnValueOnce(mockLimiter);
+    });
+
+    it('should call the correct URL', async () => {
+      const endpoint = 'test.endpoint';
+      const mockResponse: Partial<AxiosResponse<CategoriesResponse>> = {
+        data: {
+          categories: [],
+          can_create_category: false,
+          can_create_topic: false,
+        },
+      };
+      mockHttpService.get.mockReturnValueOnce(of(mockResponse));
+
+      const result = await service.getCategories(endpoint);
+
+      expect(mockHttpService.get).toHaveBeenCalledWith(
+        'https://test.endpoint/categories.json',
+      );
+      expect(result).toEqual(mockResponse);
+    });
   });
 
   describe('getLimiter', () => {
