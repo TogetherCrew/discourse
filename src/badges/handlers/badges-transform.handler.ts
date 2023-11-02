@@ -1,6 +1,6 @@
 import { Job, Queue } from 'bullmq';
 import { Handler } from '../../abstracts/handler.abstract';
-import { Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { TransformBadgesDto } from '../dto/transform-badges.dto';
 import { LoadBadgeDto } from '../dto/load-badges.dto';
 import { BadgesTransformer } from '../badges.transformer';
@@ -8,6 +8,7 @@ import { InjectQueue } from '@nestjs/bullmq';
 import { BADGE_QUEUE } from '../../constants/queues.constants';
 import { LOAD_JOB } from '../../constants/jobs.contants';
 
+@Injectable()
 export class BadgesTransformHandler extends Handler {
   private readonly logger = new Logger(BadgesTransformHandler.name);
 

@@ -8,8 +8,9 @@ import {
   BADGE_TYPE_QUEUE,
 } from '../../constants/queues.constants';
 import { TRANSFORM_JOB } from '../../constants/jobs.contants';
-import { Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 
+@Injectable()
 export class BadgesExtractHandler extends Handler {
   private readonly logger = new Logger(BadgesExtractHandler.name);
 
