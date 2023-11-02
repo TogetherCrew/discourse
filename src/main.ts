@@ -9,12 +9,14 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const port = configService.get('base.port');
 
+  // VERSIONING
   app.enableVersioning({
     type: VersioningType.URI,
     defaultVersion: '1',
     prefix: 'api/v',
   });
 
+  // SWAGGER
   const config = new DocumentBuilder()
     .setTitle('Discourse API')
     .setDescription('Documentation of the Discourse API')
@@ -24,6 +26,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/doc', app, document);
 
+  // START APPLICATION
   await app.listen(port, () => {
     Logger.verbose(`Server is running on port ${port}`, 'NestApplication');
   });
