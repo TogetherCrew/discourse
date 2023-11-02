@@ -5,8 +5,8 @@ import { TransformBadgesDto } from '../dto/transform-badges.dto';
 import { LoadBadgeDto } from '../dto/load-badges.dto';
 import { BadgesTransformer } from '../badges.transformer';
 import { InjectQueue } from '@nestjs/bullmq';
-import { BADGE_QUEUE } from 'src/constants/queues.constants';
-import { LOAD_JOB } from 'src/constants/jobs.contants';
+import { BADGE_QUEUE } from '../../constants/queues.constants';
+import { LOAD_JOB } from '../../constants/jobs.contants';
 
 export class BadgesTransformHandler extends Handler {
   private readonly logger = new Logger(BadgesTransformHandler.name);
@@ -21,9 +21,11 @@ export class BadgesTransformHandler extends Handler {
   async process(job: Job<TransformBadgesDto, any, string>): Promise<any> {
     this.logger.log('BadgesTransformHandler', job.id);
     const { forum, badges } = job.data;
-    const output: LoadBadgeDto[] = badges.map((badge: Badge) =>
+    console.log('badges', badges);
+    const output: LoadBadgeDto[] = badges.map((badge) =>
       this.transformer.transform(badge, forum),
     );
+    console.log('output', output);
     this.queue.add(LOAD_JOB, { badges: output });
   }
 }

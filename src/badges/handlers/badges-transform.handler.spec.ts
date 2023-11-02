@@ -2,8 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { BadgesTransformHandler } from './badges-transform.handler';
 import { BadgesTransformer } from '../badges.transformer';
 import { Queue } from 'bullmq';
-import { BADGE_QUEUE } from 'src/constants/queues.constants';
-import { LOAD_JOB } from 'src/constants/jobs.contants';
+import { BADGE_QUEUE } from '../../constants/queues.constants';
+import { LOAD_JOB } from '../../constants/jobs.contants';
 
 const BullQueue_BADGE_QUEUE = `BullQueue_${BADGE_QUEUE}`;
 describe('BadgesTransformHandler', () => {
@@ -23,7 +23,7 @@ describe('BadgesTransformHandler', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         BadgesTransformHandler,
-        { provide: 'BadgesTransformer', useValue: mockTransformer },
+        { provide: BadgesTransformer, useValue: mockTransformer },
         { provide: BullQueue_BADGE_QUEUE, useValue: mockQueue },
       ],
     }).compile();
@@ -40,10 +40,14 @@ describe('BadgesTransformHandler', () => {
       const mockJob = {
         id: 'test-job-id',
         data: {
-          forum: { id: 1, name: 'test-forum' },
-          badges: [{ id: 1, name: 'test-badge' }],
+          forum: { uuid: '1' },
+          badges: [{ id: 1, name: 'test-badge', grant_count: 1 }],
         },
       };
+
+      const mockOutput = { id: 1, name: 'test-badge', grantCount: 1 };
+
+      (mockTransformer.transform as jest.Mock).mockReturnValue(mockOutput);
 
       await handler.process(mockJob as any);
 
@@ -52,12 +56,7 @@ describe('BadgesTransformHandler', () => {
         mockJob.data.forum,
       );
       expect(mockQueue.add).toHaveBeenCalledWith(LOAD_JOB, {
-        badges: [
-          {
-            ...mockJob.data.badges[0],
-            forum: mockJob.data.forum,
-          },
-        ],
+        badges: [mockOutput],
       });
     });
   });
