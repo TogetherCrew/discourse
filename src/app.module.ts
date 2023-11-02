@@ -8,7 +8,6 @@ import baseConfig from './config/base.config';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: '.env',
       validationSchema: validationSchema,
       isGlobal: true,
       load: [baseConfig],
