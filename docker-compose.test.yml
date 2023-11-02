@@ -40,7 +40,7 @@ services:
     build: 
       context: .
       dockerfile: Dockerfile
-      target: production
+      target: developemnt
     command: yarn run test:cov
     ports:
       - 3000:3000
