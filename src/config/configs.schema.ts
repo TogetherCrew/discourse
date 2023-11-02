@@ -6,4 +6,9 @@ export default Joi.object({
     .default('development'),
 
   PORT: Joi.number().default(3000),
+
+  NEO4J_HOST: Joi.string().required(),
+  NEO4J_PORT: Joi.number().required(),
+  NEO4J_USERNAME: Joi.string().required(),
+  NEO4J_PASSWORD: Joi.string().required(),
 });
