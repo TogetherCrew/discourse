@@ -6,6 +6,8 @@ import validationSchema from './config/configs.schema';
 import baseConfig from './config/base.config';
 import neo4jConfig from './config/neo4j.config';
 import { Neo4jModule } from 'nest-neo4j';
+import { BullModule } from '@nestjs/bullmq';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -16,6 +18,16 @@ import { Neo4jModule } from 'nest-neo4j';
     Neo4jModule.forRootAsync({
       import: [ConfigModule],
       useFactory: (config: ConfigService) => config.get('neo4j'),
+      inject: [ConfigService],
+    }),
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        connection: {
+          host: configService.get<string>('REDIS_HOST'),
+          port: configService.get<number>('REDIS_PORT'),
+        },
+      }),
       inject: [ConfigService],
     }),
   ],
