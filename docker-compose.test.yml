@@ -10,8 +10,6 @@ services:
       timeout: 10s
       retries: 2
       start_period: 10s
-    ports:
-      - 6379:6379
 
   rabbitmq:
     image: rabbitmq:3
@@ -37,8 +35,6 @@ services:
       timeout: 10s
       retries: 5
       start_period: 10s
-    ports:
-      - 7687:7687
 
   app:
     build: 
