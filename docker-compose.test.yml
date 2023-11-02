@@ -40,7 +40,7 @@ services:
     ports:
       - 7687:7687
 
-  discourse:
+  app:
     build: 
       context: .
       dockerfile: Dockerfile
