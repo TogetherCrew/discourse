@@ -11,4 +11,7 @@ export default Joi.object({
   NEO4J_PORT: Joi.number().required(),
   NEO4J_USERNAME: Joi.string().required(),
   NEO4J_PASSWORD: Joi.string().required(),
+
+  REDIS_HOST: Joi.string().required(),
+  REDIS_PORT: Joi.number().required(),
 });
