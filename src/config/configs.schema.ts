@@ -6,4 +6,7 @@ export default Joi.object({
     .default('development'),
 
   PORT: Joi.number().default(3000),
+
+  REDIS_HOST: Joi.string().required(),
+  REDIS_PORT: Joi.number().required(),
 });
