@@ -9,7 +9,6 @@ import {
 } from '../../constants/queues.constants';
 import { TRANSFORM_JOB } from '../../constants/jobs.contants';
 import { AxiosResponse } from 'axios';
-import { BullModule } from '@nestjs/bullmq';
 
 const BullQueue_BADGE_QUEUE = `BullQueue_${BADGE_QUEUE}`;
 const BullQueue_BADGE_TYPE_QUEUE = `BullQueue_${BADGE_TYPE_QUEUE}`;
