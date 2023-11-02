@@ -6,6 +6,7 @@ import validationSchema from './config/configs.schema';
 import baseConfig from './config/base.config';
 import neo4jConfig from './config/neo4j.config';
 import { Neo4jModule } from 'nest-neo4j';
+import { ForumsModule } from './forums/forums.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -18,6 +19,7 @@ import { Neo4jModule } from 'nest-neo4j';
       useFactory: (config: ConfigService) => config.get('neo4j'),
       inject: [ConfigService],
     }),
+    ForumsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
