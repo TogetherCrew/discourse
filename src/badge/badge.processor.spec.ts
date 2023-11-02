@@ -7,7 +7,7 @@ import {
   EXTRACT_JOB,
   LOAD_JOB,
   TRANSFORM_JOB,
-} from 'src/constants/jobs.contants';
+} from '../constants/jobs.contants';
 import { BadgeProcessor } from './badge.processor';
 
 describe('BadgeProcessor', () => {

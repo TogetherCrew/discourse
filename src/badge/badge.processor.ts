@@ -1,11 +1,11 @@
-import { BADGE_QUEUE } from 'src/constants/queues.constants';
+import { BADGE_QUEUE } from '../constants/queues.constants';
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Job } from 'bullmq';
 import {
   EXTRACT_JOB,
   LOAD_JOB,
   TRANSFORM_JOB,
-} from 'src/constants/jobs.contants';
+} from '../constants/jobs.contants';
 import { BadgeExtractHandler } from './handlers/badge-extract.handler';
 import { BadgeLoadHandler } from './handlers/badge-load.handler';
 import { BadgeTransformHandler } from './handlers/badge-transform.handler';
