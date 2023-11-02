@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import validationSchema from './config/configs.schema';
 import baseConfig from './config/base.config';
 import { BullModule } from '@nestjs/bullmq';
+import { BadgeModule } from './badge/badge.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { BullModule } from '@nestjs/bullmq';
       }),
       inject: [ConfigService],
     }),
+    BadgeModule,
   ],
   controllers: [AppController],
   providers: [AppService],
