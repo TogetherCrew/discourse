@@ -30,11 +30,11 @@ export class BottleneckService {
     return this.limiters.delete(key);
   }
 
-  getLimiter(key: string) {
+  getLimiter(key: string): Bottleneck | undefined {
     return this.limiters.get(key);
   }
 
-  createClusterLimiter(key: string, options: any) {
+  createClusterLimiter(key: string, options: any): Bottleneck {
     const limiter: Bottleneck = new Bottleneck({
       ...this.defaultOptions,
       ...options,
