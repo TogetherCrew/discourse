@@ -45,7 +45,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: development
-    command: npm run start:dev forum
+    command: yarn run test:cov
     ports:
       - 3000:3000
     env_file:
