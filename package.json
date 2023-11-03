@@ -28,6 +28,7 @@
     "@nestjs/swagger": "^7.1.14",
     "axios": "^1.6.0",
     "bottleneck": "^2.19.5",
+    "class-validator": "^0.14.0",
     "ioredis": "^5.3.2",
     "joi": "^17.11.0",
     "nest-neo4j": "^0.3.1",
