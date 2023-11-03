@@ -4,12 +4,10 @@ import { BadgesService } from '../badges.service';
 import { BadgeTypesService } from '../../badge-types/badge-types.service';
 import { BadgeGroupingsService } from '../../badge-groupings/badge-groupings.service';
 import { BadgesLoadHandler } from './badges-load.handler';
-import {
-  LoadBadgeDto,
-  LoadBadgeGroupingDto,
-  LoadBadgeTypeDto,
-  LoadBadgesDto,
-} from '../dto/load-badges.dto';
+import { LoadBadgesDto } from '../dto/load-badges.dto';
+import { LoadBadgeDto } from '../dto/load-badge.dto';
+import { LoadBadgeTypeDto } from '../../badge-types/dto/load-badge-type.dto';
+import { LoadBadgeGroupingDto } from '../../badge-groupings/dto/load-badge-grouping.dto';
 
 describe('BadgesLoadHandler', () => {
   let handler: BadgesLoadHandler;

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Neo4jService } from 'nest-neo4j';
-import { LoadBadgeDto } from './dto/load-badges.dto';
+import { LoadBadgeDto } from './dto/load-badge.dto';
 
 @Injectable()
 export class BadgesRepository {

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { LoadBadgeTypeDto } from '../badges/dto/load-badges.dto';
+import { LoadBadgeTypeDto } from './dto/load-badge-type.dto';
 import { BadgeTypesRepository } from './badge-types.repository';
 
 @Injectable()

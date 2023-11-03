@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BadgeGroupingsService } from './badge-groupings.service';
 import { BadgeGroupingsRepository } from './badge-groupings.repository';
-import { LoadBadgeGroupingDto } from '../badges/dto/load-badges.dto';
+import { LoadBadgeGroupingDto } from './dto/load-badge-grouping.dto';
 
 jest.mock('./badge-groupings.repository');
 

@@ -1,44 +1,6 @@
-export class LoadBadgeDto {
-  id: number;
-  name: string;
-  description: string;
-  grantCount: number;
-  allowTitle: boolean;
-  multipleGrant: boolean;
-  icon: string;
-  imageUrl?: string;
-  listable: boolean;
-  enabled: boolean;
-  badgeGroupingId: number;
-  system: boolean;
-  longDescription: string;
-  slug: string;
-  manuallyGrantable: boolean;
-  query?: string;
-  trigger?: number;
-  targetPosts: boolean;
-  autoRevoke: boolean;
-  showPosts: boolean;
-  i18nName?: string;
-  badgeTypeId: number;
-  forumUUID: string;
-}
-
-export class LoadBadgeTypeDto {
-  id: number;
-  name: string;
-  sortOrder: number;
-  forumUUID: string;
-}
-
-export class LoadBadgeGroupingDto {
-  id: number;
-  name: string;
-  description?: string;
-  position: number;
-  system: boolean;
-  forumUUID: string;
-}
+import { LoadBadgeGroupingDto } from '../../badge-groupings/dto/load-badge-grouping.dto';
+import { LoadBadgeTypeDto } from '../../badge-types/dto/load-badge-type.dto';
+import { LoadBadgeDto } from './load-badge.dto';
 
 export class LoadBadgesDto {
   badges: LoadBadgeDto[];

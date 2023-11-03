@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { LoadBadgeGroupingDto } from '../badges/dto/load-badges.dto';
+import { LoadBadgeGroupingDto } from './dto/load-badge-grouping.dto';
 import { BadgeGroupingsRepository } from './badge-groupings.repository';
 
 @Injectable()
