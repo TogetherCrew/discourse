@@ -1,5 +1,4 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ForumsService } from './forums.service';
 import { CreateForumDto } from './dto/create-forum.dto';
 import { ForumsRepository } from './forums.repository';
 import { Neo4jService } from 'nest-neo4j/dist';
