@@ -8,13 +8,14 @@ import neo4jConfig from './config/neo4j.config';
 import { Neo4jModule } from 'nest-neo4j';
 import { BullModule } from '@nestjs/bullmq';
 import { BadgesModule } from './badges/badges.module';
+import redisConfig from './config/redis.config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       validationSchema: validationSchema,
       isGlobal: true,
-      load: [baseConfig, neo4jConfig],
+      load: [baseConfig, neo4jConfig, redisConfig],
     }),
     Neo4jModule.forRootAsync({
       import: [ConfigModule],
