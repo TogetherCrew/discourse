@@ -10,13 +10,14 @@ import { BullModule } from '@nestjs/bullmq';
 import { BadgesModule } from './badges/badges.module';
 import { TransformersService } from './transformers/transformers.service';
 import { BadgeTypesService } from './badge-types/badge-types.service';
+import redisConfig from './config/redis.config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       validationSchema: validationSchema,
       isGlobal: true,
-      load: [baseConfig, neo4jConfig],
+      load: [baseConfig, neo4jConfig, redisConfig],
     }),
     Neo4jModule.forRootAsync({
       import: [ConfigModule],
