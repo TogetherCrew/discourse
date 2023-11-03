@@ -3,7 +3,7 @@ import { BadgeGroupingsService } from './badge-groupings.service';
 import { BadgeGroupingsRepository } from './badge-groupings.repository';
 import { LoadBadgeGroupingDto } from '../badges/dto/load-badges.dto';
 
-jest.mock('./badge-types.repository');
+jest.mock('./badge-groupings.repository');
 
 describe('BadgeTypesService', () => {
   let service: BadgeGroupingsService;

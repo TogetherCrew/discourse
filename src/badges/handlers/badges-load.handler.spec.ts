@@ -1,15 +1,30 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Job } from 'bullmq';
 import { BadgesService } from '../badges.service';
+import { BadgeTypesService } from '../../badge-types/badge-types.service';
+import { BadgeGroupingsService } from '../../badge-groupings/badge-groupings.service';
 import { BadgesLoadHandler } from './badges-load.handler';
-import { LoadBadgeDto, LoadBadgesDto } from '../dto/load-badges.dto';
+import {
+  LoadBadgeDto,
+  LoadBadgeGroupingDto,
+  LoadBadgeTypeDto,
+  LoadBadgesDto,
+} from '../dto/load-badges.dto';
 
 describe('BadgesLoadHandler', () => {
   let handler: BadgesLoadHandler;
   let badgeService: Partial<BadgesService>;
+  let badgeTypesService: Partial<BadgeTypesService>;
+  let badgeGroupingsService: Partial<BadgeGroupingsService>;
 
   beforeEach(async () => {
     badgeService = {
+      insertMany: jest.fn(),
+    };
+    badgeTypesService = {
+      insertMany: jest.fn(),
+    };
+    badgeGroupingsService = {
       insertMany: jest.fn(),
     };
 
@@ -17,6 +32,8 @@ describe('BadgesLoadHandler', () => {
       providers: [
         BadgesLoadHandler,
         { provide: BadgesService, useValue: badgeService },
+        { provide: BadgeTypesService, useValue: badgeTypesService },
+        { provide: BadgeGroupingsService, useValue: badgeGroupingsService },
       ],
     }).compile();
 
@@ -33,15 +50,31 @@ describe('BadgesLoadHandler', () => {
         { name: 'test-badge-1', forumUUID: 'uuid-1' },
         { name: 'test-badge-2', forumUUID: 'uuid-2' },
       ] as LoadBadgeDto[];
+      const mockBadgeTypes = [
+        { name: 'test-badge-1', forumUUID: 'uuid-1' },
+        { name: 'test-badge-2', forumUUID: 'uuid-2' },
+      ] as LoadBadgeTypeDto[];
+      const mockBadgeGroupings = [
+        { name: 'test-badge-1', forumUUID: 'uuid-1' },
+        { name: 'test-badge-2', forumUUID: 'uuid-2' },
+      ] as LoadBadgeGroupingDto[];
 
       const mockJob: Partial<Job<LoadBadgesDto, any, string>> = {
         id: '1',
-        data: { badges: mockBadges },
+        data: {
+          badges: mockBadges,
+          badgeTypes: mockBadgeTypes,
+          badgeGroupings: mockBadgeGroupings,
+        },
       };
 
       await handler.process(mockJob as Job<LoadBadgesDto, any, string>);
 
       expect(badgeService.insertMany).toHaveBeenCalledWith(mockBadges);
+      expect(badgeTypesService.insertMany).toHaveBeenCalledWith(mockBadgeTypes);
+      expect(badgeGroupingsService.insertMany).toHaveBeenCalledWith(
+        mockBadgeGroupings,
+      );
     });
   });
 });
