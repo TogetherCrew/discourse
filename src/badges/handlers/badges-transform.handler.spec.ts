@@ -1,62 +1,87 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BadgesTransformHandler } from './badges-transform.handler';
-import { BadgesTransformer } from '../badges.transformer';
-import { Queue } from 'bullmq';
+import { Job, Queue } from 'bullmq';
 import { BADGE_QUEUE } from '../../constants/queues.constants';
+import { BadgesTransformHandler } from './badges-transform.handler';
+import { TransformersService } from '../../transformers/transformers.service';
+import { TransformBadgesDto } from '../dto/transform-badges.dto';
 import { LOAD_JOB } from '../../constants/jobs.contants';
 
-const BullQueue_BADGE_QUEUE = `BullQueue_${BADGE_QUEUE}`;
+const QUEUE = `BullQueue_${BADGE_QUEUE}`;
 describe('BadgesTransformHandler', () => {
   let handler: BadgesTransformHandler;
-  let mockQueue: Partial<Queue>;
-  let mockTransformer: Partial<BadgesTransformer>;
+  let transformersService: TransformersService;
+  let queue: Queue;
 
   beforeEach(async () => {
-    mockQueue = {
-      add: jest.fn(),
+    const mockTransformersService = {
+      transform: jest.fn().mockImplementation((obj, { forumUUID }) => ({
+        ...obj,
+        forumUUID,
+      })),
     };
-
-    mockTransformer = {
-      transform: jest.fn(),
+    const mockQueue = {
+      add: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         BadgesTransformHandler,
-        { provide: BadgesTransformer, useValue: mockTransformer },
-        { provide: BullQueue_BADGE_QUEUE, useValue: mockQueue },
+        {
+          provide: TransformersService,
+          useValue: mockTransformersService,
+        },
+        {
+          provide: QUEUE,
+          useValue: mockQueue,
+        },
       ],
     }).compile();
 
     handler = module.get<BadgesTransformHandler>(BadgesTransformHandler);
+    transformersService = module.get<TransformersService>(TransformersService);
+    queue = module.get<Queue>(QUEUE);
   });
 
   it('should be defined', () => {
     expect(handler).toBeDefined();
+    expect(transformersService).toBeDefined();
+    expect(queue).toBeDefined();
   });
 
   describe('process', () => {
-    it('should transform badges and add them to the queue', async () => {
-      const mockJob = {
-        id: 'test-job-id',
-        data: {
-          forum: { uuid: '1' },
-          badges: [{ id: 1, name: 'test-badge', grant_count: 1 }],
-        },
+    it('should transform badges, badge_types, and badge_groupings and add them to the queue', async () => {
+      const jobData: TransformBadgesDto = {
+        forum: { uuid: 'forum-uuid' },
+        badges: [{ id: 1 }, { id: 2 }] as Badge[],
+        badge_types: [{ id: 1 }] as BadgeType[],
+        badge_groupings: [{ id: 1 }] as BadgeGrouping[],
+      };
+      const mockJob: Partial<Job<TransformBadgesDto, any, string>> = {
+        id: '1',
+        data: jobData,
       };
 
-      const mockOutput = { id: 1, name: 'test-badge', grantCount: 1 };
+      await handler.process(mockJob as Job<TransformBadgesDto, any, string>);
 
-      (mockTransformer.transform as jest.Mock).mockReturnValue(mockOutput);
-
-      await handler.process(mockJob as any);
-
-      expect(mockTransformer.transform).toHaveBeenCalledWith(
-        mockJob.data.badges[0],
-        mockJob.data.forum,
+      expect(transformersService.transform).toHaveBeenCalledTimes(
+        jobData.badges.length +
+          jobData.badge_types.length +
+          jobData.badge_groupings.length,
       );
-      expect(mockQueue.add).toHaveBeenCalledWith(LOAD_JOB, {
-        badges: [mockOutput],
+      expect(queue.add).toHaveBeenCalledWith(LOAD_JOB, {
+        badges: expect.any(Array),
+        badgeTypes: expect.any(Array),
+        badgeGroupings: expect.any(Array),
+      });
+
+      // Additional checks can be made to ensure that the transformation is correct
+      expect(queue.add).toHaveBeenCalledWith(LOAD_JOB, {
+        badges: [
+          { id: 1, forumUUID: 'forum-uuid' },
+          { id: 2, forumUUID: 'forum-uuid' },
+        ],
+        badgeTypes: [{ id: 1, forumUUID: 'forum-uuid' }],
+        badgeGroupings: [{ id: 1, forumUUID: 'forum-uuid' }],
       });
     });
   });
