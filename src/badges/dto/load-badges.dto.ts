@@ -24,6 +24,22 @@ export class LoadBadgeDto {
   forumUUID: string;
 }
 
+type LoadBadgeTypeDto = {
+  id: number;
+  name: string;
+  sortOrder: number;
+};
+
+type LoadBadgeGroupingDto = {
+  id: number;
+  name: string;
+  description?: string;
+  position: number;
+  system: boolean;
+};
+
 export class LoadBadgesDto {
   badges: LoadBadgeDto[];
+  badgeTypes: LoadBadgeTypeDto[];
+  badgeGroupings: LoadBadgeGroupingDto[];
 }
