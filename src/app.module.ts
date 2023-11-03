@@ -8,6 +8,8 @@ import neo4jConfig from './config/neo4j.config';
 import { Neo4jModule } from 'nest-neo4j';
 import { BullModule } from '@nestjs/bullmq';
 import { BadgesModule } from './badges/badges.module';
+import { TransformersService } from './transformers/transformers.service';
+import { BadgeTypesService } from './badge-types/badge-types.service';
 
 @Module({
   imports: [
@@ -31,6 +33,6 @@ import { BadgesModule } from './badges/badges.module';
     BadgesModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, TransformersService, BadgeTypesService],
 })
 export class AppModule {}
