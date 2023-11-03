@@ -1,11 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { CreateForumDto } from './dto/create-forum.dto';
 import { UpdateForumDto } from './dto/update-forum.dto';
+import { ForumsRepository } from './forums.repository';
 
 @Injectable()
 export class ForumsService {
+  constructor(private readonly forumsRepository: ForumsRepository) {}
+
   create(createForumDto: CreateForumDto) {
-    return 'This action adds a new forum';
+    return this.forumsRepository.insertOne(createForumDto);
   }
 
   findAll() {
