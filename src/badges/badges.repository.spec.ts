@@ -33,9 +33,11 @@ describe('BadgesRepository', () => {
 
       const cypher = [
         'UNWIND $badges AS badge',
-        'MERGE (f:Forum {uuid: badge.forumUUID})',
+        'MERGE (bg:BadgeGrouping { id: badge.badge_grouping_id, forumUUID: badge.forumUUID})',
+        'MERGE (bt:BadgeType { id: badge.badge_type_id, forumUUID: badge.forumUUID})',
         'CREATE (b:Badge) SET b = badge',
-        'MERGE (f)-[:HAS_BADGE]->(b)',
+        'MERGE (bg)-[:HAS_BADGE]->(b)',
+        'MERGE (bt)-[:HAS_BADGE]->(b)',
       ].join(' ');
 
       expect(neo4jService.write).toHaveBeenCalledWith(cypher, {
