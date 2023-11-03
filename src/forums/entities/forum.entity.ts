@@ -1,1 +1,4 @@
-export class Forum {}
+export class Forum {
+  uuid: string;
+  endpoint: string;
+}
