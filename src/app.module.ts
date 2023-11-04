@@ -8,7 +8,7 @@ import neo4jConfig from './config/neo4j.config';
 import { Neo4jModule } from 'nest-neo4j';
 import { ForumsModule } from './forums/forums.module';
 import { BullModule } from '@nestjs/bullmq';
-import { BadgesModule } from './badges/badges.module';
+import { OrchestrationModule } from './orchestration/orchestration.module';
 import redisConfig from './config/redis.config';
 
 @Module({
@@ -31,7 +31,7 @@ import redisConfig from './config/redis.config';
       }),
       inject: [ConfigService],
     }),
-    BadgesModule,
+    OrchestrationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
