@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateForumDto } from './dto/create-forum.dto';
 import { ForumsRepository } from './forums.repository';
-import { OrchestrationService } from 'src/orchestration/orchestration.service';
+import { OrchestrationService } from '../orchestration/orchestration.service';
 import { Forum } from './entities/forum.entity';
 
 @Injectable()
