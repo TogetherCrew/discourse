@@ -52,7 +52,16 @@ export class OrchestrationService {
       property: 'tag_groups',
       cypher: CYPHERS.BULK_CREATE_TAG_GROUP,
     });
-    // const tag = this.etlService.etl(QUEUES.TAG, { forum }, [tagGroup]);
+    const tag = this.etlService.etl(
+      QUEUES.TAG,
+      {
+        forum,
+        operation: 'getTags',
+        property: 'tags',
+        cypher: CYPHERS.BULK_CREATE_TAG,
+      },
+      [tagGroup],
+    );
 
     // const group = this.etlService.etl(QUEUES.GROUP, { forum });
     // const category = this.etlService.etl(QUEUES.CATEGORY, { forum }, [group]);
@@ -63,7 +72,7 @@ export class OrchestrationService {
     const user = this.etlService.etl(
       QUEUES.USER,
       { forum, operation: 'getUsers', property: 'users', cypher: '' },
-      [badge /*, post */],
+      [badge /*, post */, tag], // for testing
     );
 
     return user;
