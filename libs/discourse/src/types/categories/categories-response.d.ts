@@ -1,5 +1,7 @@
 type CategoriesResponse = {
-  can_create_category: boolean;
-  can_create_topic: boolean;
-  categories: Category[];
+  category_list: {
+    can_create_category: boolean;
+    can_create_topic: boolean;
+    categories: Category[];
+  };
 };
