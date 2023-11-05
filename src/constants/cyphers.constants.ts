@@ -30,9 +30,19 @@ const BULK_CREATE_TAG_GROUP = [
   // 'MERGE (f)-[:HAS_BADGE_TYPE]->(b)',
 ].join(' ');
 
+const BULK_CREATE_TAG = [
+  'UNWIND $batch AS tag',
+  // 'MERGE (f:Forum {uuid: tagGroup.forumUuid})',
+  'MERGE (tg:TagGroup {id: tag.tagGroupId, forumUuid: tag.forumUuid})',
+  'CREATE (t:Tag) SET t = tag',
+  // 'MERGE (f)-[:HAS_BADGE_TYPE]->(b)',
+  'MERGE (tg)-[:CONTAINS]->(t)',
+].join(' ');
+
 export const CYPHERS = {
   BULK_CREATE_BADGE_TYPE,
   BULK_CREATE_BADGE_GROUPING,
   BULK_CREATE_BADGE,
   BULK_CREATE_TAG_GROUP,
+  BULK_CREATE_TAG,
 };
