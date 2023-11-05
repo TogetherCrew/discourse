@@ -29,8 +29,8 @@ export class BaseEtlService {
   }
   async load(job: Job<any, any, string>): Promise<any> {
     const { cypher } = job.data as EtlDto;
-    const batch = await this.getChildrenValues(job);
-    await this.neo4jService.write(cypher, { batch });
+    const array = await this.getChildrenValues(job);
+    await this.batchInsert(array, cypher);
   }
 
   private getProperty(obj: any, property: string): any {
@@ -48,5 +48,30 @@ export class BaseEtlService {
   private async getChildrenValues(job: Job): Promise<any[]> {
     const childrenValues = await job.getChildrenValues();
     return Object.values(childrenValues)[0];
+  }
+
+  private async batchInsert(array: any[], cypher: string, batchSize = 100) {
+    console.log('Cypher', cypher);
+    console.log('Items to insert:', array.length);
+    let counter: number = 1;
+    for (let i = 0; i < array.length; i += batchSize) {
+      const batch = array.slice(i, i + batchSize);
+
+      // TODO: This should be moved in TRANSFORM for Topics
+      batch.forEach((obj) => {
+        delete obj.posters;
+        delete obj.tags;
+        delete obj.tagsDescriptions;
+      });
+
+      console.log('Inserting Batch', counter, batch.length);
+      try {
+        await this.neo4jService.write(cypher, { batch });
+      } catch (error) {
+        console.error(error);
+      }
+      console.log('Finished Batch', counter);
+      counter++;
+    }
   }
 }
