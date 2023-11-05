@@ -1,11 +1,11 @@
 import { WorkerHost } from '@nestjs/bullmq';
 import { Job } from 'bullmq';
 import { JOBS } from '../constants/jobs.contants';
-import { BaseEtlService } from './base-etl.service';
+import { BaseEtlSchemaService } from './base-etl.service';
 import { EtlDto } from './dto/etl.dto';
 
 export class BaseEtlProcessor extends WorkerHost {
-  constructor(private readonly service: BaseEtlService) {
+  constructor(private readonly service: BaseEtlSchemaService) {
     super();
   }
 

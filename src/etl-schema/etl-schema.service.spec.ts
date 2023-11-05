@@ -1,17 +1,28 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { FlowJob } from 'bullmq';
-import { EtlService } from './etl.service';
+import { EtlSchemaService } from './etl-schema.service';
 import { JOBS } from '../constants/jobs.contants';
+import { EtlDto } from '../base-etl/dto/etl.dto';
 
-describe('EtlService', () => {
-  let etlService: EtlService;
+describe('EtlSchemaService', () => {
+  let etlService: EtlSchemaService;
+
+  const data: EtlDto = {
+    forum: {
+      uuid: 'test-uuid',
+      endpoint: 'endpoint',
+    },
+    operation: 'getBadges',
+    property: 'badges',
+    cypher: 'TEXT',
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [EtlService],
+      providers: [EtlSchemaService],
     }).compile();
 
-    etlService = module.get<EtlService>(EtlService);
+    etlService = module.get<EtlSchemaService>(EtlSchemaService);
   });
 
   it('should be defined', () => {
@@ -21,9 +32,8 @@ describe('EtlService', () => {
   describe('etl', () => {
     it('should create a load job with transform and extract children', () => {
       const queue = 'testQueue';
-      const data = { key: 'value' };
       const childrenJobs: FlowJob[] = [
-        { name: 'childJob', queueName: 'childQueue', data: {} },
+        { name: 'childJob', queueName: 'childQueue', data },
       ];
 
       const job = etlService.etl(queue, data, childrenJobs);
@@ -52,7 +62,6 @@ describe('EtlService', () => {
 
     it('should create a load job without children when none are provided', () => {
       const queue = 'testQueue';
-      const data = { key: 'value' };
 
       const job = etlService.etl(queue, data);
 

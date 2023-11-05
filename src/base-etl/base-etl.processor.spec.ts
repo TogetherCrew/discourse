@@ -1,5 +1,5 @@
 import { Test } from '@nestjs/testing';
-import { BaseEtlService } from './base-etl.service';
+import { BaseEtlSchemaService } from './base-etl.service';
 import { Job } from 'bullmq';
 import { BaseEtlProcessor } from './base-etl.processor';
 import { JOBS } from '../constants/jobs.contants';
@@ -7,7 +7,7 @@ import { EtlDto } from './dto/etl.dto';
 
 describe('BaseEtlProcessor', () => {
   let processor: BaseEtlProcessor;
-  let service: BaseEtlService;
+  let service: BaseEtlSchemaService;
 
   let mockService: any;
 
@@ -21,14 +21,14 @@ describe('BaseEtlProcessor', () => {
     const moduleRef = await Test.createTestingModule({
       providers: [
         {
-          provide: BaseEtlService,
+          provide: BaseEtlSchemaService,
           useValue: mockService,
         },
         BaseEtlProcessor,
       ],
     }).compile();
 
-    service = moduleRef.get<BaseEtlService>(BaseEtlService);
+    service = moduleRef.get<BaseEtlSchemaService>(BaseEtlSchemaService);
     processor = new (class extends BaseEtlProcessor {})(service);
   });
 

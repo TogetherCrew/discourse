@@ -3,15 +3,16 @@ import { Injectable } from '@nestjs/common';
 import { FlowJob, FlowProducer } from 'bullmq';
 import { FLOWS } from '../constants/flows.constants';
 import { QUEUES } from '../constants/queues.constants';
-import { EtlService } from '../etl/etl.service';
+import { EtlSchemaService } from '../etl-schema/etl-schema.service';
 import { Forum } from '../forums/entities/forum.entity';
+import { CYPHERS } from 'src/constants/cyphers.constants';
 
 @Injectable()
 export class OrchestrationService {
   constructor(
     @InjectFlowProducer(FLOWS.DISCOURSE_ETL)
     private readonly flowProducer: FlowProducer,
-    private readonly etlService: EtlService,
+    private readonly etlService: EtlSchemaService,
   ) {}
 
   async run(forum: Forum) {
@@ -22,23 +23,43 @@ export class OrchestrationService {
   }
 
   private createTree(forum: Forum): FlowJob {
-    const badgeGroup = this.etlService.etl(QUEUES.BADGE_GROUPING, { forum });
-    const badgeType = this.etlService.etl(QUEUES.BADGE_TYPE, { forum });
-    const badge = this.etlService.etl(QUEUES.BADGE, { forum }, [
-      badgeGroup,
-      badgeType,
-    ]);
+    const badgeGroup = this.etlService.etl(QUEUES.BADGE_GROUPING, {
+      forum,
+      operation: 'getBadges',
+      property: 'badge_groupings',
+      cypher: CYPHERS.BULK_CREATE_BADGE_GROUPING,
+    });
+    const badgeType = this.etlService.etl(QUEUES.BADGE_TYPE, {
+      forum,
+      operation: 'getBadges',
+      property: 'badge_types',
+      cypher: CYPHERS.BULK_CREATE_BADGE_TYPE,
+    });
+    const badge = this.etlService.etl(
+      QUEUES.BADGE,
+      {
+        forum,
+        operation: 'getBadges',
+        property: 'badges',
+        cypher: CYPHERS.BULK_CREATE_BADGE,
+      },
+      [badgeGroup, badgeType],
+    );
 
-    const tagGroup = this.etlService.etl(QUEUES.TAG_GROUP, { forum });
-    const tag = this.etlService.etl(QUEUES.TAG, { forum }, [tagGroup]);
+    // const tagGroup = this.etlService.etl(QUEUES.TAG_GROUP, { forum });
+    // const tag = this.etlService.etl(QUEUES.TAG, { forum }, [tagGroup]);
 
-    const group = this.etlService.etl(QUEUES.GROUP, { forum });
-    const category = this.etlService.etl(QUEUES.CATEGORY, { forum }, [group]);
+    // const group = this.etlService.etl(QUEUES.GROUP, { forum });
+    // const category = this.etlService.etl(QUEUES.CATEGORY, { forum }, [group]);
 
-    const topic = this.etlService.etl(QUEUES.TOPIC, { forum }, [tag, category]);
-    const post = this.etlService.etl(QUEUES.POST, { forum }, [topic]);
+    // const topic = this.etlService.etl(QUEUES.TOPIC, { forum }, [tag, category]);
+    // const post = this.etlService.etl(QUEUES.POST, { forum }, [topic]);
 
-    const user = this.etlService.etl(QUEUES.USER, { forum }, [badge, post]);
+    const user = this.etlService.etl(
+      QUEUES.USER,
+      { forum, operation: 'getUsers', property: 'users', cypher: '' },
+      [badge /*, post */],
+    );
 
     return user;
   }

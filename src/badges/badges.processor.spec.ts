@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BadgesProcessor } from './badges.processor';
-import { BaseEtlService } from '../base-etl/base-etl.service';
+import { BaseEtlSchemaService } from '../base-etl/base-etl.service';
 
 jest.mock('../base-etl/base-etl.service');
 
@@ -9,7 +9,7 @@ describe('BadgeGroupingsService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [BadgesProcessor, BaseEtlService],
+      providers: [BadgesProcessor, BaseEtlSchemaService],
     }).compile();
 
     processor = module.get<BadgesProcessor>(BadgesProcessor);

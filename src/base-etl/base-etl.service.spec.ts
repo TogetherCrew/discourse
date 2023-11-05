@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BaseEtlService } from './base-etl.service';
+import { BaseEtlSchemaService } from './base-etl.service';
 import { DiscourseService } from '@app/discourse';
 import { BaseTransformerService } from '../base-transformer/base-transformer.service';
 import { Neo4jService } from 'nest-neo4j/dist';
@@ -7,8 +7,8 @@ import { Job } from 'bullmq';
 import { EtlDto } from './dto/etl.dto';
 import { AxiosResponse } from 'axios';
 
-describe('BaseEtlService', () => {
-  let service: BaseEtlService;
+describe('BaseEtlSchemaService', () => {
+  let service: BaseEtlSchemaService;
   let discourseService: DiscourseService;
   let baseTransformerService: BaseTransformerService;
   let neo4jService: Neo4jService;
@@ -30,7 +30,7 @@ describe('BaseEtlService', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        BaseEtlService,
+        BaseEtlSchemaService,
         DiscourseService,
         {
           provide: DiscourseService,
@@ -47,7 +47,7 @@ describe('BaseEtlService', () => {
       ],
     }).compile();
 
-    service = module.get<BaseEtlService>(BaseEtlService);
+    service = module.get<BaseEtlSchemaService>(BaseEtlSchemaService);
     discourseService = module.get<DiscourseService>(DiscourseService);
     baseTransformerService = module.get<BaseTransformerService>(
       BaseTransformerService,

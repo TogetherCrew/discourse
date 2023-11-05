@@ -1,13 +1,13 @@
 import { Test } from '@nestjs/testing';
 import { FLOWS } from '../constants/flows.constants';
-import { EtlService } from '../etl/etl.service';
+import { EtlSchemaService } from '../etl-schema/etl-schema.service';
 import { OrchestrationService } from './orchestration.service';
 import { Forum } from '../forums/entities/forum.entity';
 import { FlowProducer } from 'bullmq';
 
 describe('OrchestrationService', () => {
   let orchestrationService: OrchestrationService;
-  let etlService: EtlService;
+  let etlService: EtlSchemaService;
   let flowProducer: FlowProducer;
   let forum: Forum;
 
@@ -16,7 +16,7 @@ describe('OrchestrationService', () => {
       providers: [
         OrchestrationService,
         {
-          provide: EtlService,
+          provide: EtlSchemaService,
           useValue: {
             etl: jest.fn(),
           },
@@ -32,7 +32,7 @@ describe('OrchestrationService', () => {
 
     orchestrationService =
       moduleRef.get<OrchestrationService>(OrchestrationService);
-    etlService = moduleRef.get<EtlService>(EtlService);
+    etlService = moduleRef.get<EtlSchemaService>(EtlSchemaService);
     flowProducer = moduleRef.get(`BullFlowProducer_${FLOWS.DISCOURSE_ETL}`);
     forum = new Forum(); // mock or use a real Forum instance as required
   });

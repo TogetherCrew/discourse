@@ -1,16 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { FlowJob } from 'bullmq';
 import { JOBS } from '../constants/jobs.contants';
+import { EtlDto } from 'src/base-etl/dto/etl.dto';
 
 @Injectable()
-export class EtlService {
-  etl(queue: string, data: any, children?: FlowJob[]): FlowJob {
+export class EtlSchemaService {
+  etl(queue: string, data: EtlDto, children?: FlowJob[]): FlowJob {
     return this.load(queue, data, children);
   }
 
   private extract(
     queue: string,
-    data: any,
+    data: EtlDto,
     children: [] | FlowJob[] = [],
   ): FlowJob {
     return {
@@ -21,7 +22,11 @@ export class EtlService {
     };
   }
 
-  private transform(queue: string, data: any, children?: FlowJob[]): FlowJob {
+  private transform(
+    queue: string,
+    data: EtlDto,
+    children?: FlowJob[],
+  ): FlowJob {
     return {
       name: JOBS.TRANSFORM,
       queueName: queue,
@@ -30,7 +35,7 @@ export class EtlService {
     };
   }
 
-  private load(queue: string, data: any, children?: FlowJob[]): FlowJob {
+  private load(queue: string, data: EtlDto, children?: FlowJob[]): FlowJob {
     return {
       name: JOBS.LOAD,
       queueName: queue,
