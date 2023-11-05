@@ -21,12 +21,11 @@ export class BaseEtlSchemaService {
   async transform(job: Job<EtlDto, any, string>): Promise<any> {
     const { forum } = job.data as EtlDto;
     const childrenValues = await this.getChildrenValues(job);
-    const arr = childrenValues.map((i) =>
+    return childrenValues.map((i) =>
       this.baseTransformerService.transform(i, {
         forum_uuid: forum.uuid,
       }),
     );
-    return arr;
   }
   async load(job: Job<any, any, string>): Promise<any> {
     const { cypher } = job.data as EtlDto;
