@@ -36,7 +36,23 @@ const BULK_CREATE_TAG = [
   // 'MERGE (tg:TagGroup {id: tag.tagGroupId, forumUuid: tag.forumUuid})',
   'CREATE (t:Tag) SET t = tag',
   // 'MERGE (f)-[:HAS_BADGE_TYPE]->(b)',
-  'MERGE (tg)-[:CONTAINS]->(t)',
+  // 'MERGE (tg)-[:CONTAINS]->(t)',
+].join(' ');
+
+const BULK_CREATE_GROUP = [
+  'UNWIND $batch AS group',
+  // 'MERGE (f:Forum {uuid: group.forumUuid})',
+  'CREATE (g:Group) SET g = group',
+  // 'MERGE (f)-[:HAS_GROUP]->(g)',
+].join(' ');
+
+const BULK_CREATE_CATEGORY = [
+  'UNWIND $batch AS category',
+  // 'MERGE (f:Forum {uuid: category.forumUuid})',
+  // 'MERGE (g:Group {id: category.groupId, forumUuid: tag.forumUuid})',
+  'CREATE (c:Category) SET c = category',
+  // 'MERGE (f)-[:HAS_BADGE_TYPE]->(b)',
+  // 'MERGE (g)-[:HAS_CATEGORY]->(c)',
 ].join(' ');
 
 export const CYPHERS = {
@@ -45,4 +61,6 @@ export const CYPHERS = {
   BULK_CREATE_BADGE,
   BULK_CREATE_TAG_GROUP,
   BULK_CREATE_TAG,
+  BULK_CREATE_GROUP,
+  BULK_CREATE_CATEGORY,
 };
