@@ -7,7 +7,7 @@ type TopicsResponse = {
     draft_key: string;
     draft_sequence: number;
     per_page: number;
-    more_topics_url: string;
+    more_topics_url?: string;
     topics: Topic[];
   };
 };
