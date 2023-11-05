@@ -6,7 +6,7 @@ import { QUEUES } from 'src/constants/queues.constants';
 
 @Module({
   imports: [
-    BullModule.registerQueue({ name: QUEUES.CATEGORY }),
+    BullModule.registerQueue({ name: QUEUES.GROUP }),
     BaseEtlSchemaModule,
   ],
   providers: [GroupsProcessor],
