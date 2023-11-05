@@ -15,6 +15,7 @@ export class TopicsEtlService extends BaseEtlService {
     page = 0,
     agg: Topic[] = [],
   ): Promise<Topic[]> {
+    console.log(`Topics page: ${page}, agg: ${agg.length}`);
     const { data } = await this.discourseService.getLatestTopics(
       endpoint,
       page,
@@ -23,10 +24,11 @@ export class TopicsEtlService extends BaseEtlService {
     const { topic_list }: TopicsResponse = data;
     const { topics, more_topics_url } = topic_list;
     agg = agg.concat(topics);
-    if (more_topics_url) {
-      return await this.iterate(endpoint, page + 1, agg);
-    } else {
+    if (more_topics_url === undefined) {
+      console.log(`Extracted ${agg.length} topics.`);
       return agg;
+    } else {
+      return await this.iterate(endpoint, page + 1, agg);
     }
   }
 }
