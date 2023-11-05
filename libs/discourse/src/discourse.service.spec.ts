@@ -120,7 +120,7 @@ describe('DiscourseService', () => {
     });
   });
 
-  describe('getTag', () => {
+  describe('getTags', () => {
     let mockLimiter: Bottleneck;
 
     beforeEach(() => {
