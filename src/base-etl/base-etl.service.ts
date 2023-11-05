@@ -8,7 +8,7 @@ import { Neo4jService } from 'nest-neo4j/dist';
 @Injectable()
 export class BaseEtlService {
   constructor(
-    private readonly discourseService: DiscourseService,
+    protected readonly discourseService: DiscourseService,
     private readonly baseTransformerService: BaseTransformerService,
     private readonly neo4jService: Neo4jService,
   ) {}
