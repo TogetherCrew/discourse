@@ -21,7 +21,7 @@ export class GroupsEtlService extends BaseEtlService {
     if (agg.length == total_rows_groups) {
       return agg;
     } else {
-      this.iterate(endpoint, page + 1, agg);
+      return await this.iterate(endpoint, page + 1, agg);
     }
   }
 }
