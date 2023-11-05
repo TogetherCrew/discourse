@@ -26,8 +26,13 @@ export class DiscourseService {
 
   async getTagGroups(
     endpoint: string,
-  ): Promise<AxiosResponse<CategoriesResponse>> {
+  ): Promise<AxiosResponse<TagGroupsResponse>> {
     const path = '/tag_groups.json';
+    return this.get(endpoint, path);
+  }
+
+  async getTags(endpoint: string): Promise<AxiosResponse<TagsResponse>> {
+    const path = '/tags.json';
     return this.get(endpoint, path);
   }
 
