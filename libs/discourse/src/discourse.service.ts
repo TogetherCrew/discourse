@@ -57,7 +57,7 @@ export class DiscourseService {
       | 'likes'
       | 'op_likes'
       | 'posters' = 'default',
-  ): Promise<AxiosResponse<GroupsResponse>> {
+  ): Promise<AxiosResponse<TopicsResponse>> {
     const path = `/latest.json?order=${order}&page=${page}`;
     return this.get(endpoint, path);
   }
