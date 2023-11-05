@@ -46,7 +46,12 @@ export class OrchestrationService {
       [badgeGroup, badgeType],
     );
 
-    // const tagGroup = this.etlService.etl(QUEUES.TAG_GROUP, { forum });
+    const tagGroup = this.etlService.etl(QUEUES.TAG_GROUP, {
+      forum,
+      operation: 'getTagGroups',
+      property: 'tag_groups',
+      cypher: CYPHERS.BULK_CREATE_TAG_GROUP,
+    });
     // const tag = this.etlService.etl(QUEUES.TAG, { forum }, [tagGroup]);
 
     // const group = this.etlService.etl(QUEUES.GROUP, { forum });

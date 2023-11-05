@@ -23,8 +23,16 @@ const BULK_CREATE_BADGE = [
   'MERGE (b)-[:HAS_TYPE]->(bt)',
 ].join(' ');
 
+const BULK_CREATE_TAG_GROUP = [
+  'UNWIND $batch AS tagGroup',
+  // 'MERGE (f:Forum {uuid: tagGroup.forumUuid})',
+  'CREATE (t:TagGroup) SET t = tagGroup',
+  // 'MERGE (f)-[:HAS_BADGE_TYPE]->(b)',
+].join(' ');
+
 export const CYPHERS = {
   BULK_CREATE_BADGE_TYPE,
   BULK_CREATE_BADGE_GROUPING,
   BULK_CREATE_BADGE,
+  BULK_CREATE_TAG_GROUP,
 };
