@@ -1,11 +1,11 @@
 import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
-import { FLOWS } from 'src/constants/flows.constants';
+import { FLOWS } from '../constants/flows.constants';
 import { OrchestrationService } from './orchestration.service';
-import { EtlSchemaModule } from 'src/etl-schema/etl-schema.module';
-import { BadgeTypesModule } from 'src/badge-types/badge-types.module';
-import { BadgeGroupingsModule } from 'src/badge-groupings/badge-groupings.module';
-import { BadgesModule } from 'src/badges/badges.module';
+import { EtlSchemaModule } from '../etl-schema/etl-schema.module';
+import { BadgeTypesModule } from '../badge-types/badge-types.module';
+import { BadgeGroupingsModule } from '../badge-groupings/badge-groupings.module';
+import { BadgesModule } from '../badges/badges.module';
 
 @Module({
   imports: [

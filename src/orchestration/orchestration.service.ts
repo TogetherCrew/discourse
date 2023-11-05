@@ -5,7 +5,7 @@ import { FLOWS } from '../constants/flows.constants';
 import { QUEUES } from '../constants/queues.constants';
 import { EtlSchemaService } from '../etl-schema/etl-schema.service';
 import { Forum } from '../forums/entities/forum.entity';
-import { CYPHERS } from 'src/constants/cyphers.constants';
+import { CYPHERS } from '../constants/cyphers.constants';
 
 @Injectable()
 export class OrchestrationService {
