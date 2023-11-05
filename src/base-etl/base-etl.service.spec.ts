@@ -74,7 +74,6 @@ describe('BaseEtlService', () => {
       } as AxiosResponse<BadgesResponse>);
 
       const result = await service.extract(job as Job<EtlDto, any, string>);
-      console.log(result);
 
       expect(discourseService.getBadges).toHaveBeenCalledWith('endpoint');
       expect(result).toEqual(mockBadges);
@@ -96,8 +95,6 @@ describe('BaseEtlService', () => {
         data: inputData,
         getChildrenValues: jest.fn().mockResolvedValue({ key: childrenValues }),
       } as Partial<Job>;
-
-      console.log(await job.getChildrenValues());
 
       const transformedValue = { id: 1, badgeGroupingId: 3, forumUuid };
       mockBaseTransformerService.transform.mockReturnValue(transformedValue);
