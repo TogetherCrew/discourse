@@ -36,8 +36,11 @@ export class DiscourseService {
     return this.get(endpoint, path);
   }
 
-  async getGroups(endpoint: string): Promise<AxiosResponse<GroupsResponse>> {
-    const path = '/groups.json';
+  async getGroups(
+    endpoint: string,
+    page = 0,
+  ): Promise<AxiosResponse<GroupsResponse | GroupsResponse[]>> {
+    const path = `/groups.json?page=${page}`;
     return this.get(endpoint, path);
   }
 

@@ -78,9 +78,11 @@ describe('DiscourseService', () => {
       const endpoint = 'test.endpoint';
       const mockResponse: Partial<AxiosResponse<CategoriesResponse>> = {
         data: {
-          categories: [],
-          can_create_category: false,
-          can_create_topic: false,
+          category_list: {
+            categories: [],
+            can_create_category: false,
+            can_create_topic: false,
+          },
         },
       };
       mockHttpService.get.mockReturnValueOnce(of(mockResponse));
@@ -174,7 +176,7 @@ describe('DiscourseService', () => {
       const result = await service.getGroups(endpoint);
 
       expect(mockHttpService.get).toHaveBeenCalledWith(
-        'https://test.endpoint/groups.json',
+        'https://test.endpoint/groups.json?page=0',
       );
       expect(result).toEqual(mockResponse);
     });
