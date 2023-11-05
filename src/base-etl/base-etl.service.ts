@@ -6,7 +6,7 @@ import { BaseTransformerService } from '../base-transformer/base-transformer.ser
 import { Neo4jService } from 'nest-neo4j/dist';
 
 @Injectable()
-export class BaseEtlSchemaService {
+export class BaseEtlService {
   constructor(
     private readonly discourseService: DiscourseService,
     private readonly baseTransformerService: BaseTransformerService,
