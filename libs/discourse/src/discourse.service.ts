@@ -44,11 +44,21 @@ export class DiscourseService {
     return this.get(endpoint, path);
   }
 
-  async getTopics(
+  async getLatestTopics(
     endpoint: string,
     page = 0,
+    order:
+      | 'default'
+      | 'created'
+      | 'activity'
+      | 'views'
+      | 'posts'
+      | 'category'
+      | 'likes'
+      | 'op_likes'
+      | 'posters' = 'default',
   ): Promise<AxiosResponse<GroupsResponse>> {
-    const path = `/latest.json?order=created&page=${page}`;
+    const path = `/latest.json?order=${order}&page=${page}`;
     return this.get(endpoint, path);
   }
 

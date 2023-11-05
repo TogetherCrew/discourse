@@ -182,7 +182,7 @@ describe('DiscourseService', () => {
     });
   });
 
-  describe('getTopics', () => {
+  describe('getLatestTopics', () => {
     let mockLimiter: Bottleneck;
 
     beforeEach(() => {
@@ -209,7 +209,7 @@ describe('DiscourseService', () => {
       };
       mockHttpService.get.mockReturnValueOnce(of(mockResponse));
 
-      const result = await service.getTopics(endpoint);
+      const result = await service.getLatestTopics(endpoint, 0, 'created');
 
       expect(mockHttpService.get).toHaveBeenCalledWith(
         'https://test.endpoint/latest.json?order=created&page=0',
