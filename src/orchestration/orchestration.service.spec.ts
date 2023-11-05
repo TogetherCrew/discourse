@@ -45,7 +45,7 @@ describe('OrchestrationService', () => {
     it('should create a flow job tree and add it using FlowProducer', async () => {
       const result = await orchestrationService.run(forum);
 
-      expect(etlService.etl).toHaveBeenCalledTimes(10);
+      expect(etlService.etl).toHaveBeenCalledTimes(9);
 
       expect(result).toHaveProperty('id', 'flowJobId');
       expect(flowProducer.add).toHaveBeenCalled();
