@@ -39,7 +39,7 @@ export class DiscourseService {
   async getGroups(
     endpoint: string,
     page = 0,
-  ): Promise<AxiosResponse<GroupsResponse | GroupsResponse[]>> {
+  ): Promise<AxiosResponse<GroupsResponse>> {
     const path = `/groups.json?page=${page}`;
     return this.get(endpoint, path);
   }
