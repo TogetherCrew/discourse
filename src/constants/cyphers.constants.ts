@@ -33,7 +33,7 @@ const BULK_CREATE_TAG_GROUP = [
 const BULK_CREATE_TAG = [
   'UNWIND $batch AS tag',
   // 'MERGE (f:Forum {uuid: tagGroup.forumUuid})',
-  'MERGE (tg:TagGroup {id: tag.tagGroupId, forumUuid: tag.forumUuid})',
+  // 'MERGE (tg:TagGroup {id: tag.tagGroupId, forumUuid: tag.forumUuid})',
   'CREATE (t:Tag) SET t = tag',
   // 'MERGE (f)-[:HAS_BADGE_TYPE]->(b)',
   'MERGE (tg)-[:CONTAINS]->(t)',

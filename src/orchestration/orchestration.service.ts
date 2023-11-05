@@ -46,12 +46,12 @@ export class OrchestrationService {
       [badgeGroup, badgeType],
     );
 
-    const tagGroup = this.etlService.etl(QUEUES.TAG_GROUP, {
-      forum,
-      operation: 'getTagGroups',
-      property: 'tag_groups',
-      cypher: CYPHERS.BULK_CREATE_TAG_GROUP,
-    });
+    // const tagGroup = this.etlService.etl(QUEUES.TAG_GROUP, {
+    //   forum,
+    //   operation: 'getTagGroups',
+    //   property: 'tag_groups',
+    //   cypher: CYPHERS.BULK_CREATE_TAG_GROUP,
+    // });
     const tag = this.etlService.etl(
       QUEUES.TAG,
       {
@@ -60,7 +60,7 @@ export class OrchestrationService {
         property: 'tags',
         cypher: CYPHERS.BULK_CREATE_TAG,
       },
-      [tagGroup],
+      // [tagGroup],
     );
 
     // const group = this.etlService.etl(QUEUES.GROUP, { forum });
@@ -72,7 +72,7 @@ export class OrchestrationService {
     const user = this.etlService.etl(
       QUEUES.USER,
       { forum, operation: 'getUsers', property: 'users', cypher: '' },
-      [badge /*, post */, tag], // for testing
+      [badge /* , post */, tag], // for testing
     );
 
     return user;
