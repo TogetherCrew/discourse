@@ -14,13 +14,15 @@ describe('DiscourseService', () => {
     permissions$: EMPTY,
   };
 
-  const mockBottleneckService = {
-    getLimiter: jest.fn(),
-    createClusterLimiter: jest.fn(),
-    setLimiter: jest.fn(),
-  };
+  let mockBottleneckService: any;
 
   beforeEach(async () => {
+    mockBottleneckService = {
+      getLimiter: jest.fn(),
+      createClusterLimiter: jest.fn(),
+      setLimiter: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         DiscourseService,
@@ -231,8 +233,8 @@ describe('DiscourseService', () => {
     });
 
     it('should create a new limiter if it does not exist', () => {
-      const mockLimiter = {};
       const id = 'test.id';
+      const mockLimiter = { id };
       mockBottleneckService.getLimiter.mockReturnValueOnce(null);
       mockBottleneckService.createClusterLimiter.mockReturnValueOnce(
         mockLimiter,
@@ -242,7 +244,7 @@ describe('DiscourseService', () => {
 
       expect(mockBottleneckService.createClusterLimiter).toHaveBeenCalledWith(
         id,
-        null,
+        undefined,
       );
       expect(mockBottleneckService.setLimiter).toHaveBeenCalledWith(
         id,
