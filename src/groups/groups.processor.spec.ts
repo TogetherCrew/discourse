@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GroupsProcessor } from './groups.processor';
-import { BaseEtlSchemaService } from '../base-etl/base-etl.service';
+import { GroupsEtlService } from './groups-etl.service';
 
 jest.mock('../base-etl/base-etl.service');
 
@@ -9,7 +9,7 @@ describe('GroupsProcessor', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [GroupsProcessor, BaseEtlSchemaService],
+      providers: [GroupsProcessor, GroupsEtlService],
     }).compile();
 
     processor = module.get<GroupsProcessor>(GroupsProcessor);

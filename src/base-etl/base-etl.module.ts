@@ -9,4 +9,4 @@ import { Neo4jModule } from 'nest-neo4j/dist';
   providers: [BaseEtlService],
   exports: [BaseEtlService],
 })
-export class BaseEtlSchemaModule {}
+export class BaseEtlModule {}

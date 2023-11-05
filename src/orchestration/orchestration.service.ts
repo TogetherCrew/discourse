@@ -65,8 +65,6 @@ export class OrchestrationService {
 
     const group = this.etlService.etl(QUEUES.GROUP, {
       forum,
-      operation: 'getGroups',
-      property: 'groups',
       cypher: CYPHERS.BULK_CREATE_GROUP,
     });
     const category = this.etlService.etl(
