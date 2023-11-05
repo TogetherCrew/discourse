@@ -182,6 +182,42 @@ describe('DiscourseService', () => {
     });
   });
 
+  describe('getTopics', () => {
+    let mockLimiter: Bottleneck;
+
+    beforeEach(() => {
+      mockLimiter = new Bottleneck();
+      mockBottleneckService.getLimiter.mockReturnValueOnce(mockLimiter);
+    });
+
+    it('should call the correct URL', async () => {
+      const endpoint = 'test.endpoint';
+      const mockResponse: Partial<AxiosResponse<TopicsResponse>> = {
+        data: {
+          users: [],
+          primary_groups: [],
+          topic_list: {
+            can_create_topic: false,
+            draft: '',
+            draft_key: '',
+            draft_sequence: 0,
+            per_page: 0,
+            more_topics_url: '',
+            topics: [],
+          },
+        },
+      };
+      mockHttpService.get.mockReturnValueOnce(of(mockResponse));
+
+      const result = await service.getTopics(endpoint);
+
+      expect(mockHttpService.get).toHaveBeenCalledWith(
+        'https://test.endpoint/latest.json?order=created&page=0',
+      );
+      expect(result).toEqual(mockResponse);
+    });
+  });
+
   describe('getLimiter', () => {
     it('should return existing limiter if it exists', () => {
       const mockLimiter = {};

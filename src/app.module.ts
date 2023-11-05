@@ -9,6 +9,7 @@ import { Neo4jModule } from 'nest-neo4j';
 import { ForumsModule } from './forums/forums.module';
 import { BullModule } from '@nestjs/bullmq';
 import { OrchestrationModule } from './orchestration/orchestration.module';
+import { TopicsModule } from './topics/topics.module';
 import redisConfig from './config/redis.config';
 
 @Module({
@@ -32,6 +33,7 @@ import redisConfig from './config/redis.config';
       inject: [ConfigService],
     }),
     OrchestrationModule,
+    TopicsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
