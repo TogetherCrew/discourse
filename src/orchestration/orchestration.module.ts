@@ -8,6 +8,8 @@ import { BadgeGroupingsModule } from '../badge-groupings/badge-groupings.module'
 import { BadgesModule } from '../badges/badges.module';
 import { TagGroupsModule } from '../tag-groups/tag-groups.module';
 import { TagsModule } from '../tags/tags.module';
+import { GroupsModule } from 'src/groups/groups.module';
+import { CategoriesModule } from 'src/categories/categories.module';
 
 @Module({
   imports: [
@@ -20,6 +22,8 @@ import { TagsModule } from '../tags/tags.module';
     BadgesModule,
     TagGroupsModule,
     TagsModule,
+    GroupsModule,
+    CategoriesModule,
   ],
   providers: [OrchestrationService],
   exports: [OrchestrationService],

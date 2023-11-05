@@ -63,16 +63,48 @@ export class OrchestrationService {
       // [tagGroup],
     );
 
-    // const group = this.etlService.etl(QUEUES.GROUP, { forum });
-    // const category = this.etlService.etl(QUEUES.CATEGORY, { forum }, [group]);
+    const group = this.etlService.etl(QUEUES.GROUP, {
+      forum,
+      operation: 'getGroups',
+      property: 'groups',
+      cypher: CYPHERS.BULK_CREATE_GROUP,
+    });
+    const category = this.etlService.etl(
+      QUEUES.CATEGORY,
+      {
+        forum,
+        operation: 'getCategories',
+        property: 'category_list.categories',
+        cypher: CYPHERS.BULK_CREATE_CATEGORY,
+      },
+      [group],
+    );
 
-    // const topic = this.etlService.etl(QUEUES.TOPIC, { forum }, [tag, category]);
-    // const post = this.etlService.etl(QUEUES.POST, { forum }, [topic]);
+    const topic = this.etlService.etl(
+      QUEUES.TOPIC,
+      {
+        forum,
+        operation: '',
+        property: '',
+        cypher: '',
+      },
+      [tag, group, category],
+    );
+    const post = this.etlService.etl(
+      QUEUES.POST,
+      {
+        forum,
+        operation: '',
+        property: '',
+        cypher: '',
+      },
+      [topic],
+    );
 
     const user = this.etlService.etl(
       QUEUES.USER,
       { forum, operation: 'getUsers', property: 'users', cypher: '' },
-      [badge /* , post */, tag], // for testing
+      [badge, post], // for testing
     );
 
     return user;
