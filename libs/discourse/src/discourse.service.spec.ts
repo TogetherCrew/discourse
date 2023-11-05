@@ -149,6 +149,37 @@ describe('DiscourseService', () => {
     });
   });
 
+  describe('getGroups', () => {
+    let mockLimiter: Bottleneck;
+
+    beforeEach(() => {
+      mockLimiter = new Bottleneck();
+      mockBottleneckService.getLimiter.mockReturnValueOnce(mockLimiter);
+    });
+
+    it('should call the correct URL', async () => {
+      const endpoint = 'test.endpoint';
+      const mockResponse: Partial<AxiosResponse<GroupsResponse>> = {
+        data: {
+          groups: [],
+          extras: {
+            type_filters: [],
+          },
+          total_rows_groups: 0,
+          load_more_groups: '',
+        },
+      };
+      mockHttpService.get.mockReturnValueOnce(of(mockResponse));
+
+      const result = await service.getGroups(endpoint);
+
+      expect(mockHttpService.get).toHaveBeenCalledWith(
+        'https://test.endpoint/groups.json',
+      );
+      expect(result).toEqual(mockResponse);
+    });
+  });
+
   describe('getLimiter', () => {
     it('should return existing limiter if it exists', () => {
       const mockLimiter = {};

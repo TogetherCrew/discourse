@@ -36,6 +36,11 @@ export class DiscourseService {
     return this.get(endpoint, path);
   }
 
+  async getGroups(endpoint: string): Promise<AxiosResponse<GroupsResponse>> {
+    const path = '/groups.json';
+    return this.get(endpoint, path);
+  }
+
   private async get(endpoint: string, path: string, scheme = 'https') {
     try {
       const limiter: Bottleneck = this.getLimiter(endpoint);
