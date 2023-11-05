@@ -49,10 +49,8 @@ const BULK_CREATE_GROUP = [
 const BULK_CREATE_CATEGORY = [
   'UNWIND $batch AS category',
   // 'MERGE (f:Forum {uuid: category.forumUuid})',
-  // 'MERGE (g:Group {id: category.groupId, forumUuid: tag.forumUuid})',
   'CREATE (c:Category) SET c = category',
   // 'MERGE (f)-[:HAS_BADGE_TYPE]->(b)',
-  // 'MERGE (g)-[:HAS_CATEGORY]->(c)',
 ].join(' ');
 
 export const CYPHERS = {
