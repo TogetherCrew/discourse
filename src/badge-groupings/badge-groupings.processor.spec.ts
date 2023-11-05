@@ -1,18 +1,21 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BadgeGroupingsProcessor } from './badge-groupings.processor';
+import { BaseEtlService } from '../base-etl/base-etl.service';
 
-describe('BadgeTypesService', () => {
-  let service: BadgeGroupingsProcessor;
+jest.mock('../base-etl/base-etl.service');
+
+describe('BadgeGroupingsService', () => {
+  let processor: BadgeGroupingsProcessor;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [BadgeGroupingsProcessor],
+      providers: [BadgeGroupingsProcessor, BaseEtlService],
     }).compile();
 
-    service = module.get<BadgeGroupingsProcessor>(BadgeGroupingsProcessor);
+    processor = module.get<BadgeGroupingsProcessor>(BadgeGroupingsProcessor);
   });
 
   it('should be defined', () => {
-    expect(service).toBeDefined();
+    expect(processor).toBeDefined();
   });
 });
