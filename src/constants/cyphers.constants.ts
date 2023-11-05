@@ -53,6 +53,15 @@ const BULK_CREATE_CATEGORY = [
   // 'MERGE (f)-[:HAS_BADGE_TYPE]->(b)',
 ].join(' ');
 
+const BULK_CREATE_TOPIC = [
+  'UNWIND $batch AS topic',
+  // 'MERGE (f:Forum {uuid: topic.forumUuid })',
+  'MERGE (c:Category { id: topic.categoryId, forumUuid: topic.forumUuid })',
+  'CREATE (t:Topic) SET t = topic',
+  // 'MERGE (f)-[:HAS_TOPIC]->(g)',
+  'MERGE (c)-[:HAS_TOPIC]->(t)',
+].join(' ');
+
 export const CYPHERS = {
   BULK_CREATE_BADGE_TYPE,
   BULK_CREATE_BADGE_GROUPING,
@@ -61,4 +70,5 @@ export const CYPHERS = {
   BULK_CREATE_TAG,
   BULK_CREATE_GROUP,
   BULK_CREATE_CATEGORY,
+  BULK_CREATE_TOPIC,
 };
