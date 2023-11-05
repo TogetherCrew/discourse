@@ -24,6 +24,13 @@ export class DiscourseService {
     return this.get(endpoint, path);
   }
 
+  async getTagGroups(
+    endpoint: string,
+  ): Promise<AxiosResponse<CategoriesResponse>> {
+    const path = '/tag_groups.json';
+    return this.get(endpoint, path);
+  }
+
   private async get(endpoint: string, path: string, scheme = 'https') {
     try {
       const limiter: Bottleneck = this.getLimiter(endpoint);
