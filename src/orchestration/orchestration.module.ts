@@ -6,6 +6,8 @@ import { EtlSchemaModule } from '../etl-schema/etl-schema.module';
 import { BadgeTypesModule } from '../badge-types/badge-types.module';
 import { BadgeGroupingsModule } from '../badge-groupings/badge-groupings.module';
 import { BadgesModule } from '../badges/badges.module';
+import { TagGroupsModule } from '../tag-groups/tag-groups.module';
+import { TagsModule } from '../tags/tags.module';
 
 @Module({
   imports: [
@@ -16,6 +18,8 @@ import { BadgesModule } from '../badges/badges.module';
     BadgeTypesModule,
     BadgeGroupingsModule,
     BadgesModule,
+    TagGroupsModule,
+    TagsModule,
   ],
   providers: [OrchestrationService],
   exports: [OrchestrationService],
