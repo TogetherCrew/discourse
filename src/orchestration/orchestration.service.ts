@@ -82,9 +82,7 @@ export class OrchestrationService {
       QUEUES.TOPIC,
       {
         forum,
-        operation: '',
-        property: '',
-        cypher: '',
+        cypher: CYPHERS.BULK_CREATE_TOPIC,
       },
       [tag, group, category],
     );
