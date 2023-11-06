@@ -220,6 +220,35 @@ describe('DiscourseService', () => {
     });
   });
 
+  describe('getPosts', () => {
+    let mockLimiter: Bottleneck;
+
+    beforeEach(() => {
+      mockLimiter = new Bottleneck();
+      mockBottleneckService.getLimiter.mockReturnValueOnce(mockLimiter);
+    });
+
+    it('should call the correct URL', async () => {
+      const endpoint = 'test.endpoint';
+      const mockResponse: Partial<AxiosResponse<PostsResponse>> = {
+        data: {
+          post_stream: {
+            posts: [],
+          },
+          id: 0,
+        },
+      };
+      mockHttpService.get.mockReturnValueOnce(of(mockResponse));
+
+      const result = await service.getPosts(endpoint, 0);
+
+      expect(mockHttpService.get).toHaveBeenCalledWith(
+        'https://test.endpoint/t/0/posts.json',
+      );
+      expect(result).toEqual(mockResponse);
+    });
+  });
+
   describe('getLimiter', () => {
     it('should return existing limiter if it exists', () => {
       const mockLimiter = {};

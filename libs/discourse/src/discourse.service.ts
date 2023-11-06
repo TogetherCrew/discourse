@@ -62,6 +62,14 @@ export class DiscourseService {
     return this.get(endpoint, path);
   }
 
+  async getPosts(
+    endpoint: string,
+    topicId: number,
+  ): Promise<AxiosResponse<PostsResponse>> {
+    const path = `/t/${topicId}/posts.json`;
+    return this.get(endpoint, path);
+  }
+
   private async get(endpoint: string, path: string, scheme = 'https') {
     const limiter: Bottleneck = this.getLimiter(endpoint);
     const url = `${scheme}://${endpoint}${path}`;
