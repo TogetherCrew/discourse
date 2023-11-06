@@ -15,6 +15,11 @@ export class BottleneckService {
         host: this.configService.get<string>('REDIS_HOST'),
         port: this.configService.get<number>('REDIS_PORT'),
       },
+      minTime: (10 * 1000) / 40,
+      reservoir: 40,
+      reservoirRefreshAmount: 40,
+      reservoirRefreshInterval: 10 * 1000,
+      maxConcurrent: 5,
     };
   }
 

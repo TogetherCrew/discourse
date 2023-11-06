@@ -14,13 +14,15 @@ describe('DiscourseService', () => {
     permissions$: EMPTY,
   };
 
-  const mockBottleneckService = {
-    getLimiter: jest.fn(),
-    createClusterLimiter: jest.fn(),
-    setLimiter: jest.fn(),
-  };
+  let mockBottleneckService: any;
 
   beforeEach(async () => {
+    mockBottleneckService = {
+      getLimiter: jest.fn(),
+      createClusterLimiter: jest.fn(),
+      setLimiter: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         DiscourseService,
@@ -78,9 +80,11 @@ describe('DiscourseService', () => {
       const endpoint = 'test.endpoint';
       const mockResponse: Partial<AxiosResponse<CategoriesResponse>> = {
         data: {
-          categories: [],
-          can_create_category: false,
-          can_create_topic: false,
+          category_list: {
+            categories: [],
+            can_create_category: false,
+            can_create_topic: false,
+          },
         },
       };
       mockHttpService.get.mockReturnValueOnce(of(mockResponse));
@@ -89,6 +93,128 @@ describe('DiscourseService', () => {
 
       expect(mockHttpService.get).toHaveBeenCalledWith(
         'https://test.endpoint/categories.json',
+      );
+      expect(result).toEqual(mockResponse);
+    });
+  });
+
+  describe('getTagGroups', () => {
+    let mockLimiter: Bottleneck;
+
+    beforeEach(() => {
+      mockLimiter = new Bottleneck();
+      mockBottleneckService.getLimiter.mockReturnValueOnce(mockLimiter);
+    });
+
+    it('should call the correct URL', async () => {
+      const endpoint = 'test.endpoint';
+      const mockResponse: Partial<AxiosResponse<TagGroupsResponse>> = {
+        data: {
+          tag_groups: [],
+        },
+      };
+      mockHttpService.get.mockReturnValueOnce(of(mockResponse));
+
+      const result = await service.getTagGroups(endpoint);
+
+      expect(mockHttpService.get).toHaveBeenCalledWith(
+        'https://test.endpoint/tag_groups.json',
+      );
+      expect(result).toEqual(mockResponse);
+    });
+  });
+
+  describe('getTags', () => {
+    let mockLimiter: Bottleneck;
+
+    beforeEach(() => {
+      mockLimiter = new Bottleneck();
+      mockBottleneckService.getLimiter.mockReturnValueOnce(mockLimiter);
+    });
+
+    it('should call the correct URL', async () => {
+      const endpoint = 'test.endpoint';
+      const mockResponse: Partial<AxiosResponse<TagsResponse>> = {
+        data: {
+          tags: [],
+          extras: {
+            categories: [],
+          },
+        },
+      };
+      mockHttpService.get.mockReturnValueOnce(of(mockResponse));
+
+      const result = await service.getTags(endpoint);
+
+      expect(mockHttpService.get).toHaveBeenCalledWith(
+        'https://test.endpoint/tags.json',
+      );
+      expect(result).toEqual(mockResponse);
+    });
+  });
+
+  describe('getGroups', () => {
+    let mockLimiter: Bottleneck;
+
+    beforeEach(() => {
+      mockLimiter = new Bottleneck();
+      mockBottleneckService.getLimiter.mockReturnValueOnce(mockLimiter);
+    });
+
+    it('should call the correct URL', async () => {
+      const endpoint = 'test.endpoint';
+      const mockResponse: Partial<AxiosResponse<GroupsResponse>> = {
+        data: {
+          groups: [],
+          extras: {
+            type_filters: [],
+          },
+          total_rows_groups: 0,
+          load_more_groups: '',
+        },
+      };
+      mockHttpService.get.mockReturnValueOnce(of(mockResponse));
+
+      const result = await service.getGroups(endpoint);
+
+      expect(mockHttpService.get).toHaveBeenCalledWith(
+        'https://test.endpoint/groups.json?page=0',
+      );
+      expect(result).toEqual(mockResponse);
+    });
+  });
+
+  describe('getLatestTopics', () => {
+    let mockLimiter: Bottleneck;
+
+    beforeEach(() => {
+      mockLimiter = new Bottleneck();
+      mockBottleneckService.getLimiter.mockReturnValueOnce(mockLimiter);
+    });
+
+    it('should call the correct URL', async () => {
+      const endpoint = 'test.endpoint';
+      const mockResponse: Partial<AxiosResponse<TopicsResponse>> = {
+        data: {
+          users: [],
+          primary_groups: [],
+          topic_list: {
+            can_create_topic: false,
+            draft: '',
+            draft_key: '',
+            draft_sequence: 0,
+            per_page: 0,
+            more_topics_url: '',
+            topics: [],
+          },
+        },
+      };
+      mockHttpService.get.mockReturnValueOnce(of(mockResponse));
+
+      const result = await service.getLatestTopics(endpoint, 0, 'created');
+
+      expect(mockHttpService.get).toHaveBeenCalledWith(
+        'https://test.endpoint/latest.json?order=created&page=0',
       );
       expect(result).toEqual(mockResponse);
     });
@@ -107,8 +233,8 @@ describe('DiscourseService', () => {
     });
 
     it('should create a new limiter if it does not exist', () => {
-      const mockLimiter = {};
       const id = 'test.id';
+      const mockLimiter = { id };
       mockBottleneckService.getLimiter.mockReturnValueOnce(null);
       mockBottleneckService.createClusterLimiter.mockReturnValueOnce(
         mockLimiter,
@@ -118,7 +244,7 @@ describe('DiscourseService', () => {
 
       expect(mockBottleneckService.createClusterLimiter).toHaveBeenCalledWith(
         id,
-        null,
+        undefined,
       );
       expect(mockBottleneckService.setLimiter).toHaveBeenCalledWith(
         id,

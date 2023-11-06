@@ -1,12 +1,11 @@
 import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bullmq';
-import { BADGE_QUEUE } from 'src/constants/queues.constants';
+import { QUEUES } from 'src/constants/queues.constants';
 import { BadgesProcessor } from './badges.processor';
-import { BadgesService } from './badges.service';
-import { BadgesTransformer } from './badges.transformer';
+import { BaseEtlModule } from 'src/base-etl/base-etl.module';
 
 @Module({
-  imports: [BullModule.registerQueue({ name: BADGE_QUEUE })],
-  providers: [BadgesProcessor, BadgesService, BadgesTransformer],
+  imports: [BullModule.registerQueue({ name: QUEUES.BADGE }), BaseEtlModule],
+  providers: [BadgesProcessor],
 })
 export class BadgesModule {}

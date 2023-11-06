@@ -24,19 +24,65 @@ export class DiscourseService {
     return this.get(endpoint, path);
   }
 
+  async getTagGroups(
+    endpoint: string,
+  ): Promise<AxiosResponse<TagGroupsResponse>> {
+    const path = '/tag_groups.json';
+    return this.get(endpoint, path);
+  }
+
+  async getTags(endpoint: string): Promise<AxiosResponse<TagsResponse>> {
+    const path = '/tags.json';
+    return this.get(endpoint, path);
+  }
+
+  async getGroups(
+    endpoint: string,
+    page = 0,
+  ): Promise<AxiosResponse<GroupsResponse>> {
+    const path = `/groups.json?page=${page}`;
+    return this.get(endpoint, path);
+  }
+
+  async getLatestTopics(
+    endpoint: string,
+    page = 0,
+    order:
+      | 'default'
+      | 'created'
+      | 'activity'
+      | 'views'
+      | 'posts'
+      | 'category'
+      | 'likes'
+      | 'op_likes'
+      | 'posters' = 'default',
+  ): Promise<AxiosResponse<TopicsResponse>> {
+    const path = `/latest.json?order=${order}&page=${page}`;
+    return this.get(endpoint, path);
+  }
+
   private async get(endpoint: string, path: string, scheme = 'https') {
+    const limiter: Bottleneck = this.getLimiter(endpoint);
+    const url = `${scheme}://${endpoint}${path}`;
+    return limiter.schedule(() => this.req(url));
+  }
+
+  private async req(url: string): Promise<AxiosResponse<any, any>> {
     try {
-      const limiter: Bottleneck = this.getLimiter(endpoint);
-      const url = `${scheme}://${endpoint}${path}`;
-      return limiter.schedule(() => lastValueFrom(this.httpService.get(url)));
+      const obs = this.httpService.get(url);
+      return await lastValueFrom(obs);
     } catch (error) {
-      throw error;
+      console.error(error);
     }
   }
 
-  private getLimiter(id: string, options = null): Bottleneck {
+  private getLimiter(
+    id: string,
+    options?: Partial<Bottleneck.ConstructorOptions>,
+  ): Bottleneck {
     let limiter: Bottleneck = this.bottleneckService.getLimiter(id);
-    if (!limiter) {
+    if (limiter == undefined) {
       limiter = this.bottleneckService.createClusterLimiter(id, options);
       this.bottleneckService.setLimiter(id, limiter);
     }

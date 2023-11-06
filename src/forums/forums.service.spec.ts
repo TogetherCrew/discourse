@@ -2,11 +2,15 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ForumsService } from './forums.service';
 import { CreateForumDto } from './dto/create-forum.dto';
 import { ForumsRepository } from './forums.repository';
+import { OrchestrationService } from '../orchestration/orchestration.service';
 
 describe('ForumsService', () => {
   let service: ForumsService;
   const mockForumsRepository = {
     insertOne: jest.fn(),
+  };
+  const mockOrchestrationService = {
+    run: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -14,6 +18,7 @@ describe('ForumsService', () => {
       providers: [
         ForumsService,
         { provide: ForumsRepository, useValue: mockForumsRepository },
+        { provide: OrchestrationService, useValue: mockOrchestrationService },
       ],
     }).compile();
 
