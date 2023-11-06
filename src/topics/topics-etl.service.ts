@@ -10,6 +10,16 @@ export class TopicsEtlService extends BaseEtlService {
     return this.iterate(forum.endpoint);
   }
 
+  async transform(job: Job<EtlDto, any, string>): Promise<any> {
+    const array = await super.transform(job);
+    array.forEach((obj) => {
+      delete obj.posters;
+      delete obj.tags;
+      delete obj.tagsDescriptions;
+    });
+    return array;
+  }
+
   private async iterate(
     endpoint: string,
     page = 0,
