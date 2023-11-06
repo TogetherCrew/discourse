@@ -8,8 +8,10 @@ import { BadgeGroupingsModule } from '../badge-groupings/badge-groupings.module'
 import { BadgesModule } from '../badges/badges.module';
 import { TagGroupsModule } from '../tag-groups/tag-groups.module';
 import { TagsModule } from '../tags/tags.module';
-import { GroupsModule } from 'src/groups/groups.module';
-import { CategoriesModule } from 'src/categories/categories.module';
+import { GroupsModule } from '../groups/groups.module';
+import { CategoriesModule } from '../categories/categories.module';
+import { PostsModule } from '../posts/posts.module';
+import { TopicsModule } from '../topics/topics.module';
 
 @Module({
   imports: [
@@ -24,6 +26,8 @@ import { CategoriesModule } from 'src/categories/categories.module';
     TagsModule,
     GroupsModule,
     CategoriesModule,
+    TopicsModule,
+    PostsModule,
   ],
   providers: [OrchestrationService],
   exports: [OrchestrationService],
