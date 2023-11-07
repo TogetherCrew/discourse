@@ -38,6 +38,13 @@ export class TopicsEtlService extends BaseEtlService {
       delete obj.posters;
       delete obj.tags;
       delete obj.tagsDescriptions;
+      delete obj.acceptedAnswer;
+      delete obj.details;
+      delete obj.thumbnails;
+      delete obj.bookmarks;
+      delete obj.timelineLookup;
+      delete obj.suggestedTopics;
+      delete obj.actionSummary;
       return obj;
     });
     return array;
@@ -50,10 +57,10 @@ export class TopicsEtlService extends BaseEtlService {
       page,
       'created',
     );
-    const { topic_list }: TopicsResponse = data;
+    const { topic_list, users }: TopicsResponse = data;
     const { topics, more_topics_url } = topic_list;
 
-    const flow = this.flowExtractPosts(forum, topics);
+    const flow = this.flowExtractPosts(forum, topics, users);
     await this.flowProducer.add(flow);
 
     if (more_topics_url) {
@@ -63,23 +70,32 @@ export class TopicsEtlService extends BaseEtlService {
     }
   }
 
-  private flowExtractPosts(forum: Forum, topics: Topic[]): FlowJob {
+  private flowExtractPosts(
+    forum: Forum,
+    topics: Topic[],
+    users: User[],
+  ): FlowJob {
     return {
       name: JOBS.EXTRACT,
       queueName: QUEUES.POST,
       data: { forum },
-      children: [this.flowLoadTopics(forum, topics)],
-      // opts: { priority: 1 },
+      children: [this.flowLoadTopics(forum, topics, users)],
     };
   }
 
-  private flowLoadTopics(forum: Forum, topics: Topic[]): FlowJob {
+  private flowLoadTopics(
+    forum: Forum,
+    topics: Topic[],
+    users: User[],
+  ): FlowJob {
     return {
       name: JOBS.LOAD,
       queueName: QUEUES.TOPIC,
       data: { forum, cypher: CYPHERS.BULK_CREATE_TOPIC },
-      children: [this.flowTransformTopics(forum, topics)],
-      // opts: { priority: 2 },
+      children: [
+        this.flowTransformTopics(forum, topics),
+        this.flowLoadUsers(forum, users),
+      ],
     };
   }
 
@@ -88,7 +104,23 @@ export class TopicsEtlService extends BaseEtlService {
       name: JOBS.TRANSFORM,
       queueName: QUEUES.TOPIC,
       data: { forum, topics },
-      // opts: { priority: 1 },
+    };
+  }
+
+  private flowTransformUsers(forum: Forum, users: User[]): FlowJob {
+    return {
+      name: JOBS.TRANSFORM,
+      queueName: QUEUES.USER,
+      data: { forum, users },
+    };
+  }
+
+  private flowLoadUsers(forum: Forum, users: User[]): FlowJob {
+    return {
+      name: JOBS.LOAD,
+      queueName: QUEUES.USER,
+      data: { forum },
+      children: [this.flowTransformUsers(forum, users)],
     };
   }
 }
