@@ -6,6 +6,7 @@ import { QUEUES } from '../constants/queues.constants';
 import { EtlSchemaService } from '../etl-schema/etl-schema.service';
 import { Forum } from '../forums/entities/forum.entity';
 import { CYPHERS } from '../constants/cyphers.constants';
+import { JOBS } from '../constants/jobs.contants';
 
 @Injectable()
 export class OrchestrationService {
@@ -78,31 +79,13 @@ export class OrchestrationService {
       [group],
     );
 
-    const topic = this.etlService.etl(
-      QUEUES.TOPIC,
-      {
-        forum,
-        cypher: CYPHERS.BULK_CREATE_TOPIC,
-      },
-      [tag, group, category],
-    );
-    const post = this.etlService.etl(
-      QUEUES.POST,
-      {
-        forum,
-        operation: '',
-        property: '',
-        cypher: '',
-      },
-      [topic],
-    );
+    const flow: FlowJob = {
+      name: JOBS.EXTRACT,
+      queueName: QUEUES.TOPIC,
+      data: { forum },
+      children: [tag, group, category, badge],
+    };
 
-    const user = this.etlService.etl(
-      QUEUES.USER,
-      { forum, operation: 'getUsers', property: 'users', cypher: '' },
-      [badge, post], // for testing
-    );
-
-    return user;
+    return flow;
   }
 }
