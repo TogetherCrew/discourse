@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Neo4jService } from 'nest-neo4j';
 import { CreateForumDto } from './dto/create-forum.dto';
 import { Forum } from './entities/forum.entity';
+import { UpdateForumDto } from './dto/update-forum.dto';
 
 @Injectable()
 export class ForumsRepository {
@@ -21,6 +22,25 @@ export class ForumsRepository {
     } else {
       throw new Error(
         'Failed to create the forum: No record returned from the database',
+      );
+    }
+  }
+
+  async updateOne(
+    uuid: string,
+    updateForumDto: UpdateForumDto,
+  ): Promise<Forum> {
+    const neoResult = await this.neo4jService.write(
+      'MATCH (f:Forum { uuid: $uuid }) SET f += $updateForumDto RETURN f',
+      { uuid, updateForumDto },
+    );
+
+    const record = neoResult.records[0];
+    if (record) {
+      return record.get('f').properties as Forum;
+    } else {
+      throw new Error(
+        'Failed to update the forum: No record returned from the database',
       );
     }
   }
