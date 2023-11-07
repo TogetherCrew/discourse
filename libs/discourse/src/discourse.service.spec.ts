@@ -263,7 +263,7 @@ describe('DiscourseService', () => {
 
     it('should create a new limiter if it does not exist', () => {
       const id = 'test.id';
-      const mockLimiter = { id };
+      const mockLimiter = { id, on: jest.fn() };
       mockBottleneckService.getLimiter.mockReturnValueOnce(null);
       mockBottleneckService.createClusterLimiter.mockReturnValueOnce(
         mockLimiter,

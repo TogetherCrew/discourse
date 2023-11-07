@@ -92,6 +92,9 @@ export class DiscourseService {
     let limiter: Bottleneck = this.bottleneckService.getLimiter(id);
     if (limiter == undefined) {
       limiter = this.bottleneckService.createClusterLimiter(id, options);
+      limiter.on('depleted', () => {
+        console.log('limiter.counts', limiter.counts());
+      });
       this.bottleneckService.setLimiter(id, limiter);
     }
     return limiter;
