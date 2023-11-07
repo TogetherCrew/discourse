@@ -1,66 +1,70 @@
-const BULK_CREATE_BADGE_TYPE = [
-  'UNWIND $batch AS badgeType',
-  // 'MERGE (f:Forum {uuid: badgeType.forumUuid})',
-  'CREATE (b:BadgeType) SET b = badgeType',
-  // 'MERGE (f)-[:HAS_BADGE_TYPE]->(b)',
-].join(' ');
+const PREPEND = 'CALL apoc.periodic.iterate(';
+const CONFIG =
+  '{ batchSize: 10000, parallel: true, params: { batch: $batch } }';
+const POSTPEND = ')';
+const COMMA = ',';
 
-const BULK_CREATE_BADGE_GROUPING = [
-  'UNWIND $batch AS badgeGrouping',
-  // 'MERGE (f:Forum {uuid: badgeGrouping.forumUuid})',
-  'CREATE (b:BadgeGrouping) SET b = badgeGrouping',
-  // 'MERGE (f)-[:HAS_BADGE_GROUPING]->(b)',
-].join(' ');
+function generateCypher(cypherIterate: string, cypherAction: string): string {
+  return [
+    PREPEND,
+    `"${cypherIterate}"`,
+    COMMA,
+    `"${cypherAction}"`,
+    COMMA,
+    CONFIG,
+    POSTPEND,
+  ].join(' ');
+}
 
-const BULK_CREATE_BADGE = [
-  'UNWIND $batch AS badge',
-  // 'MERGE (f:Forum {uuid: badge.forumUuid})',
-  'MERGE (bg:BadgeGrouping {id: badge.badgeGroupingId, forumUuid: badge.forumUuid})',
-  'MERGE (bt:BadgeType {id: badge.badgeTypeId, forumUuid: badge.forumUuid})',
-  'CREATE (b:Badge) SET b = badge',
-  // 'MERGE (f)-[:HAS_BADGE]->(b)',
-  'MERGE (b)-[:HAS_GROUPING]->(bg)',
-  'MERGE (b)-[:HAS_TYPE]->(bt)',
-].join(' ');
+const BULK_CREATE_BADGE_TYPE = generateCypher(
+  'UNWIND $batch AS badgeType RETURN badgeType',
+  'MERGE (b:BadgeType { id: badgeType.id, forumUuid: badgeType.forumUuid }) SET b = badgeType',
+);
 
-const BULK_CREATE_TAG_GROUP = [
-  'UNWIND $batch AS tagGroup',
-  // 'MERGE (f:Forum {uuid: tagGroup.forumUuid})',
-  'CREATE (t:TagGroup) SET t = tagGroup',
-  // 'MERGE (f)-[:HAS_BADGE_TYPE]->(b)',
-].join(' ');
+const BULK_CREATE_BADGE_GROUPING = generateCypher(
+  'UNWIND $batch AS badgeGrouping return badgeGrouping',
+  'MERGE (b:BadgeGrouping { id: badgeGrouping.id, forumUuid: badgeGrouping.forumUuid }) SET b = badgeGrouping',
+);
 
-const BULK_CREATE_TAG = [
-  'UNWIND $batch AS tag',
-  // 'MERGE (f:Forum {uuid: tag.forumUuid})',
-  // 'MERGE (tg:TagGroup {id: tag.tagGroupId, forumUuid: tag.forumUuid})',
-  'CREATE (t:Tag) SET t = tag',
-  // 'MERGE (f)-[:HAS_TAG]->(t)',
-  // 'MERGE (tg)-[:CONTAINS]->(t)',
-].join(' ');
+const BULK_CREATE_BADGE = generateCypher(
+  'UNWIND $batch AS badge return badge',
+  [
+    'MERGE (bg:BadgeGrouping {id: badge.badgeGroupingId, forumUuid: badge.forumUuid })',
+    'MERGE (bt:BadgeType {id: badge.badgeTypeId, forumUuid: badge.forumUuid })',
+    'MERGE (b:Badge { id: badge.id, forumUuid: badge.forumUuid }) SET b = badge',
+    'MERGE (b)-[:HAS_GROUPING]->(bg)',
+    'MERGE (b)-[:HAS_TYPE]->(bt)',
+  ].join(' '),
+);
 
-const BULK_CREATE_GROUP = [
-  'UNWIND $batch AS group',
-  // 'MERGE (f:Forum {uuid: group.forumUuid})',
-  'CREATE (g:Group) SET g = group',
-  // 'MERGE (f)-[:HAS_GROUP]->(g)',
-].join(' ');
+const BULK_CREATE_TAG_GROUP = generateCypher(
+  'UNWIND $batch AS tagGroup RETURN tagGroup',
+  'CREATE (tg:TagGroup { id: tagGroup.id, forumUuid: tagGroup.forumUuid }) SET tg = tagGroup',
+);
 
-const BULK_CREATE_CATEGORY = [
-  'UNWIND $batch AS category',
-  // 'MERGE (f:Forum {uuid: category.forumUuid})',
-  'CREATE (c:Category) SET c = category',
-  // 'MERGE (f)-[:HAS_BADGE_TYPE]->(b)',
-].join(' ');
+const BULK_CREATE_TAG = generateCypher(
+  'UNWIND $batch AS tag RETURN tag',
+  'MERGE (t:Tag { id: tag.id, forumUuid: tag.forumUuid}) SET t = tag',
+);
 
-const BULK_CREATE_TOPIC = [
-  'UNWIND $batch AS topic',
-  // 'MERGE (f:Forum {uuid: topic.forumUuid })',
-  'MERGE (c:Category { id: topic.categoryId, forumUuid: topic.forumUuid })',
-  'CREATE (t:Topic) SET t = topic',
-  // 'MERGE (f)-[:HAS_TOPIC]->(g)',
-  'MERGE (c)-[:HAS_TOPIC]->(t)',
-].join(' ');
+const BULK_CREATE_GROUP = generateCypher(
+  'UNWIND $batch AS group RETURN group',
+  'MERGE (g:Group { id: group.id, forumUuid: group.forumUuid }) SET g = group',
+);
+
+const BULK_CREATE_CATEGORY = generateCypher(
+  'UNWIND $batch AS category RETURN category',
+  'MERGE (c:Category { id: category.id, forumUuid: category.forumUuid }) SET c = category',
+);
+
+const BULK_CREATE_TOPIC = generateCypher(
+  'UNWIND $batch AS topic RETURN topic',
+  [
+    'MERGE (c:Category { id: topic.categoryId, forumUuid: topic.forumUuid })',
+    'MERGE (t:Topic { id: topic.id, forumUuid: topic.forumUuid }) SET t = topic',
+    'MERGE (c)-[:HAS_TOPIC]->(t)',
+  ].join(' '),
+);
 
 const BULK_CREATE_POST = [
   'UNWIND $batch AS post',
