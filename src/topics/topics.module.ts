@@ -6,9 +6,13 @@ import { QUEUES } from '../constants/queues.constants';
 import { TopicsEtlService } from './topics-etl.service';
 import { DiscourseModule } from '@app/discourse';
 import { BaseTransformerModule } from 'src/base-transformer/base-transformer.module';
+import { FLOWS } from 'src/constants/flows.constants';
 
 @Module({
   imports: [
+    BullModule.registerFlowProducer({
+      name: FLOWS.TOPIC_TL,
+    }),
     BullModule.registerQueue({ name: QUEUES.TOPIC }),
     BaseEtlModule,
     DiscourseModule,

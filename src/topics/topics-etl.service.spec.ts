@@ -7,12 +7,14 @@ import { TopicsEtlService } from './topics-etl.service';
 import { Neo4jService } from 'nest-neo4j/dist';
 import { BaseTransformerService } from '../base-transformer/base-transformer.service';
 import { BaseEtlService } from '../base-etl/base-etl.service';
+import { FLOWS } from '../constants/flows.constants';
 
 describe('TopicsEtlService', () => {
   let service: TopicsEtlService;
   let mockDiscourseService: any;
   let mockBaseTransformerService: any;
   let mockNeo4jService: any;
+  let mockFlowProducer: any;
 
   beforeEach(async () => {
     mockDiscourseService = {
@@ -21,6 +23,9 @@ describe('TopicsEtlService', () => {
 
     mockBaseTransformerService = {};
     mockNeo4jService = {};
+    mockFlowProducer = {
+      add: jest.fn().mockResolvedValue({ id: 'flowJobId' }),
+    };
 
     const module: TestingModule = await Test.createTestingModule({
       // imports: [BaseEtlModule],
@@ -38,6 +43,10 @@ describe('TopicsEtlService', () => {
         {
           provide: Neo4jService,
           useValue: mockNeo4jService,
+        },
+        {
+          provide: `BullFlowProducer_${FLOWS.TOPIC_TL}`,
+          useValue: mockFlowProducer,
         },
       ],
     }).compile();
@@ -64,7 +73,7 @@ describe('TopicsEtlService', () => {
       });
 
       // Act
-      const result = await service.extract(job);
+      await service.extract(job);
 
       // Assert
       expect(mockDiscourseService.getLatestTopics).toHaveBeenCalledWith(
@@ -72,7 +81,7 @@ describe('TopicsEtlService', () => {
         0,
         'created',
       );
-      expect(result).toEqual(topics);
+      expect(mockFlowProducer.add).toHaveBeenCalled();
     });
     it('should concatenate group data across multiple pages', async () => {
       const etlDto: EtlDto = {
@@ -120,7 +129,7 @@ describe('TopicsEtlService', () => {
         },
       );
 
-      const result = await service.extract(job);
+      await service.extract(job);
 
       expect(mockDiscourseService.getLatestTopics).toHaveBeenCalledTimes(3);
       expect(mockDiscourseService.getLatestTopics).toHaveBeenCalledWith(
@@ -138,8 +147,7 @@ describe('TopicsEtlService', () => {
         2,
         'created',
       );
-      expect(result.length).toBe(3); // total_rows_topics is 3, so we expect an array of 3 topics
-      expect(result).toEqual([...topicsPage1, ...topicsPage2, ...topicsPage3]); // Expect the concatenated result
+      expect(mockFlowProducer.add).toHaveBeenCalledTimes(3);
     });
   });
 });
