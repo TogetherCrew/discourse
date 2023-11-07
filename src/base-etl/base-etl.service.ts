@@ -9,8 +9,8 @@ import { Neo4jService } from 'nest-neo4j/dist';
 export class BaseEtlService {
   constructor(
     protected readonly discourseService: DiscourseService,
-    private readonly baseTransformerService: BaseTransformerService,
-    private readonly neo4jService: Neo4jService,
+    protected readonly baseTransformerService: BaseTransformerService,
+    protected readonly neo4jService: Neo4jService,
   ) {}
 
   async extract(job: Job<EtlDto, any, string>): Promise<any> {
@@ -45,7 +45,7 @@ export class BaseEtlService {
     }, obj);
   }
 
-  private async getChildrenValues(job: Job): Promise<any[]> {
+  async getChildrenValues(job: Job): Promise<any[]> {
     const childrenValues = await job.getChildrenValues();
     return Object.values(childrenValues)[0];
   }
