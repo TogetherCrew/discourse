@@ -62,6 +62,15 @@ const BULK_CREATE_TOPIC = [
   'MERGE (c)-[:HAS_TOPIC]->(t)',
 ].join(' ');
 
+const BULK_CREATE_POST = [
+  'UNWIND $batch AS post',
+  // 'MERGE (f:Forum {uuid: topic.forumUuid })',
+  'MERGE (t:Topic { id: post.topicId, forumUuid: post.forumUuid })',
+  'CREATE (p:Post) SET p = post',
+  // 'MERGE (f)-[:HAS_TOPIC]->(g)',
+  'MERGE (t)-[:HAS_POST]->(p)',
+].join(' ');
+
 export const CYPHERS = {
   BULK_CREATE_BADGE_TYPE,
   BULK_CREATE_BADGE_GROUPING,
@@ -71,4 +80,5 @@ export const CYPHERS = {
   BULK_CREATE_GROUP,
   BULK_CREATE_CATEGORY,
   BULK_CREATE_TOPIC,
+  BULK_CREATE_POST,
 };
