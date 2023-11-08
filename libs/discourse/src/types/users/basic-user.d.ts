@@ -1,4 +1,4 @@
-type User = {
+type BasicUser = {
   id: number;
   username: string;
   name: string;

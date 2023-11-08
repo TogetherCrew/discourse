@@ -1,6 +1,6 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
-import { AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import Bottleneck from 'bottleneck';
 import { lastValueFrom } from 'rxjs';
 import { BottleneckService } from './bottleneck/bottleneck.service';
@@ -70,6 +70,14 @@ export class DiscourseService {
     return this.get(endpoint, path);
   }
 
+  async getUser(
+    endpoint: string,
+    username: string,
+  ): Promise<AxiosResponse<UserResponse>> {
+    const path = `/u/${username}.json`;
+    return this.get(endpoint, path);
+  }
+
   private async get(endpoint: string, path: string, scheme = 'https') {
     const limiter: Bottleneck = this.getLimiter(endpoint);
     const url = `${scheme}://${endpoint}${path}`;
@@ -81,7 +89,9 @@ export class DiscourseService {
       const obs = this.httpService.get(url);
       return await lastValueFrom(obs);
     } catch (error) {
-      console.error(error);
+      const err: AxiosError = error as AxiosError;
+      console.error(err.message, err.code);
+      console.log(err.response.config.url);
     }
   }
 

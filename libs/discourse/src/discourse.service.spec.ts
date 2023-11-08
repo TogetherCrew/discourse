@@ -249,6 +249,96 @@ describe('DiscourseService', () => {
     });
   });
 
+  describe('getPosts', () => {
+    let mockLimiter: Bottleneck;
+
+    beforeEach(() => {
+      mockLimiter = new Bottleneck();
+      mockBottleneckService.getLimiter.mockReturnValueOnce(mockLimiter);
+    });
+
+    it('should call the correct URL', async () => {
+      const endpoint = 'test.endpoint';
+      const mockResponse: Partial<AxiosResponse<UserResponse>> = {
+        data: {
+          user_badges: [],
+          badges: [],
+          badge_types: [],
+          users: [],
+          user: {
+            active: false,
+            admin: false,
+            moderator: false,
+            last_seen_at: '',
+            last_emailed_at: '',
+            created_at: '',
+            last_seen_age: 0,
+            last_emailed_age: 0,
+            created_at_age: 0,
+            manual_locked_trust_level: '',
+            title: '',
+            time_read: 0,
+            staged: false,
+            days_visited: 0,
+            posts_read_count: 0,
+            topics_entered: 0,
+            post_count: 0,
+            associated_accounts: [],
+            can_send_activation_email: false,
+            can_activate: false,
+            can_deactivate: false,
+            ip_address: '',
+            registration_ip_address: '',
+            can_grant_admin: false,
+            can_revoke_admin: false,
+            can_grant_moderation: false,
+            can_revoke_moderation: false,
+            can_impersonate: false,
+            like_count: 0,
+            like_given_count: 0,
+            topic_count: 0,
+            flags_given_count: 0,
+            flags_received_count: 0,
+            private_topics_count: 0,
+            can_delete_all_posts: false,
+            can_be_deleted: false,
+            can_be_anonymized: false,
+            can_be_merged: false,
+            full_suspend_reason: '',
+            silence_reason: '',
+            post_edits_count: 0,
+            primary_group_id: '',
+            badge_count: 0,
+            warnings_received_count: 0,
+            bounce_score: 0,
+            reset_bounce_score_after: '',
+            can_view_action_logs: false,
+            can_disable_second_factor: false,
+            can_delete_sso_record: false,
+            api_key_count: 0,
+            single_sign_on_record: '',
+            approved_by: undefined,
+            suspended_by: '',
+            silenced_by: '',
+            penalty_counts: undefined,
+            next_penalty: '',
+            tl3_requirements: undefined,
+            groups: [],
+            external_ids: undefined,
+          },
+        },
+      };
+      mockHttpService.get.mockReturnValueOnce(of(mockResponse));
+
+      const result = await service.getUser(endpoint, 'test-username');
+
+      expect(mockHttpService.get).toHaveBeenCalledWith(
+        'https://test.endpoint/u/test-username.json',
+      );
+      expect(result).toEqual(mockResponse);
+    });
+  });
+
   describe('getLimiter', () => {
     it('should return existing limiter if it exists', () => {
       const mockLimiter = {};
