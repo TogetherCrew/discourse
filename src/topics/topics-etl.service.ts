@@ -60,8 +60,8 @@ export class TopicsEtlService extends BaseEtlService {
     const { topic_list, users }: TopicsResponse = data;
     const { topics, more_topics_url } = topic_list;
 
-    const flow = this.flowExtractPosts(forum, topics, users);
-    await this.flowProducer.add(flow);
+    await this.flowProducer.add(this.flowExtractPosts(forum, topics));
+    await this.flowProducer.add(this.flowLoadUsers(forum, users));
 
     if (more_topics_url) {
       return await this.iterate(forum, page + 1);
@@ -70,32 +70,21 @@ export class TopicsEtlService extends BaseEtlService {
     }
   }
 
-  private flowExtractPosts(
-    forum: Forum,
-    topics: Topic[],
-    users: User[],
-  ): FlowJob {
+  private flowExtractPosts(forum: Forum, topics: Topic[]): FlowJob {
     return {
       name: JOBS.EXTRACT,
       queueName: QUEUES.POST,
       data: { forum },
-      children: [this.flowLoadTopics(forum, topics, users)],
+      children: [this.flowLoadTopics(forum, topics)],
     };
   }
 
-  private flowLoadTopics(
-    forum: Forum,
-    topics: Topic[],
-    users: User[],
-  ): FlowJob {
+  private flowLoadTopics(forum: Forum, topics: Topic[]): FlowJob {
     return {
       name: JOBS.LOAD,
       queueName: QUEUES.TOPIC,
       data: { forum, cypher: CYPHERS.BULK_CREATE_TOPIC },
-      children: [
-        this.flowTransformTopics(forum, topics),
-        this.flowLoadUsers(forum, users),
-      ],
+      children: [this.flowTransformTopics(forum, topics)],
     };
   }
 
@@ -107,20 +96,29 @@ export class TopicsEtlService extends BaseEtlService {
     };
   }
 
-  private flowTransformUsers(forum: Forum, users: User[]): FlowJob {
+  private flowLoadUsers(forum: Forum, users: BasicUser[]): FlowJob {
+    return {
+      name: JOBS.LOAD,
+      queueName: QUEUES.USER,
+      data: { forum, cypher: CYPHERS.BULK_CREATE_USER },
+      children: [this.flowTransformUsers(forum, users)],
+    };
+  }
+
+  private flowTransformUsers(forum: Forum, users: BasicUser[]): FlowJob {
     return {
       name: JOBS.TRANSFORM,
       queueName: QUEUES.USER,
       data: { forum, users },
+      // children: [this.flowExtractUsers(forum, users)],
     };
   }
 
-  private flowLoadUsers(forum: Forum, users: User[]): FlowJob {
+  private flowExtractUsers(forum: Forum, users: BasicUser[]): FlowJob {
     return {
-      name: JOBS.LOAD,
+      name: JOBS.EXTRACT,
       queueName: QUEUES.USER,
-      data: { forum },
-      children: [this.flowTransformUsers(forum, users)],
+      data: { forum, users },
     };
   }
 }

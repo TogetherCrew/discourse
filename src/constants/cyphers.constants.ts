@@ -66,14 +66,26 @@ const BULK_CREATE_TOPIC = generateCypher(
   ].join(' '),
 );
 
-const BULK_CREATE_POST = [
-  'UNWIND $batch AS post',
-  // 'MERGE (f:Forum {uuid: topic.forumUuid })',
-  'MERGE (t:Topic { id: post.topicId, forumUuid: post.forumUuid })',
-  'CREATE (p:Post) SET p = post',
-  // 'MERGE (f)-[:HAS_TOPIC]->(g)',
-  'MERGE (t)-[:HAS_POST]->(p)',
-].join(' ');
+const BULK_CREATE_POST = generateCypher(
+  'UNWIND $batch AS post RETURN post',
+  [
+    'MERGE (t:Topic { id: post.topicId, forumUuid: post.forumUuid })',
+    'MERGE (u:User { id: post.userId, forumUuid: post.forumUuid })',
+    'MERGE (p:Post { id: post.id, forumUuid: post.forumUuid }) SET p = post',
+    'MERGE (u)-[r:POSTED]->(p)',
+    'MERGE (t)-[:HAS_POST]->(p)',
+    'ON CREATE SET r.createdAt = p.createdAt',
+    'WITH p, post',
+    'WHERE post.replyToPostNumber IS NOT NULL',
+    'MERGE (rT:Post { id: post.replyToPostNumber, forumUuid: post.forumUuid })',
+    'MERGE (p)-[:REPLIED]->(rT)',
+  ].join(' '),
+);
+
+const BULK_CREATE_USER = generateCypher(
+  'UNWIND $batch AS user RETURN user',
+  'MERGE (u:User { id: user.id, forumUuid: user.forumUuid }) SET u = user',
+);
 
 export const CYPHERS = {
   BULK_CREATE_BADGE_TYPE,
@@ -85,4 +97,5 @@ export const CYPHERS = {
   BULK_CREATE_CATEGORY,
   BULK_CREATE_TOPIC,
   BULK_CREATE_POST,
+  BULK_CREATE_USER,
 };

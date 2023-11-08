@@ -20,6 +20,9 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@bull-board/api": "^5.9.1",
+    "@bull-board/express": "^5.9.1",
+    "@bull-board/nestjs": "^5.9.1",
     "@nestjs/axios": "^3.0.1",
     "@nestjs/bullmq": "^10.0.1",
     "@nestjs/common": "^10.0.0",
@@ -29,8 +32,8 @@
     "@nestjs/swagger": "^7.1.14",
     "axios": "^1.6.0",
     "bottleneck": "^2.19.5",
-    "class-validator": "^0.14.0",
     "bullmq": "^4.12.7",
+    "class-validator": "^0.14.0",
     "ioredis": "^5.3.2",
     "joi": "^17.11.0",
     "nest-neo4j": "^0.3.1",

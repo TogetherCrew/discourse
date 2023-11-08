@@ -51,7 +51,10 @@ export class BaseEtlService {
   }
 
   private async batchInsert(array: any[], cypher: string, batchSize = 100) {
-    console.log('Items to insert:', array.length);
+    console.log(
+      'Items to insert:',
+      array.map((obj) => obj.id),
+    );
     let counter: number = 1;
     for (let i = 0; i < array.length; i += batchSize) {
       const batch = array.slice(i, i + batchSize);

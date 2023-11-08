@@ -10,6 +10,8 @@ import { ForumsModule } from './forums/forums.module';
 import { BullModule } from '@nestjs/bullmq';
 import { OrchestrationModule } from './orchestration/orchestration.module';
 import redisConfig from './config/redis.config';
+import { BullBoardModule } from '@bull-board/nestjs';
+import { ExpressAdapter } from '@bull-board/express';
 
 @Module({
   imports: [
@@ -30,6 +32,10 @@ import redisConfig from './config/redis.config';
         connection: configService.get('redis'),
       }),
       inject: [ConfigService],
+    }),
+    BullBoardModule.forRoot({
+      route: '/queues',
+      adapter: ExpressAdapter,
     }),
     OrchestrationModule,
   ],

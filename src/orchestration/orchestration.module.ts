@@ -12,6 +12,7 @@ import { GroupsModule } from '../groups/groups.module';
 import { CategoriesModule } from '../categories/categories.module';
 import { PostsModule } from '../posts/posts.module';
 import { TopicsModule } from '../topics/topics.module';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { TopicsModule } from '../topics/topics.module';
     CategoriesModule,
     TopicsModule,
     PostsModule,
+    UsersModule,
   ],
   providers: [OrchestrationService],
   exports: [OrchestrationService],

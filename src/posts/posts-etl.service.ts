@@ -51,21 +51,23 @@ export class PostsEtlService extends BaseEtlService {
 
   private async iterate(forum: Forum, topicIds: number[]) {
     topicIds.forEach(async (id) => {
-      const posts = await this.getPosts(forum.endpoint, id);
-      await this.flowProducer.add({
-        name: JOBS.LOAD,
-        queueName: QUEUES.POST,
-        opts: { priority: 2 },
-        data: { forum, cypher: CYPHERS.BULK_CREATE_POST },
-        children: [
-          {
-            name: JOBS.TRANSFORM,
-            queueName: QUEUES.POST,
-            opts: { priority: 1 },
-            data: { forum, posts },
-          },
-        ],
-      });
+      try {
+        const posts = await this.getPosts(forum.endpoint, id);
+        await this.flowProducer.add({
+          name: JOBS.LOAD,
+          queueName: QUEUES.POST,
+          data: { forum, cypher: CYPHERS.BULK_CREATE_POST },
+          children: [
+            {
+              name: JOBS.TRANSFORM,
+              queueName: QUEUES.POST,
+              data: { forum, posts },
+            },
+          ],
+        });
+      } catch (error) {
+        console.log(error.message);
+      }
     });
   }
 
