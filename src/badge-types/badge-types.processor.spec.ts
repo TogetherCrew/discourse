@@ -6,8 +6,6 @@ import { Neo4jService } from 'nest-neo4j/dist';
 import { BaseTransformerService } from '../base-transformer/base-transformer.service';
 import { FLOW_PRODUCER } from '../constants/flows.constants';
 
-jest.mock('../base-etl/base-etl.service');
-
 describe('BadgeGroupingsService', () => {
   let processor: BadgeTypesProcessor;
 

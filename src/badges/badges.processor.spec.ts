@@ -6,8 +6,6 @@ import { FLOW_PRODUCER } from '../constants/flows.constants';
 import { BadgesProcessor } from './badges.processor';
 import { BadgesService } from './badges.service';
 
-jest.mock('../base-etl/base-etl.service');
-
 describe('BadgesProcessor', () => {
   let processor: BadgesProcessor;
 
