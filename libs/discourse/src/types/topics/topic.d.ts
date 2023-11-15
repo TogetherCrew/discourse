@@ -32,4 +32,5 @@ type Topic = {
   pinned_globally: boolean;
   featured_link?: string;
   posters: Poster[];
+  tags: any[];
 };
