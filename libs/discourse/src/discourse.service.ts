@@ -4,13 +4,23 @@ import { AxiosError, AxiosResponse } from 'axios';
 import Bottleneck from 'bottleneck';
 import { lastValueFrom } from 'rxjs';
 import { BottleneckService } from './bottleneck/bottleneck.service';
+import { HttpsProxyAgent } from 'https-proxy-agent';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class DiscourseService {
+  proxyAgent: HttpsProxyAgent<string>;
+
   constructor(
     private httpService: HttpService,
     private bottleneckService: BottleneckService,
-  ) {}
+    private readonly configService: ConfigService,
+  ) {
+    const uri = configService.get('proxy');
+    if (uri) {
+      this.proxyAgent = new HttpsProxyAgent(uri);
+    }
+  }
 
   async getBadges(endpoint: string): Promise<AxiosResponse<BadgesResponse>> {
     const path = '/badges.json';
@@ -78,15 +88,47 @@ export class DiscourseService {
     return this.get(endpoint, path);
   }
 
-  private async get(endpoint: string, path: string, scheme = 'https') {
-    const limiter: Bottleneck = this.getLimiter(endpoint);
-    const url = `${scheme}://${endpoint}${path}`;
-    return limiter.schedule(() => this.req(url));
+  async getGroupMembers(
+    endpoint: string,
+    groupName: string,
+    offset = 0,
+    limit = 50,
+  ): Promise<AxiosResponse<GroupMembersResponse>> {
+    const path = `/groups/${groupName}/members.json?limit=${limit}&offset=${offset}`;
+    return this.get(endpoint, path);
   }
 
-  private async req(url: string): Promise<AxiosResponse<any, any>> {
+  async getUserActions(
+    endpoint: string,
+    username: string,
+    offset = 0,
+    limit = 50,
+  ): Promise<AxiosResponse<UserActionsResponse>> {
+    const path = `/user_actions.json?username=${username}&limit=${limit}&offset=${offset}`;
+    return this.get(endpoint, path);
+  }
+
+  getUserBadges(
+    endpoint: string,
+    username: string,
+  ): Promise<AxiosResponse<UserBadgesResponse>> {
+    const path = `/user-badges/${username}.json`;
+    return this.get(endpoint, path);
+  }
+
+  private async get(endpoint: string, path: string, scheme = 'https') {
+    const url = `${scheme}://${endpoint}${path}`;
+    if (this.proxyAgent) {
+      return this.req(url, { httpsAgent: this.proxyAgent });
+    } else {
+      const limiter: Bottleneck = this.getLimiter(endpoint);
+      return limiter.schedule(() => this.req(url));
+    }
+  }
+
+  private async req(url: string, opts = {}): Promise<AxiosResponse<any, any>> {
     try {
-      const obs = this.httpService.get(url);
+      const obs = this.httpService.get(url, opts);
       return await lastValueFrom(obs);
     } catch (error) {
       const err: AxiosError = error as AxiosError;
