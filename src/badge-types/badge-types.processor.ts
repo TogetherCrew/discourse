@@ -1,11 +1,11 @@
 import { Processor } from '@nestjs/bullmq';
 import { BaseEtlProcessor } from '../base-etl/base-etl.processor';
-import { BaseEtlService } from '../base-etl/base-etl.service';
 import { QUEUES } from '../constants/queues.constants';
+import { BadgeTypesService } from './badge-types.service';
 
 @Processor(QUEUES.BADGE_TYPE)
 export class BadgeTypesProcessor extends BaseEtlProcessor {
-  constructor(private readonly myservice: BaseEtlService) {
-    super(myservice);
+  constructor(private readonly badgeTypesService: BadgeTypesService) {
+    super(badgeTypesService);
   }
 }
