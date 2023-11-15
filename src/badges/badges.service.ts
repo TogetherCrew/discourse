@@ -5,7 +5,6 @@ import { FlowProducer, Job } from 'bullmq';
 import { Neo4jService } from 'nest-neo4j/dist';
 import { BaseTransformerService } from '../base-transformer/base-transformer.service';
 import { FLOW_PRODUCER } from '../constants/flows.constants';
-import { BaseEtlService } from '../base-etl/base-etl.service';
 import { Forum } from '../forums/entities/forum.entity';
 import { QUEUES } from '../constants/queues.constants';
 import { JOBS } from '../constants/jobs.contants';
