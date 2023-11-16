@@ -15,6 +15,7 @@ import { ExpressAdapter } from '@bull-board/express';
 import { ExtractModule } from './extract/extract.module';
 import { TransformModule } from './transform/transform.module';
 import proxyConfig from './config/proxy.config';
+import { LoadModule } from './load/load.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import proxyConfig from './config/proxy.config';
     OrchestrationModule,
     ExtractModule,
     TransformModule,
+    LoadModule,
   ],
   controllers: [AppController],
   providers: [AppService],
