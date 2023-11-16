@@ -2,7 +2,6 @@ import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
 import { FLOW_PRODUCER } from '../constants/flows.constants';
 import { OrchestrationService } from './orchestration.service';
-import { EtlSchemaModule } from '../etl-schema/etl-schema.module';
 import { BadgeTypesModule } from '../badge-types/badge-types.module';
 import { BadgesModule } from '../badges/badges.module';
 import { TagGroupsModule } from '../tag-groups/tag-groups.module';
@@ -23,7 +22,6 @@ import { TopicTagsModule } from '../topic-tags/topic-tags.module';
 @Module({
   imports: [
     BullModule.registerFlowProducer({ name: FLOW_PRODUCER }),
-    EtlSchemaModule,
     BadgeTypesModule,
     BadgeGroupingsModule,
     BadgesModule,
