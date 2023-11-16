@@ -14,10 +14,14 @@ import { UserActionsModule } from '../user-actions/user-actions.module';
 import { UserBadgesModule } from '../user-badges/user-badges.module';
 import { UsersModule } from '../users/users.module';
 import { CategoriesModule } from '../categories/categories.module';
+import { DEFAULT_JOB_OPTS } from 'src/constants/opts.constant';
 
 @Module({
   imports: [
-    BullModule.registerQueue({ name: QUEUES.EXTRACT }),
+    BullModule.registerQueue({
+      name: QUEUES.EXTRACT,
+      defaultJobOptions: DEFAULT_JOB_OPTS,
+    }),
     BullBoardModule.forFeature({
       name: QUEUES.EXTRACT,
       adapter: BullMQAdapter,

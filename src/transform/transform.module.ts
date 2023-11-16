@@ -19,10 +19,14 @@ import { TopicsModule } from '../topics/topics.module';
 import { UserActionsModule } from '../user-actions/user-actions.module';
 import { UserBadgesModule } from '../user-badges/user-badges.module';
 import { UsersModule } from '../users/users.module';
+import { DEFAULT_JOB_OPTS } from 'src/constants/opts.constant';
 
 @Module({
   imports: [
-    BullModule.registerQueue({ name: QUEUES.TRANSFORM }),
+    BullModule.registerQueue({
+      name: QUEUES.TRANSFORM,
+      defaultJobOptions: DEFAULT_JOB_OPTS,
+    }),
     BullBoardModule.forFeature({
       name: QUEUES.TRANSFORM,
       adapter: BullMQAdapter,
