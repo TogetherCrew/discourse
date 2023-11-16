@@ -1,11 +1,11 @@
+import { QUEUES } from '../constants/queues.constants';
 import { Processor } from '@nestjs/bullmq';
 import { BaseEtlProcessor } from '../base-etl/base-etl.processor';
-import { BaseEtlService } from '../base-etl/base-etl.service';
-import { QUEUES } from '../constants/queues.constants';
+import { TagsService } from './tags.service';
 
-@Processor(QUEUES.TAG)
+@Processor(QUEUES.TAG, { concurrency: 2 })
 export class TagsProcessor extends BaseEtlProcessor {
-  constructor(private readonly myservice: BaseEtlService) {
-    super(myservice);
+  constructor(private readonly tagsService: TagsService) {
+    super(tagsService);
   }
 }
