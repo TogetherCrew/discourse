@@ -12,13 +12,15 @@ import { OrchestrationModule } from './orchestration/orchestration.module';
 import redisConfig from './config/redis.config';
 import { BullBoardModule } from '@bull-board/nestjs';
 import { ExpressAdapter } from '@bull-board/express';
+import { ExtractModule } from './extract/extract.module';
+import proxyConfig from './config/proxy.config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       validationSchema: validationSchema,
       isGlobal: true,
-      load: [baseConfig, neo4jConfig, redisConfig],
+      load: [baseConfig, neo4jConfig, redisConfig, proxyConfig],
     }),
     Neo4jModule.forRootAsync({
       import: [ConfigModule],
@@ -38,6 +40,7 @@ import { ExpressAdapter } from '@bull-board/express';
       adapter: ExpressAdapter,
     }),
     OrchestrationModule,
+    ExtractModule,
   ],
   controllers: [AppController],
   providers: [AppService],
