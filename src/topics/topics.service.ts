@@ -33,8 +33,8 @@ export class TopicsService extends EtlService {
     });
 
     await this.flowProducer.add({
-      name: JOBS.LOAD,
-      queueName: QUEUES.TOPIC,
+      name: JOBS.TOPIC,
+      queueName: QUEUES.LOAD,
       data: { batch },
     });
   }
@@ -59,22 +59,22 @@ export class TopicsService extends EtlService {
     await this.flowProducer.addBulk([
       {
         queueName: QUEUES.EXTRACT,
-        name: JOBS.POSTS,
+        name: JOBS.POST,
         data: { forum, topics },
       },
       {
-        queueName: QUEUES.USER,
-        name: JOBS.TRANSFORM,
+        queueName: QUEUES.TRANSFORM,
+        name: JOBS.USER,
         data: { forum, users },
       },
       {
-        queueName: QUEUES.TOPIC,
-        name: JOBS.TRANSFORM,
+        queueName: QUEUES.TRANSFORM,
+        name: JOBS.TOPIC,
         data: { forum, topics },
       },
       {
-        queueName: QUEUES.TOPIC_TAGS,
-        name: JOBS.TRANSFORM,
+        queueName: QUEUES.TRANSFORM,
+        name: JOBS.TOPIC_TAG,
         data: { forum, topics },
       },
     ]);

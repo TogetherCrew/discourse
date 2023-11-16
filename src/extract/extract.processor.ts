@@ -33,23 +33,23 @@ export class ExtractProcessor extends WorkerHost {
     console.log(job.queueName, job.name);
 
     switch (job.name) {
-      case JOBS.BADGES:
+      case JOBS.BADGE:
         return this.badgesService.extract(job);
-      case JOBS.GROUPS:
+      case JOBS.GROUP:
         return this.groupsService.extract(job);
-      case JOBS.GROUP_MEMBERS:
+      case JOBS.GROUP_MEMBER:
         return this.groupMembersService.extract(job);
-      case JOBS.POSTS:
+      case JOBS.POST:
         return this.postsService.extract(job);
-      case JOBS.TAGS:
+      case JOBS.TAG:
         return this.tagsService.extract(job);
-      case JOBS.TOPICS:
+      case JOBS.TOPIC:
         return this.topicsService.extract(job);
-      case JOBS.CATEGORIES:
+      case JOBS.CATEGORY:
         return this.categoriesService.extract(job);
-      case JOBS.USER_ACTIONS:
+      case JOBS.USER_ACTION:
         return this.userActionsService.extract(job);
-      case JOBS.USER_BADGES:
+      case JOBS.USER_BADGE:
         return this.userBadgesService.extract(job);
       default:
         break;

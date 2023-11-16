@@ -71,15 +71,15 @@ describe('UsersService', () => {
 
       expect(mockFlowProducer.addBulk).toHaveBeenCalledWith([
         {
-          queueName: QUEUES.USER,
-          name: JOBS.LOAD,
+          queueName: QUEUES.LOAD,
+          name: JOBS.USER,
           data: {
             batch,
           },
         },
         {
           queueName: QUEUES.EXTRACT,
-          name: JOBS.USER_ACTIONS,
+          name: JOBS.USER_ACTION,
           data: {
             user: batch[0],
             forum,
@@ -87,7 +87,7 @@ describe('UsersService', () => {
         },
         {
           queueName: QUEUES.EXTRACT,
-          name: JOBS.USER_ACTIONS,
+          name: JOBS.USER_ACTION,
           data: {
             user: batch[1],
             forum,
@@ -95,7 +95,7 @@ describe('UsersService', () => {
         },
         {
           queueName: QUEUES.EXTRACT,
-          name: JOBS.USER_BADGES,
+          name: JOBS.USER_BADGE,
           data: {
             user: batch[0],
             forum,
@@ -103,7 +103,7 @@ describe('UsersService', () => {
         },
         {
           queueName: QUEUES.EXTRACT,
-          name: JOBS.USER_BADGES,
+          name: JOBS.USER_BADGE,
           data: {
             user: batch[1],
             forum,

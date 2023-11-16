@@ -31,8 +31,8 @@ export class PostsService extends EtlService {
     });
 
     await this.flowProducer.add({
-      name: JOBS.LOAD,
-      queueName: QUEUES.POST,
+      queueName: QUEUES.LOAD,
+      name: JOBS.POST,
       data: { batch },
     });
   }
@@ -47,8 +47,8 @@ export class PostsService extends EtlService {
       try {
         const posts = await this.getPosts(forum.endpoint, id);
         await this.flowProducer.add({
-          name: JOBS.TRANSFORM,
-          queueName: QUEUES.POST,
+          queueName: QUEUES.TRANSFORM,
+          name: JOBS.POST,
           data: { forum, posts },
         });
       } catch (error) {

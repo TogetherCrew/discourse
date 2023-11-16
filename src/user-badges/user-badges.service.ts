@@ -24,8 +24,8 @@ export class UserBadgesService extends EtlService {
       );
       const { user_badges } = data;
       await this.flowProducer.add({
-        queueName: QUEUES.USER_BADGES,
-        name: JOBS.TRANSFORM,
+        queueName: QUEUES.TRANSFORM,
+        name: JOBS.USER_BADGE,
         data: { forum, user_badges, user },
       });
     } catch (error) {
@@ -43,8 +43,8 @@ export class UserBadgesService extends EtlService {
       return obj;
     });
     await this.flowProducer.add({
-      queueName: QUEUES.USER_BADGES,
-      name: JOBS.LOAD,
+      queueName: QUEUES.LOAD,
+      name: JOBS.USER_BADGE,
       data: { batch },
     });
   }

@@ -1,15 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { DiscourseService } from '@app/discourse';
-import { InjectFlowProducer } from '@nestjs/bullmq';
-import { FlowProducer, Job } from 'bullmq';
-import { Neo4jService } from 'nest-neo4j/dist';
-import { BaseTransformerService } from '../base-transformer/base-transformer.service';
-import { FLOW_PRODUCER } from '../constants/flows.constants';
 import { Forum } from '../forums/entities/forum.entity';
 import { QUEUES } from '../constants/queues.constants';
 import { JOBS } from '../constants/jobs.contants';
 import { CYPHERS } from '../constants/cyphers.constants';
 import { EtlService } from '../etl/etl.service';
+import { Job } from 'bullmq';
 
 type TransformDto = {
   forum: Forum;
@@ -28,8 +23,8 @@ export class BadgeTypesService extends EtlService {
       this.baseTransformerService.transform(obj, { forum_uuid: forum.uuid }),
     );
     await this.flowProducer.add({
-      queueName: QUEUES.BADGE_TYPE,
-      name: JOBS.LOAD,
+      queueName: QUEUES.LOAD,
+      name: JOBS.BADGE_TYPE,
       data: { batch: output },
     });
   }

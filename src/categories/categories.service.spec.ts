@@ -57,8 +57,8 @@ describe('CategoriesService', () => {
       await service.transform(mockJob as any);
 
       expect(mockFlowProducer.add).toHaveBeenCalledWith({
-        queueName: QUEUES.CATEGORY,
-        name: JOBS.LOAD,
+        queueName: QUEUES.LOAD,
+        name: JOBS.CATEGORY,
         data: {
           batch: [
             { name: 'badge1', forumUuid: 'test-uuid' },

@@ -22,27 +22,27 @@ describe('OrchestrationService', () => {
     expect(mockFlowProducer.addBulk).toHaveBeenCalledWith([
       expect.objectContaining({
         queueName: QUEUES.EXTRACT,
-        name: JOBS.TOPICS,
+        name: JOBS.TOPIC,
         data: { forum },
       }),
       expect.objectContaining({
         queueName: QUEUES.EXTRACT,
-        name: JOBS.CATEGORIES,
+        name: JOBS.CATEGORY,
         data: { forum },
       }),
       expect.objectContaining({
         queueName: QUEUES.EXTRACT,
-        name: JOBS.BADGES,
+        name: JOBS.BADGE,
         data: { forum },
       }),
       expect.objectContaining({
         queueName: QUEUES.EXTRACT,
-        name: JOBS.TAGS,
+        name: JOBS.TAG,
         data: { forum },
       }),
       expect.objectContaining({
         queueName: QUEUES.EXTRACT,
-        name: JOBS.GROUPS,
+        name: JOBS.GROUP,
         data: { forum },
       }),
     ]);

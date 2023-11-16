@@ -39,10 +39,6 @@ describe('GroupOwnersService', () => {
           provide: `BullFlowProducer_${FLOW_PRODUCER}`,
           useValue: mockFlowProducer,
         },
-        {
-          provide: `BullQueue_EXTRACT`,
-          useValue: jest.fn(),
-        },
       ],
     }).compile();
 
@@ -62,8 +58,8 @@ describe('GroupOwnersService', () => {
       await service.transform(mockJob as any);
 
       expect(mockFlowProducer.add).toHaveBeenCalledWith({
-        queueName: QUEUES.GROUP_OWNERS,
-        name: JOBS.LOAD,
+        queueName: QUEUES.LOAD,
+        name: JOBS.GROUP_OWNER,
         data: {
           batch: [
             { id: 1, forumUuid: 'test-uuid' },

@@ -62,8 +62,8 @@ describe('UserBadgesService', () => {
       await service.transform(mockJob as any);
 
       expect(mockFlowProducer.add).toHaveBeenCalledWith({
-        queueName: QUEUES.USER_BADGES,
-        name: JOBS.LOAD,
+        queueName: QUEUES.LOAD,
+        name: JOBS.USER_BADGE,
         data: {
           batch: [
             { id: 1, userId: 1, forumUuid: 'test-uuid' },

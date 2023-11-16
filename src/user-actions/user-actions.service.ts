@@ -32,8 +32,8 @@ export class UserActionsService extends EtlService {
         this.baseTransformerService.transform(obj, { forum_uuid: forum.uuid }),
       );
       await this.flowProducer.add({
-        queueName: QUEUES.USER_ACTIONS,
-        name: JOBS.LOAD,
+        queueName: QUEUES.LOAD,
+        name: JOBS.USER_ACTION,
         data: { batch },
       });
     } catch (error) {
@@ -70,8 +70,8 @@ export class UserActionsService extends EtlService {
       return;
     } else {
       await this.flowProducer.add({
-        queueName: QUEUES.USER_ACTIONS,
-        name: JOBS.TRANSFORM,
+        queueName: QUEUES.TRANSFORM,
+        name: JOBS.USER,
         data: { forum, user_actions },
       });
       return await this.iterate(job, forum, user, offset + limit, limit);

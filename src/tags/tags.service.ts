@@ -31,13 +31,13 @@ export class TagsService extends EtlService {
 
       this.flowProducer.addBulk([
         {
-          queueName: QUEUES.TAG,
-          name: JOBS.TRANSFORM,
+          queueName: QUEUES.TRANSFORM,
+          name: JOBS.TAG,
           data: { forum, tags },
         },
         {
-          queueName: QUEUES.TAG_GROUP,
-          name: JOBS.TRANSFORM,
+          queueName: QUEUES.TRANSFORM,
+          name: JOBS.TAG_GROUP,
           data: { forum, tag_groups },
         },
       ]);
@@ -54,8 +54,8 @@ export class TagsService extends EtlService {
       }),
     );
     await this.flowProducer.add({
-      queueName: QUEUES.TAG,
-      name: JOBS.LOAD,
+      queueName: QUEUES.LOAD,
+      name: JOBS.TAG,
       data: { batch },
     });
   }

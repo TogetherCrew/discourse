@@ -39,22 +39,17 @@ export class UsersService extends EtlService {
     });
     await this.flowProducer.addBulk([
       {
-        queueName: QUEUES.USER,
-        name: JOBS.LOAD,
+        queueName: QUEUES.LOAD,
+        name: JOBS.USER,
         data: { batch },
       },
       ...(await this.uniqueJobs(
         QUEUES.EXTRACT,
-        JOBS.USER_ACTIONS,
+        JOBS.USER_ACTION,
         forum,
         batch,
       )),
-      ...(await this.uniqueJobs(
-        QUEUES.EXTRACT,
-        JOBS.USER_BADGES,
-        forum,
-        batch,
-      )),
+      ...(await this.uniqueJobs(QUEUES.EXTRACT, JOBS.USER_BADGE, forum, batch)),
     ]);
   }
 

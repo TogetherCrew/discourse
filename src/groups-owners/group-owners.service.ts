@@ -29,8 +29,8 @@ export class GroupOwnersService extends EtlService {
       this.baseTransformerService.transform(obj, { forum_uuid: forum.uuid }),
     );
     await this.flowProducer.add({
-      queueName: QUEUES.GROUP_OWNERS,
-      name: JOBS.LOAD,
+      queueName: QUEUES.LOAD,
+      name: JOBS.GROUP_OWNER,
       data: { batch, groupId: group.id },
     });
   }

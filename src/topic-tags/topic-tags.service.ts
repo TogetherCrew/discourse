@@ -34,8 +34,8 @@ export class TopicTagsService extends EtlService {
     });
 
     await this.flowProducer.add({
-      queueName: QUEUES.TOPIC_TAGS,
-      name: JOBS.LOAD,
+      queueName: QUEUES.LOAD,
+      name: JOBS.TOPIC_TAG,
       data: { batch },
     });
   }

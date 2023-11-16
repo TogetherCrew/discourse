@@ -43,18 +43,18 @@ export class BadgesService extends EtlService {
 
       this.flowProducer.addBulk([
         {
-          queueName: QUEUES.BADGE,
-          name: JOBS.TRANSFORM,
+          queueName: QUEUES.TRANSFORM,
+          name: JOBS.BADGE,
           data: { forum, batch: badges },
         },
         {
-          queueName: QUEUES.BADGE_GROUPING,
-          name: JOBS.TRANSFORM,
+          queueName: QUEUES.TRANSFORM,
+          name: JOBS.BADGE_GROUPING,
           data: { forum, batch: badge_groupings },
         },
         {
-          queueName: QUEUES.BADGE_TYPE,
-          name: JOBS.TRANSFORM,
+          queueName: QUEUES.TRANSFORM,
+          name: JOBS.BADGE_TYPE,
           data: { forum, batch: badge_types },
         },
       ]);
@@ -69,8 +69,8 @@ export class BadgesService extends EtlService {
       this.baseTransformerService.transform(obj, { forum_uuid: forum.uuid }),
     );
     await this.flowProducer.add({
-      queueName: QUEUES.BADGE,
-      name: JOBS.LOAD,
+      queueName: QUEUES.LOAD,
+      name: JOBS.BADGE,
       data: { batch: output },
     });
   }

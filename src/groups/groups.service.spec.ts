@@ -57,8 +57,8 @@ describe('GroupsService', () => {
       await service.transform(mockJob as any);
 
       expect(mockFlowProducer.add).toHaveBeenCalledWith({
-        queueName: QUEUES.GROUP,
-        name: JOBS.LOAD,
+        queueName: QUEUES.LOAD,
+        name: JOBS.GROUP,
         data: {
           batch: [
             { name: 'group1', forumUuid: 'test-uuid' },

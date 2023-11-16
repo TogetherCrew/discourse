@@ -13,6 +13,7 @@ import redisConfig from './config/redis.config';
 import { BullBoardModule } from '@bull-board/nestjs';
 import { ExpressAdapter } from '@bull-board/express';
 import { ExtractModule } from './extract/extract.module';
+import { TransformModule } from './transform/transform.module';
 import proxyConfig from './config/proxy.config';
 
 @Module({
@@ -41,6 +42,7 @@ import proxyConfig from './config/proxy.config';
     }),
     OrchestrationModule,
     ExtractModule,
+    TransformModule,
   ],
   controllers: [AppController],
   providers: [AppService],

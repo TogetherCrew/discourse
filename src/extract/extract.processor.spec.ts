@@ -108,33 +108,33 @@ describe('ExtractProcessor', () => {
 
   it('should call the correct service based on job name', async () => {
     const mockBadgesJob = {
-      name: JOBS.BADGES,
+      name: JOBS.BADGE,
       queueName: QUEUES.EXTRACT,
     } as Job;
     const mockGroupsJob = {
-      name: JOBS.GROUPS,
+      name: JOBS.GROUP,
       queueName: QUEUES.EXTRACT,
     } as Job;
     const mockGroupMembersJob = {
-      name: JOBS.GROUP_MEMBERS,
+      name: JOBS.GROUP_MEMBER,
       queueName: QUEUES.EXTRACT,
     } as Job;
-    const mockPostsJob = { name: JOBS.POSTS, queueName: QUEUES.EXTRACT } as Job;
-    const mockTagsJob = { name: JOBS.TAGS, queueName: QUEUES.EXTRACT } as Job;
+    const mockPostsJob = { name: JOBS.POST, queueName: QUEUES.EXTRACT } as Job;
+    const mockTagsJob = { name: JOBS.TAG, queueName: QUEUES.EXTRACT } as Job;
     const mockTopicsJob = {
-      name: JOBS.TOPICS,
+      name: JOBS.TOPIC,
       queueName: QUEUES.EXTRACT,
     } as Job;
     const mockCategoriesJob = {
-      name: JOBS.CATEGORIES,
+      name: JOBS.CATEGORY,
       queueName: QUEUES.EXTRACT,
     } as Job;
     const mockUserActionsJob = {
-      name: JOBS.USER_ACTIONS,
+      name: JOBS.USER_ACTION,
       queueName: QUEUES.EXTRACT,
     } as Job;
     const mockUserBadgesJob = {
-      name: JOBS.USER_BADGES,
+      name: JOBS.USER_BADGE,
       queueName: QUEUES.EXTRACT,
     } as Job;
 

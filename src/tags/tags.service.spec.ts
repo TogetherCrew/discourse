@@ -39,10 +39,6 @@ describe('TagsService', () => {
           provide: `BullFlowProducer_${FLOW_PRODUCER}`,
           useValue: mockFlowProducer,
         },
-        {
-          provide: `BullQueue_EXTRACT`,
-          useValue: jest.fn(),
-        },
       ],
     }).compile();
 
@@ -61,8 +57,8 @@ describe('TagsService', () => {
       await service.transform(mockJob as any);
 
       expect(mockFlowProducer.add).toHaveBeenCalledWith({
-        queueName: QUEUES.TAG,
-        name: JOBS.LOAD,
+        queueName: QUEUES.LOAD,
+        name: JOBS.TAG,
         data: {
           batch: [
             { id: 'tag1', forumUuid: 'test-uuid' },

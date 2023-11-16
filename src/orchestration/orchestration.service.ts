@@ -17,27 +17,27 @@ export class OrchestrationService {
     this.flowProducer.addBulk([
       {
         queueName: QUEUES.EXTRACT,
-        name: JOBS.TOPICS,
+        name: JOBS.TOPIC,
         data: { forum },
       },
       {
         queueName: QUEUES.EXTRACT,
-        name: JOBS.CATEGORIES,
+        name: JOBS.CATEGORY,
         data: { forum },
       },
       {
         queueName: QUEUES.EXTRACT,
-        name: JOBS.BADGES,
+        name: JOBS.BADGE,
         data: { forum },
       },
       {
         queueName: QUEUES.EXTRACT,
-        name: JOBS.TAGS,
+        name: JOBS.TAG,
         data: { forum },
       },
       {
         queueName: QUEUES.EXTRACT,
-        name: JOBS.GROUPS,
+        name: JOBS.GROUP,
         data: { forum },
       },
     ]);

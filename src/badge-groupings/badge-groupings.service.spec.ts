@@ -57,8 +57,8 @@ describe('BadgeGroupingsService', () => {
       await service.transform(mockJob as any);
 
       expect(mockFlowProducer.add).toHaveBeenCalledWith({
-        queueName: QUEUES.BADGE_GROUPING,
-        name: JOBS.LOAD,
+        queueName: QUEUES.LOAD,
+        name: JOBS.BADGE_GROUPING,
         data: {
           batch: [
             { id: 1, forumUuid: 'test-uuid' },

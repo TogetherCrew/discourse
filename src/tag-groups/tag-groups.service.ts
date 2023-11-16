@@ -28,8 +28,8 @@ export class TagGroupsService extends EtlService {
       }),
     );
     await this.flowProducer.add({
-      queueName: QUEUES.TAG_GROUP,
-      name: JOBS.LOAD,
+      queueName: QUEUES.LOAD,
+      name: JOBS.TAG_GROUP,
       data: { batch },
     });
   }

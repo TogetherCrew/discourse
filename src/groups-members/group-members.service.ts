@@ -50,8 +50,8 @@ export class GroupMembersService extends EtlService {
       this.baseTransformerService.transform(obj, { forum_uuid: forum.uuid }),
     );
     await this.flowProducer.add({
-      queueName: QUEUES.GROUP_MEMBERS,
-      name: JOBS.LOAD,
+      queueName: QUEUES.LOAD,
+      name: JOBS.GROUP_MEMBER,
       data: { batch, groupId: group.id },
     });
   }
@@ -71,36 +71,36 @@ export class GroupMembersService extends EtlService {
 
     await this.flowProducer.addBulk([
       {
-        queueName: QUEUES.GROUP_MEMBERS,
-        name: JOBS.TRANSFORM,
+        queueName: QUEUES.TRANSFORM,
+        name: JOBS.GROUP_MEMBER,
         data: { forum, group, members },
       },
       {
-        queueName: QUEUES.GROUP_OWNERS,
-        name: JOBS.TRANSFORM,
+        queueName: QUEUES.TRANSFORM,
+        name: JOBS.GROUP_OWNER,
         data: { forum, group, owners },
       },
       ...(await this.uniqueJobs(
         QUEUES.EXTRACT,
-        JOBS.USER_ACTIONS,
+        JOBS.USER_ACTION,
         forum,
         members,
       )),
       ...(await this.uniqueJobs(
         QUEUES.EXTRACT,
-        JOBS.USER_BADGES,
+        JOBS.USER_BADGE,
         forum,
         members,
       )),
       ...(await this.uniqueJobs(
         QUEUES.EXTRACT,
-        JOBS.USER_ACTIONS,
+        JOBS.USER_ACTION,
         forum,
         owners,
       )),
       ...(await this.uniqueJobs(
         QUEUES.EXTRACT,
-        JOBS.USER_BADGES,
+        JOBS.USER_BADGE,
         forum,
         owners,
       )),

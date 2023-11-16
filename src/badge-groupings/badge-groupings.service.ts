@@ -24,8 +24,8 @@ export class BadgeGroupingsService extends EtlService {
     );
     console.log('output', output);
     await this.flowProducer.add({
-      queueName: QUEUES.BADGE_GROUPING,
-      name: JOBS.LOAD,
+      queueName: QUEUES.LOAD,
+      name: JOBS.BADGE_GROUPING,
       data: { batch: output },
     });
   }

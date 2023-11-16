@@ -39,10 +39,6 @@ describe('PostsService', () => {
           provide: `BullFlowProducer_${FLOW_PRODUCER}`,
           useValue: mockFlowProducer,
         },
-        {
-          provide: `BullQueue_EXTRACT`,
-          useValue: jest.fn(),
-        },
       ],
     }).compile();
 
@@ -61,8 +57,8 @@ describe('PostsService', () => {
       await service.transform(mockJob as any);
 
       expect(mockFlowProducer.add).toHaveBeenCalledWith({
-        queueName: QUEUES.POST,
-        name: JOBS.LOAD,
+        queueName: QUEUES.LOAD,
+        name: JOBS.POST,
         data: {
           batch: [
             { id: 1, forumUuid: 'test-uuid' },

@@ -31,8 +31,8 @@ export class GroupsService extends EtlService {
       this.baseTransformerService.transform(obj, { forum_uuid: forum.uuid }),
     );
     await this.flowProducer.add({
-      queueName: QUEUES.GROUP,
-      name: JOBS.LOAD,
+      queueName: QUEUES.LOAD,
+      name: JOBS.GROUP,
       data: { batch },
     });
   }
@@ -49,13 +49,13 @@ export class GroupsService extends EtlService {
     const { groups, total_rows_groups }: GroupsResponse = data;
 
     await this.flowProducer.add({
-      queueName: QUEUES.GROUP,
-      name: JOBS.TRANSFORM,
+      queueName: QUEUES.TRANSFORM,
+      name: JOBS.GROUP,
       data: { forum, groups },
     });
     const jobs: FlowJob[] = groups.map((group) => ({
       queueName: QUEUES.EXTRACT,
-      name: JOBS.GROUP_MEMBERS,
+      name: JOBS.GROUP_MEMBER,
       data: { forum, group },
     }));
     await this.flowProducer.addBulk(jobs);

@@ -40,8 +40,10 @@ describe('GroupMembersService', () => {
           useValue: mockFlowProducer,
         },
         {
-          provide: `BullQueue_EXTRACT`,
-          useValue: jest.fn(),
+          provide: 'BullQueue_EXTRACT',
+          useValue: {
+            add: jest.fn(),
+          },
         },
       ],
     }).compile();
@@ -62,8 +64,8 @@ describe('GroupMembersService', () => {
       await service.transform(mockJob as any);
 
       expect(mockFlowProducer.add).toHaveBeenCalledWith({
-        queueName: QUEUES.GROUP_MEMBERS,
-        name: JOBS.LOAD,
+        queueName: QUEUES.LOAD,
+        name: JOBS.GROUP_MEMBER,
         data: {
           batch: [
             { id: 1, forumUuid: 'test-uuid' },

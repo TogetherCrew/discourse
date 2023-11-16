@@ -61,8 +61,8 @@ describe('UserActionsService', () => {
       await service.transform(mockJob as any);
 
       expect(mockFlowProducer.add).toHaveBeenCalledWith({
-        queueName: QUEUES.USER_ACTIONS,
-        name: JOBS.LOAD,
+        queueName: QUEUES.LOAD,
+        name: JOBS.USER_ACTION,
         data: {
           batch: [
             { id: 1, forumUuid: 'test-uuid' },
