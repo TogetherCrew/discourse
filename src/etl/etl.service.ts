@@ -3,7 +3,7 @@ import { FlowProducer, Job } from 'bullmq';
 import { Neo4jService } from 'nest-neo4j/dist';
 import { BaseTransformerService } from '../base-transformer/base-transformer.service';
 import { InjectFlowProducer } from '@nestjs/bullmq';
-import { FLOW_PRODUCER } from 'src/constants/flows.constants';
+import { FLOW_PRODUCER } from '../constants/flows.constants';
 
 export abstract class EtlService {
   constructor(
