@@ -1,54 +1,50 @@
-import { Test } from '@nestjs/testing';
-import { FLOWS } from '../constants/flows.constants';
-import { EtlSchemaService } from '../etl-schema/etl-schema.service';
-import { OrchestrationService } from './orchestration.service';
-import { Forum } from '../forums/entities/forum.entity';
 import { FlowProducer } from 'bullmq';
+import { JOBS } from '../constants/jobs.contants';
+import { QUEUES } from '../constants/queues.constants';
+import { Forum } from '../forums/entities/forum.entity';
+import { OrchestrationService } from './orchestration.service';
 
 describe('OrchestrationService', () => {
   let orchestrationService: OrchestrationService;
-  let etlService: EtlSchemaService;
-  let flowProducer: FlowProducer;
-  let forum: Forum;
+  let mockFlowProducer: jest.Mocked<FlowProducer>;
 
   beforeEach(async () => {
-    const moduleRef = await Test.createTestingModule({
-      providers: [
-        OrchestrationService,
-        {
-          provide: EtlSchemaService,
-          useValue: {
-            etl: jest.fn(),
-          },
-        },
-        {
-          provide: `BullFlowProducer_${FLOWS.DISCOURSE_ETL}`,
-          useValue: {
-            add: jest.fn().mockResolvedValue({ id: 'flowJobId' }),
-          },
-        },
-      ],
-    }).compile();
-
-    orchestrationService =
-      moduleRef.get<OrchestrationService>(OrchestrationService);
-    etlService = moduleRef.get<EtlSchemaService>(EtlSchemaService);
-    flowProducer = moduleRef.get(`BullFlowProducer_${FLOWS.DISCOURSE_ETL}`);
-    forum = new Forum(); // mock or use a real Forum instance as required
+    mockFlowProducer = {
+      addBulk: jest.fn(),
+    } as unknown as jest.Mocked<FlowProducer>;
+    orchestrationService = new OrchestrationService(mockFlowProducer);
   });
 
-  it('should be defined', () => {
-    expect(orchestrationService).toBeDefined();
-  });
+  it('should add jobs correctly when run is called', async () => {
+    const forum = new Forum(); // Assuming you have a Forum class
+    await orchestrationService.run(forum);
 
-  describe('run method', () => {
-    it('should create a flow job tree and add it using FlowProducer', async () => {
-      const result = await orchestrationService.run(forum);
-
-      expect(etlService.etl).toHaveBeenCalledTimes(6);
-
-      expect(result).toHaveProperty('id', 'flowJobId');
-      expect(flowProducer.add).toHaveBeenCalled();
-    });
+    expect(mockFlowProducer.addBulk).toHaveBeenCalledWith([
+      expect.objectContaining({
+        queueName: QUEUES.EXTRACT,
+        name: JOBS.TOPICS,
+        data: { forum },
+      }),
+      expect.objectContaining({
+        queueName: QUEUES.EXTRACT,
+        name: JOBS.CATEGORIES,
+        data: { forum },
+      }),
+      expect.objectContaining({
+        queueName: QUEUES.EXTRACT,
+        name: JOBS.BADGES,
+        data: { forum },
+      }),
+      expect.objectContaining({
+        queueName: QUEUES.EXTRACT,
+        name: JOBS.TAGS,
+        data: { forum },
+      }),
+      expect.objectContaining({
+        queueName: QUEUES.EXTRACT,
+        name: JOBS.GROUPS,
+        data: { forum },
+      }),
+    ]);
   });
 });
