@@ -16,7 +16,7 @@ export class DiscourseService {
     private bottleneckService: BottleneckService,
     private readonly configService: ConfigService,
   ) {
-    const uri = configService.get('proxy');
+    const uri = configService.get<string>('PROXY_URI');
     if (uri) {
       this.proxyAgent = new HttpsProxyAgent(uri);
     }
