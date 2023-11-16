@@ -2,9 +2,8 @@ import { Test } from '@nestjs/testing';
 import { Job } from 'bullmq';
 import { BaseEtlProcessor } from './base-etl.processor';
 import { JOBS } from '../constants/jobs.contants';
-import { EtlService } from 'src/etl/etl.service';
-import { FLOW_PRODUCER } from 'src/constants/flows.constants';
-
+import { EtlService } from '../etl/etl.service';
+import { FLOW_PRODUCER } from '../constants/flows.constants';
 describe('BaseEtlProcessor', () => {
   let processor: BaseEtlProcessor;
   let mockService: jest.Mocked<EtlService>;
@@ -31,6 +30,7 @@ describe('BaseEtlProcessor', () => {
     }).compile();
 
     processor = module.get<BaseEtlProcessor>(BaseEtlProcessor);
+    console.log('processor', processor);
   });
 
   it('should process extract job', async () => {
