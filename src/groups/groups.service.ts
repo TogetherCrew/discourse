@@ -1,6 +1,4 @@
 import { FlowJob, Job } from 'bullmq';
-import { EtlDto } from '../base-etl/dto/etl.dto';
-
 import { Injectable } from '@nestjs/common';
 import { EtlService } from '../etl/etl.service';
 import { QUEUES } from '../constants/queues.constants';
@@ -23,7 +21,7 @@ type LoadDto = {
 @Injectable()
 export class GroupsService extends EtlService {
   async extract(job: Job<ExtractDto, any, string>): Promise<any> {
-    const { forum } = job.data as EtlDto;
+    const { forum } = job.data;
     return this.iterate(forum);
   }
 

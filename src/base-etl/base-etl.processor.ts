@@ -1,15 +1,14 @@
 import { WorkerHost } from '@nestjs/bullmq';
 import { Job } from 'bullmq';
 import { JOBS } from '../constants/jobs.contants';
-import { BaseEtlService } from './base-etl.service';
-import { EtlDto } from './dto/etl.dto';
+import { EtlService } from 'src/etl/etl.service';
 
 export class BaseEtlProcessor extends WorkerHost {
-  constructor(private readonly service: BaseEtlService) {
+  constructor(private readonly service: EtlService) {
     super();
   }
 
-  async process(job: Job<EtlDto, any, string>): Promise<any> {
+  async process(job: Job<any, any, string>): Promise<any> {
     console.log(job.queueName, job.name);
     switch (job.name) {
       case JOBS.EXTRACT:

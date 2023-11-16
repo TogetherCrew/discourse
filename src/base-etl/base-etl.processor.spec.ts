@@ -1,76 +1,77 @@
 import { Test } from '@nestjs/testing';
-import { BaseEtlService } from './base-etl.service';
 import { Job } from 'bullmq';
 import { BaseEtlProcessor } from './base-etl.processor';
 import { JOBS } from '../constants/jobs.contants';
-import { EtlDto } from './dto/etl.dto';
+import { EtlService } from 'src/etl/etl.service';
+import { FLOW_PRODUCER } from 'src/constants/flows.constants';
 
 describe('BaseEtlProcessor', () => {
   let processor: BaseEtlProcessor;
-  let service: BaseEtlService;
-
-  let mockService: any;
+  let mockService: jest.Mocked<EtlService>;
 
   beforeEach(async () => {
     mockService = {
       extract: jest.fn(),
       transform: jest.fn(),
       load: jest.fn(),
-    };
+    } as unknown as jest.Mocked<EtlService>;
 
-    const moduleRef = await Test.createTestingModule({
+    const module = await Test.createTestingModule({
       providers: [
+        BaseEtlProcessor,
         {
-          provide: BaseEtlService,
+          provide: EtlService,
           useValue: mockService,
         },
-        BaseEtlProcessor,
+        {
+          provide: `BullFlowProducer_${FLOW_PRODUCER}`,
+          useValue: jest.fn(),
+        },
       ],
     }).compile();
 
-    service = moduleRef.get<BaseEtlService>(BaseEtlService);
-    processor = new (class extends BaseEtlProcessor {})(service);
+    processor = module.get<BaseEtlProcessor>(BaseEtlProcessor);
   });
 
   it('should process extract job', async () => {
     const job = { name: JOBS.EXTRACT, queueName: 'testQueue' } as Job<
-      EtlDto,
+      any,
       any,
       string
     >;
     await processor.process(job);
-    expect(service.extract).toHaveBeenCalledWith(job);
+    expect(mockService.extract).toHaveBeenCalledWith(job);
   });
 
   it('should process transform job', async () => {
     const job = { name: JOBS.TRANSFORM, queueName: 'testQueue' } as Job<
-      EtlDto,
+      any,
       any,
       string
     >;
     await processor.process(job);
-    expect(service.transform).toHaveBeenCalledWith(job);
+    expect(mockService.transform).toHaveBeenCalledWith(job);
   });
 
   it('should process load job', async () => {
     const job = { name: JOBS.LOAD, queueName: 'testQueue' } as Job<
-      EtlDto,
+      any,
       any,
       string
     >;
     await processor.process(job);
-    expect(service.load).toHaveBeenCalledWith(job);
+    expect(mockService.load).toHaveBeenCalledWith(job);
   });
 
   it('should not process an unknown job', async () => {
     const job = { name: 'unknown', queueName: 'testQueue' } as Job<
-      EtlDto,
+      any,
       any,
       string
     >;
     await processor.process(job);
-    expect(service.extract).not.toHaveBeenCalled();
-    expect(service.transform).not.toHaveBeenCalled();
-    expect(service.load).not.toHaveBeenCalled();
+    expect(mockService.extract).not.toHaveBeenCalled();
+    expect(mockService.transform).not.toHaveBeenCalled();
+    expect(mockService.load).not.toHaveBeenCalled();
   });
 });
