@@ -5,12 +5,15 @@ import { BullModule } from '@nestjs/bullmq';
 import { BaseEtlModule } from '../base-etl/base-etl.module';
 import { BaseTransformerModule } from '../base-transformer/base-transformer.module';
 import { QUEUES } from '../constants/queues.constants';
-import { UsersEtlService } from './users-etl.service';
+import { UsersService } from './users.service';
 import { BullBoardModule } from '@bull-board/nestjs';
 import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
+import { FLOW_PRODUCER } from '../constants/flows.constants';
 
 @Module({
   imports: [
+    BullModule.registerFlowProducer({ name: FLOW_PRODUCER }),
+    BullModule.registerQueue({ name: QUEUES.EXTRACT }),
     BullModule.registerQueue({ name: QUEUES.USER }),
     BullBoardModule.forFeature({
       name: QUEUES.USER,
@@ -20,6 +23,7 @@ import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
     DiscourseModule,
     BaseTransformerModule,
   ],
-  providers: [UsersProcessor, UsersEtlService],
+  providers: [UsersProcessor, UsersService],
+  exports: [UsersService],
 })
 export class UsersModule {}
