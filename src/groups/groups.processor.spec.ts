@@ -6,7 +6,7 @@ import { FLOW_PRODUCER } from '../constants/flows.constants';
 import { GroupsProcessor } from './groups.processor';
 import { GroupsService } from './groups.service';
 
-describe('GroupsService', () => {
+describe('GroupsProcessor', () => {
   let processor: GroupsProcessor;
 
   beforeEach(async () => {

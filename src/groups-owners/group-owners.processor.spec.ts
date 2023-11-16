@@ -6,7 +6,7 @@ import { FLOW_PRODUCER } from '../constants/flows.constants';
 import { GroupOwnersProcessor } from './group-owners.processor';
 import { GroupOwnersService } from './group-owners.service';
 
-describe('GroupOwnersService', () => {
+describe('GroupOwnersProcessor', () => {
   let processor: GroupOwnersProcessor;
 
   beforeEach(async () => {

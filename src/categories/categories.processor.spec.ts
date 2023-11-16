@@ -6,7 +6,7 @@ import { FLOW_PRODUCER } from '../constants/flows.constants';
 import { CategoriesProcessor } from './categories.processor';
 import { CategoriesService } from './categories.service';
 
-describe('CategoriesService', () => {
+describe('CategoriesProcessor', () => {
   let processor: CategoriesProcessor;
 
   beforeEach(async () => {

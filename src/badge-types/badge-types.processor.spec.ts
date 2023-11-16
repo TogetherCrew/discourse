@@ -6,7 +6,7 @@ import { Neo4jService } from 'nest-neo4j/dist';
 import { BaseTransformerService } from '../base-transformer/base-transformer.service';
 import { FLOW_PRODUCER } from '../constants/flows.constants';
 
-describe('BadgeGroupingsService', () => {
+describe('BadgeGroupingsProcessor', () => {
   let processor: BadgeTypesProcessor;
 
   beforeEach(async () => {
