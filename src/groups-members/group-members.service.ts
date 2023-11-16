@@ -123,7 +123,6 @@ export class GroupMembersService extends EtlService {
     const since = Date.now() - 24 * 60 * 60 * 1000; // 24 Hours
 
     let jobs = await this.extractQueue.getJobs();
-    console.log('jobs.length', jobs.length);
     jobs = jobs.filter((job) => job.name === name && since < job.timestamp);
 
     const array = [];

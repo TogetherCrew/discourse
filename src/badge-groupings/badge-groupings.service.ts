@@ -22,7 +22,7 @@ export class BadgeGroupingsService extends EtlService {
     const output = batch.map((obj) =>
       this.baseTransformerService.transform(obj, { forum_uuid: forum.uuid }),
     );
-    console.log('output', output);
+
     await this.flowProducer.add({
       queueName: QUEUES.LOAD,
       name: JOBS.BADGE_GROUPING,

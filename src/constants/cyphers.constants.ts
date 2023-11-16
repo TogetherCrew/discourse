@@ -115,7 +115,7 @@ const BULK_CREATE_POST = generateCypher(
 const BULK_CREATE_USER = generateCypher(
   'UNWIND $batch AS user RETURN user',
   [
-    'MERGE (f:Forum { uuid: user.forumUuid })',
+    'MATCH (f:Forum { uuid: user.forumUuid })', // This is a MATCH because we don't want to recreate a forum
     'MERGE (u:User { id: user.id, forumUuid: user.forumUuid }) SET u = user',
     'MERGE (u)-[:HAS_JOINED]->(f)',
   ].join(' '),
