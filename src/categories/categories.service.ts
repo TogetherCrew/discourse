@@ -36,23 +36,34 @@ export class CategoriesService extends EtlService {
         data: { forum, batch: categories },
       });
     } catch (error) {
-      console.error(error.message);
+      job.log(error.message);
+      throw error;
     }
   }
 
   async transform(job: Job<TransformDto, any, string>): Promise<any> {
-    const { forum, batch } = job.data;
-    const output = batch.map((obj) =>
-      this.baseTransformerService.transform(obj, { forum_uuid: forum.uuid }),
-    );
-    await this.flowProducer.add({
-      queueName: QUEUES.LOAD,
-      name: JOBS.CATEGORY,
-      data: { batch: output },
-    });
+    try {
+      const { forum, batch } = job.data;
+      const output = batch.map((obj) =>
+        this.baseTransformerService.transform(obj, { forum_uuid: forum.uuid }),
+      );
+      await this.flowProducer.add({
+        queueName: QUEUES.LOAD,
+        name: JOBS.CATEGORY,
+        data: { batch: output },
+      });
+    } catch (error) {
+      job.log(error.message);
+      throw error;
+    }
   }
 
   async load(job: Job<LoadDto, any, string>): Promise<any> {
-    await this.neo4jService.write(CYPHERS.BULK_CREATE_CATEGORY, job.data);
+    try {
+      await this.neo4jService.write(CYPHERS.BULK_CREATE_CATEGORY, job.data);
+    } catch (error) {
+      job.log(error.message);
+      throw error;
+    }
   }
 }

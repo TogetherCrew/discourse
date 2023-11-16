@@ -24,18 +24,28 @@ type LoadDto = {
 @Injectable()
 export class GroupOwnersService extends EtlService {
   async transform(job: Job<TransformDto, any, string>) {
-    const { forum, owners, group } = job.data;
-    const batch = owners.map((obj) =>
-      this.baseTransformerService.transform(obj, { forum_uuid: forum.uuid }),
-    );
-    await this.flowProducer.add({
-      queueName: QUEUES.LOAD,
-      name: JOBS.GROUP_OWNER,
-      data: { batch, groupId: group.id },
-    });
+    try {
+      const { forum, owners, group } = job.data;
+      const batch = owners.map((obj) =>
+        this.baseTransformerService.transform(obj, { forum_uuid: forum.uuid }),
+      );
+      await this.flowProducer.add({
+        queueName: QUEUES.LOAD,
+        name: JOBS.GROUP_OWNER,
+        data: { batch, groupId: group.id },
+      });
+    } catch (error) {
+      job.log(error.message);
+      throw error;
+    }
   }
 
   async load(job: Job<LoadDto, any, string>) {
-    await this.neo4jService.write(CYPHERS.BULK_CREATE_GROUP_OWNERS, job.data);
+    try {
+      await this.neo4jService.write(CYPHERS.BULK_CREATE_GROUP_OWNERS, job.data);
+    } catch (error) {
+      job.log(error.message);
+      throw error;
+    }
   }
 }

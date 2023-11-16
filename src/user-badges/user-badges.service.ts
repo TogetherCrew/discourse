@@ -29,31 +29,38 @@ export class UserBadgesService extends EtlService {
         data: { forum, user_badges, user },
       });
     } catch (error) {
-      console.error(error);
+      job.log(error.message);
+      throw error;
     }
   }
 
   async transform(job: Job<TransformDto, any, string>): Promise<any> {
-    const { forum, user_badges, user } = job.data;
-    const batch = user_badges.map((user_badge) => {
-      const obj = this.baseTransformerService.transform(user_badge, {
-        forum_uuid: forum.uuid,
-        user_id: user.id,
+    try {
+      const { forum, user_badges, user } = job.data;
+      const batch = user_badges.map((user_badge) => {
+        const obj = this.baseTransformerService.transform(user_badge, {
+          forum_uuid: forum.uuid,
+          user_id: user.id,
+        });
+        return obj;
       });
-      return obj;
-    });
-    await this.flowProducer.add({
-      queueName: QUEUES.LOAD,
-      name: JOBS.USER_BADGE,
-      data: { batch },
-    });
+      await this.flowProducer.add({
+        queueName: QUEUES.LOAD,
+        name: JOBS.USER_BADGE,
+        data: { batch },
+      });
+    } catch (error) {
+      job.log(error.message);
+      throw error;
+    }
   }
 
   async load(job: Job<any, any, string>): Promise<any> {
     try {
       await this.neo4jService.write(CYPHERS.BULK_CREATE_USER_BADGE, job.data);
     } catch (error) {
-      console.error(error.message);
+      job.log(error.message);
+      throw error;
     }
   }
 }

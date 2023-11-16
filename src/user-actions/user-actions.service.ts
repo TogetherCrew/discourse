@@ -22,6 +22,7 @@ export class UserActionsService extends EtlService {
       return this.iterate(job, forum, user);
     } catch (error) {
       job.log(error.log);
+      throw error;
     }
   }
 
@@ -58,23 +59,27 @@ export class UserActionsService extends EtlService {
     offset = 0,
     limit = 50,
   ) {
-    const { data } = await this.discourseService.getUserActions(
-      forum.endpoint,
-      user.username,
-      offset,
-      limit,
-    );
-    const { user_actions }: UserActionsResponse = data;
+    try {
+      const { data } = await this.discourseService.getUserActions(
+        forum.endpoint,
+        user.username,
+        offset,
+        limit,
+      );
+      const { user_actions }: UserActionsResponse = data;
 
-    if (user_actions.length == 0) {
-      return;
-    } else {
-      await this.flowProducer.add({
-        queueName: QUEUES.TRANSFORM,
-        name: JOBS.USER,
-        data: { forum, user_actions },
-      });
-      return await this.iterate(job, forum, user, offset + limit, limit);
+      if (user_actions.length == 0) {
+        return;
+      } else {
+        await this.flowProducer.add({
+          queueName: QUEUES.TRANSFORM,
+          name: JOBS.USER,
+          data: { forum, user_actions },
+        });
+        return await this.iterate(job, forum, user, offset + limit, limit);
+      }
+    } catch (error) {
+      throw error;
     }
   }
 }

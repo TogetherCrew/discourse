@@ -20,31 +20,37 @@ type TopicTag = {
 @Injectable()
 export class TopicTagsService extends EtlService {
   async transform(job: Job<TransformDto, any, string>): Promise<any> {
-    const { forum, topics } = job.data;
-    const batch: TopicTag[] = [];
+    try {
+      const { forum, topics } = job.data;
+      const batch: TopicTag[] = [];
 
-    topics.forEach((topic) => {
-      topic.tags.forEach((tagId) => {
-        batch.push({
-          forumUuid: forum.uuid,
-          tagId: tagId,
-          topicId: topic.id,
+      topics.forEach((topic) => {
+        topic.tags.forEach((tagId) => {
+          batch.push({
+            forumUuid: forum.uuid,
+            tagId: tagId,
+            topicId: topic.id,
+          });
         });
       });
-    });
 
-    await this.flowProducer.add({
-      queueName: QUEUES.LOAD,
-      name: JOBS.TOPIC_TAG,
-      data: { batch },
-    });
+      await this.flowProducer.add({
+        queueName: QUEUES.LOAD,
+        name: JOBS.TOPIC_TAG,
+        data: { batch },
+      });
+    } catch (error) {
+      job.log(error.message);
+      throw error;
+    }
   }
 
   async load(job: Job<any, any, string>): Promise<any> {
     try {
       await this.neo4jService.write(CYPHERS.BULK_CREATE_TOPIC_TAG, job.data);
     } catch (error) {
-      console.error(error.message);
+      job.log(error.message);
+      throw error;
     }
   }
 }

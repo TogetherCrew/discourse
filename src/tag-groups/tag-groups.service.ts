@@ -21,24 +21,30 @@ type LoadDto = {
 @Injectable()
 export class TagGroupsService extends EtlService {
   async transform(job: Job<TransformDto, any, string>): Promise<any> {
-    const { forum, tag_groups } = job.data;
-    const batch = tag_groups.map((obj) =>
-      this.baseTransformerService.transform(obj, {
-        forum_uuid: forum.uuid,
-      }),
-    );
-    await this.flowProducer.add({
-      queueName: QUEUES.LOAD,
-      name: JOBS.TAG_GROUP,
-      data: { batch },
-    });
+    try {
+      const { forum, tag_groups } = job.data;
+      const batch = tag_groups.map((obj) =>
+        this.baseTransformerService.transform(obj, {
+          forum_uuid: forum.uuid,
+        }),
+      );
+      await this.flowProducer.add({
+        queueName: QUEUES.LOAD,
+        name: JOBS.TAG_GROUP,
+        data: { batch },
+      });
+    } catch (error) {
+      job.log(error.message);
+      throw error;
+    }
   }
 
   async load(job: Job<LoadDto, any, string>): Promise<any> {
     try {
       await this.neo4jService.write(CYPHERS.BULK_CREATE_TAG_GROUP, job.data);
     } catch (error) {
-      console.error(error.message);
+      job.log(error.message);
+      throw error;
     }
   }
 }

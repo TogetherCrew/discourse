@@ -25,37 +25,51 @@ export class UsersService extends EtlService {
   }
 
   async transform(job: Job<any, any, string>): Promise<any> {
-    const { forum, users } = job.data;
-    const batch = users.map((user) => {
-      const obj = this.baseTransformerService.transform(user, {
-        forum_uuid: forum.uuid,
+    try {
+      const { forum, users } = job.data;
+      const batch = users.map((user) => {
+        const obj = this.baseTransformerService.transform(user, {
+          forum_uuid: forum.uuid,
+        });
+        delete obj.associatedAccounts;
+        delete obj.groups;
+        delete obj.approvedBy;
+        delete obj.penaltyCounts;
+        delete obj.externalIds;
+        return obj;
       });
-      delete obj.associatedAccounts;
-      delete obj.groups;
-      delete obj.approvedBy;
-      delete obj.penaltyCounts;
-      delete obj.externalIds;
-      return obj;
-    });
-    await this.flowProducer.addBulk([
-      {
-        queueName: QUEUES.LOAD,
-        name: JOBS.USER,
-        data: { batch },
-      },
-      ...(await this.uniqueJobs(
-        QUEUES.EXTRACT,
-        JOBS.USER_ACTION,
-        forum,
-        batch,
-      )),
-      ...(await this.uniqueJobs(QUEUES.EXTRACT, JOBS.USER_BADGE, forum, batch)),
-    ]);
+      await this.flowProducer.addBulk([
+        {
+          queueName: QUEUES.LOAD,
+          name: JOBS.USER,
+          data: { batch },
+        },
+        ...(await this.uniqueJobs(
+          QUEUES.EXTRACT,
+          JOBS.USER_ACTION,
+          forum,
+          batch,
+        )),
+        ...(await this.uniqueJobs(
+          QUEUES.EXTRACT,
+          JOBS.USER_BADGE,
+          forum,
+          batch,
+        )),
+      ]);
+    } catch (error) {
+      job.log(error.message);
+      throw error;
+    }
   }
 
   async load(job: Job<any, any, string>): Promise<any> {
-    const { batch } = job.data;
-    await this.neo4jService.write(CYPHERS.BULK_CREATE_USER, { batch });
+    try {
+      await this.neo4jService.write(CYPHERS.BULK_CREATE_USER, job.data);
+    } catch (error) {
+      job.log(error.message);
+      throw error;
+    }
   }
 
   private async uniqueJobs(
@@ -64,30 +78,34 @@ export class UsersService extends EtlService {
     forum: Forum,
     users: GroupMember[],
   ) {
-    const since = Date.now() - 24 * 60 * 60 * 1000; // 24 Hours
+    try {
+      const since = Date.now() - 24 * 60 * 60 * 1000; // 24 Hours
 
-    let jobs = await this.extractQueue.getJobs([
-      'completed',
-      'waiting',
-      'active',
-      'delayed',
-      'failed',
-    ]);
-    jobs = jobs.filter((job) => job.name === name && since < job.timestamp);
+      let jobs = await this.extractQueue.getJobs([
+        'completed',
+        'waiting',
+        'active',
+        'delayed',
+        'failed',
+      ]);
+      jobs = jobs.filter((job) => job.name === name && since < job.timestamp);
 
-    const array = [];
-    users.forEach((user) => {
-      const jobExists = jobs.some(
-        (job) => job.data?.user?.username === user.username,
-      );
-      if (!jobExists) {
-        array.push({
-          queueName,
-          name,
-          data: { forum, user },
-        });
-      }
-    });
-    return array;
+      const array = [];
+      users.forEach((user) => {
+        const jobExists = jobs.some(
+          (job) => job.data?.user?.username === user.username,
+        );
+        if (!jobExists) {
+          array.push({
+            queueName,
+            name,
+            data: { forum, user },
+          });
+        }
+      });
+      return array;
+    } catch (error) {
+      throw error;
+    }
   }
 }

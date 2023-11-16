@@ -18,18 +18,28 @@ type LoadDto = {
 @Injectable()
 export class BadgeTypesService extends EtlService {
   async transform(job: Job<TransformDto, any, string>): Promise<any> {
-    const { forum, batch } = job.data;
-    const output = batch.map((obj) =>
-      this.baseTransformerService.transform(obj, { forum_uuid: forum.uuid }),
-    );
-    await this.flowProducer.add({
-      queueName: QUEUES.LOAD,
-      name: JOBS.BADGE_TYPE,
-      data: { batch: output },
-    });
+    try {
+      const { forum, batch } = job.data;
+      const output = batch.map((obj) =>
+        this.baseTransformerService.transform(obj, { forum_uuid: forum.uuid }),
+      );
+      await this.flowProducer.add({
+        queueName: QUEUES.LOAD,
+        name: JOBS.BADGE_TYPE,
+        data: { batch: output },
+      });
+    } catch (error) {
+      job.log(error.message);
+      throw error;
+    }
   }
 
   async load(job: Job<LoadDto, any, string>): Promise<any> {
-    await this.neo4jService.write(CYPHERS.BULK_CREATE_BADGE_TYPE, job.data);
+    try {
+      await this.neo4jService.write(CYPHERS.BULK_CREATE_BADGE_TYPE, job.data);
+    } catch (error) {
+      job.log(error.message);
+      throw error;
+    }
   }
 }

@@ -21,50 +21,68 @@ type LoadDto = {
 @Injectable()
 export class GroupsService extends EtlService {
   async extract(job: Job<ExtractDto, any, string>): Promise<any> {
-    const { forum } = job.data;
-    return this.iterate(forum);
+    try {
+      const { forum } = job.data;
+      return this.iterate(forum);
+    } catch (error) {
+      job.log(error.message);
+    }
   }
 
   async transform(job: Job<TransformDto, any, string>) {
-    const { forum, groups } = job.data;
-    const batch = groups.map((obj) =>
-      this.baseTransformerService.transform(obj, { forum_uuid: forum.uuid }),
-    );
-    await this.flowProducer.add({
-      queueName: QUEUES.LOAD,
-      name: JOBS.GROUP,
-      data: { batch },
-    });
+    try {
+      const { forum, groups } = job.data;
+      const batch = groups.map((obj) =>
+        this.baseTransformerService.transform(obj, { forum_uuid: forum.uuid }),
+      );
+      await this.flowProducer.add({
+        queueName: QUEUES.LOAD,
+        name: JOBS.GROUP,
+        data: { batch },
+      });
+    } catch (error) {
+      job.log(error.message);
+      throw error;
+    }
   }
 
   async load(job: Job<LoadDto, any, string>) {
-    await this.neo4jService.write(CYPHERS.BULK_CREATE_GROUP, job.data);
+    try {
+      await this.neo4jService.write(CYPHERS.BULK_CREATE_GROUP, job.data);
+    } catch (error) {
+      job.log(error.message);
+      throw error;
+    }
   }
 
   private async iterate(forum: Forum, page = 0, count = 0) {
-    const { data } = await this.discourseService.getGroups(
-      forum.endpoint,
-      page,
-    );
-    const { groups, total_rows_groups }: GroupsResponse = data;
+    try {
+      const { data } = await this.discourseService.getGroups(
+        forum.endpoint,
+        page,
+      );
+      const { groups, total_rows_groups }: GroupsResponse = data;
 
-    await this.flowProducer.add({
-      queueName: QUEUES.TRANSFORM,
-      name: JOBS.GROUP,
-      data: { forum, groups },
-    });
-    const jobs: FlowJob[] = groups.map((group) => ({
-      queueName: QUEUES.EXTRACT,
-      name: JOBS.GROUP_MEMBER,
-      data: { forum, group },
-    }));
-    await this.flowProducer.addBulk(jobs);
+      await this.flowProducer.add({
+        queueName: QUEUES.TRANSFORM,
+        name: JOBS.GROUP,
+        data: { forum, groups },
+      });
+      const jobs: FlowJob[] = groups.map((group) => ({
+        queueName: QUEUES.EXTRACT,
+        name: JOBS.GROUP_MEMBER,
+        data: { forum, group },
+      }));
+      await this.flowProducer.addBulk(jobs);
 
-    count += groups.length;
-    if (count >= total_rows_groups) {
-      return;
-    } else {
-      return await this.iterate(forum, page + 1, count);
+      count += groups.length;
+      if (count >= total_rows_groups) {
+        return;
+      } else {
+        return await this.iterate(forum, page + 1, count);
+      }
+    } catch (error) {
+      throw error;
     }
   }
 }

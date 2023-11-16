@@ -40,77 +40,98 @@ export class GroupMembersService extends EtlService {
   }
 
   async extract(job: Job<ExtractDto, any, string>): Promise<any> {
-    const { forum, group } = job.data;
-    return this.iterate(forum, group);
+    try {
+      const { forum, group } = job.data;
+      return this.iterate(forum, group);
+    } catch (error) {
+      job.log(error.message);
+    }
   }
 
   async transform(job: Job<TransformDto, any, string>) {
-    const { forum, members, group } = job.data;
-    const batch = members.map((obj) =>
-      this.baseTransformerService.transform(obj, { forum_uuid: forum.uuid }),
-    );
-    await this.flowProducer.add({
-      queueName: QUEUES.LOAD,
-      name: JOBS.GROUP_MEMBER,
-      data: { batch, groupId: group.id },
-    });
+    try {
+      const { forum, members, group } = job.data;
+      const batch = members.map((obj) =>
+        this.baseTransformerService.transform(obj, { forum_uuid: forum.uuid }),
+      );
+      await this.flowProducer.add({
+        queueName: QUEUES.LOAD,
+        name: JOBS.GROUP_MEMBER,
+        data: { batch, groupId: group.id },
+      });
+    } catch (error) {
+      job.log(error.message);
+      throw error;
+    }
   }
 
   async load(job: Job<LoadDto, any, string>) {
-    await this.neo4jService.write(CYPHERS.BULK_CREATE_GROUP_MEMBERS, job.data);
+    try {
+      await this.neo4jService.write(
+        CYPHERS.BULK_CREATE_GROUP_MEMBERS,
+        job.data,
+      );
+    } catch (error) {
+      job.log(error.message);
+      throw error;
+    }
   }
 
   private async iterate(forum: Forum, group: Group, offset = 0, limit = 50) {
-    const { data } = await this.discourseService.getGroupMembers(
-      forum.endpoint,
-      group.name,
-      offset,
-      limit,
-    );
-    const { members, owners, meta }: GroupMembersResponse = data;
+    try {
+      const { data } = await this.discourseService.getGroupMembers(
+        forum.endpoint,
+        group.name,
+        offset,
+        limit,
+      );
+      const { members, owners, meta }: GroupMembersResponse = data;
 
-    await this.flowProducer.addBulk([
-      {
-        queueName: QUEUES.TRANSFORM,
-        name: JOBS.GROUP_MEMBER,
-        data: { forum, group, members },
-      },
-      {
-        queueName: QUEUES.TRANSFORM,
-        name: JOBS.GROUP_OWNER,
-        data: { forum, group, owners },
-      },
-      ...(await this.uniqueJobs(
-        QUEUES.EXTRACT,
-        JOBS.USER_ACTION,
-        forum,
-        members,
-      )),
-      ...(await this.uniqueJobs(
-        QUEUES.EXTRACT,
-        JOBS.USER_BADGE,
-        forum,
-        members,
-      )),
-      ...(await this.uniqueJobs(
-        QUEUES.EXTRACT,
-        JOBS.USER_ACTION,
-        forum,
-        owners,
-      )),
-      ...(await this.uniqueJobs(
-        QUEUES.EXTRACT,
-        JOBS.USER_BADGE,
-        forum,
-        owners,
-      )),
-    ]);
+      await this.flowProducer.addBulk([
+        {
+          queueName: QUEUES.TRANSFORM,
+          name: JOBS.GROUP_MEMBER,
+          data: { forum, group, members },
+        },
+        {
+          queueName: QUEUES.TRANSFORM,
+          name: JOBS.GROUP_OWNER,
+          data: { forum, group, owners },
+        },
+        ...(await this.uniqueJobs(
+          QUEUES.EXTRACT,
+          JOBS.USER_ACTION,
+          forum,
+          members,
+        )),
+        ...(await this.uniqueJobs(
+          QUEUES.EXTRACT,
+          JOBS.USER_BADGE,
+          forum,
+          members,
+        )),
+        ...(await this.uniqueJobs(
+          QUEUES.EXTRACT,
+          JOBS.USER_ACTION,
+          forum,
+          owners,
+        )),
+        ...(await this.uniqueJobs(
+          QUEUES.EXTRACT,
+          JOBS.USER_BADGE,
+          forum,
+          owners,
+        )),
+      ]);
 
-    offset += limit;
-    if (offset >= meta.total) {
-      return;
-    } else {
-      return await this.iterate(forum, group, offset, limit);
+      offset += limit;
+      if (offset >= meta.total) {
+        return;
+      } else {
+        return await this.iterate(forum, group, offset, limit);
+      }
+    } catch (error) {
+      throw error;
     }
   }
 
@@ -120,24 +141,28 @@ export class GroupMembersService extends EtlService {
     forum: Forum,
     users: GroupMember[],
   ) {
-    const since = Date.now() - 24 * 60 * 60 * 1000; // 24 Hours
+    try {
+      const since = Date.now() - 24 * 60 * 60 * 1000; // 24 Hours
 
-    let jobs = await this.extractQueue.getJobs();
-    jobs = jobs.filter((job) => job.name === name && since < job.timestamp);
+      let jobs = await this.extractQueue.getJobs();
+      jobs = jobs.filter((job) => job.name === name && since < job.timestamp);
 
-    const array = [];
-    users.forEach((user) => {
-      if (jobs.find((job) => job.data.user.username === user.username)) {
-        // do nothing, job exists
-      } else {
-        array.push(user);
-      }
-    });
+      const array = [];
+      users.forEach((user) => {
+        if (jobs.find((job) => job.data.user.username === user.username)) {
+          // do nothing, job exists
+        } else {
+          array.push(user);
+        }
+      });
 
-    return array.map((user) => ({
-      queueName,
-      name,
-      data: { forum, user },
-    }));
+      return array.map((user) => ({
+        queueName,
+        name,
+        data: { forum, user },
+      }));
+    } catch (error) {
+      throw error;
+    }
   }
 }

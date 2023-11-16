@@ -42,25 +42,35 @@ export class TagsService extends EtlService {
         },
       ]);
     } catch (error) {
-      console.error(error.message);
+      job.log(error.message);
     }
   }
 
   async transform(job: Job<TransformDto, any, string>): Promise<any> {
-    const { forum, tags } = job.data;
-    const batch = tags.map((obj) =>
-      this.baseTransformerService.transform(obj, {
-        forum_uuid: forum.uuid,
-      }),
-    );
-    await this.flowProducer.add({
-      queueName: QUEUES.LOAD,
-      name: JOBS.TAG,
-      data: { batch },
-    });
+    try {
+      const { forum, tags } = job.data;
+      const batch = tags.map((obj) =>
+        this.baseTransformerService.transform(obj, {
+          forum_uuid: forum.uuid,
+        }),
+      );
+      await this.flowProducer.add({
+        queueName: QUEUES.LOAD,
+        name: JOBS.TAG,
+        data: { batch },
+      });
+    } catch (error) {
+      job.log(error.message);
+      throw error;
+    }
   }
 
   async load(job: Job<LoadDto, any, string>): Promise<any> {
-    await this.neo4jService.write(CYPHERS.BULK_CREATE_TAG, job.data);
+    try {
+      await this.neo4jService.write(CYPHERS.BULK_CREATE_TAG, job.data);
+    } catch (error) {
+      job.log(error.message);
+      throw error;
+    }
   }
 }

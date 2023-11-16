@@ -131,9 +131,7 @@ export class DiscourseService {
       const obs = this.httpService.get(url, opts);
       return await lastValueFrom(obs);
     } catch (error) {
-      const err: AxiosError = error as AxiosError;
-      console.error(err.message, err.code);
-      console.log(err.response.config.url);
+      throw error;
     }
   }
 
