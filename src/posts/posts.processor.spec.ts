@@ -1,42 +1,38 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PostsProcessor } from './posts.processor';
-import { PostsEtlService } from './posts-etl.service';
 import { DiscourseService } from '@app/discourse';
-import { Neo4jService } from 'nest-neo4j/dist';
-import { BaseEtlService } from '../base-etl/base-etl.service';
 import { BaseTransformerService } from '../base-transformer/base-transformer.service';
-import { FLOWS } from '../constants/flows.constants';
+import { Neo4jService } from 'nest-neo4j';
+import { FLOW_PRODUCER } from '../constants/flows.constants';
+import { PostsService } from './posts.service';
+import { PostsProcessor } from './posts.processor';
 
-jest.mock('../base-etl/base-etl.service');
-
-describe('PostsProcessor', () => {
+describe('PostsService', () => {
   let processor: PostsProcessor;
-  let mockDiscourseService: any;
-  let mockBaseTransformerService: any;
-  let mockNeo4jService: any;
-  let mockFlowProducer: any;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         PostsProcessor,
-        BaseEtlService,
-        PostsEtlService,
+        PostsService,
         {
           provide: DiscourseService,
-          useValue: mockDiscourseService,
+          useValue: jest.fn(),
         },
         {
           provide: BaseTransformerService,
-          useValue: mockBaseTransformerService,
+          useValue: jest.fn(),
         },
         {
           provide: Neo4jService,
-          useValue: mockNeo4jService,
+          useValue: jest.fn(),
         },
         {
-          provide: `BullFlowProducer_${FLOWS.POST_TL}`,
-          useValue: mockFlowProducer,
+          provide: `BullFlowProducer_${FLOW_PRODUCER}`,
+          useValue: jest.fn(),
+        },
+        {
+          provide: `BullQueue_EXTRACT`,
+          useValue: jest.fn(),
         },
       ],
     }).compile();
