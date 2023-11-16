@@ -1,5 +1,1 @@
-export const FLOWS = {
-  DISCOURSE_ETL: 'DISCOURSE_ETL',
-  POST_TL: 'POST_TL',
-  TOPIC_TL: 'TOPIC_TL',
-};
+export const FLOW_PRODUCER = 'PRODUCER';
