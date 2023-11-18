@@ -4,8 +4,8 @@ import { QUEUES } from '../constants/queues.constants';
 import { JOBS } from '../constants/jobs.contants';
 import { Forum } from '../forums/entities/forum.entity';
 import { CYPHERS } from '../constants/cyphers.constants';
-import { FlowProducer, Job, Queue } from 'bullmq';
-import { InjectFlowProducer, InjectQueue } from '@nestjs/bullmq';
+import { FlowProducer, Job } from 'bullmq';
+import { InjectFlowProducer } from '@nestjs/bullmq';
 import { DiscourseService } from '@app/discourse';
 import { Neo4jService } from 'nest-neo4j/dist';
 import { BaseTransformerService } from '../base-transformer/base-transformer.service';
@@ -34,7 +34,6 @@ export class GroupMembersService extends EtlService {
     protected readonly neo4jService: Neo4jService,
     @InjectFlowProducer(FLOW_PRODUCER)
     protected readonly flowProducer: FlowProducer,
-    @InjectQueue(QUEUES.EXTRACT) private readonly extractQueue: Queue,
   ) {
     super(discourseService, baseTransformerService, neo4jService, flowProducer);
   }
@@ -98,30 +97,26 @@ export class GroupMembersService extends EtlService {
           name: JOBS.GROUP_OWNER,
           data: { forum, group, owners },
         },
-        ...(await this.uniqueJobs(
-          QUEUES.EXTRACT,
-          JOBS.USER_ACTION,
-          forum,
-          members,
-        )),
-        ...(await this.uniqueJobs(
-          QUEUES.EXTRACT,
-          JOBS.USER_BADGE,
-          forum,
-          members,
-        )),
-        ...(await this.uniqueJobs(
-          QUEUES.EXTRACT,
-          JOBS.USER_ACTION,
-          forum,
-          owners,
-        )),
-        ...(await this.uniqueJobs(
-          QUEUES.EXTRACT,
-          JOBS.USER_BADGE,
-          forum,
-          owners,
-        )),
+        ...members.map((user) => ({
+          queueName: QUEUES.EXTRACT,
+          name: JOBS.USER_ACTION,
+          data: { forum, user },
+        })),
+        ...members.map((user) => ({
+          queueName: QUEUES.EXTRACT,
+          name: JOBS.USER_BADGE,
+          data: { forum, user },
+        })),
+        ...owners.map((user) => ({
+          queueName: QUEUES.EXTRACT,
+          name: JOBS.USER_ACTION,
+          data: { forum, user },
+        })),
+        ...owners.map((user) => ({
+          queueName: QUEUES.EXTRACT,
+          name: JOBS.USER_BADGE,
+          data: { forum, user },
+        })),
       ]);
 
       offset += limit;
@@ -130,37 +125,6 @@ export class GroupMembersService extends EtlService {
       } else {
         return await this.iterate(forum, group, offset, limit);
       }
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  private async uniqueJobs(
-    queueName: string,
-    name: string,
-    forum: Forum,
-    users: GroupMember[],
-  ) {
-    try {
-      const since = Date.now() - 24 * 60 * 60 * 1000; // 24 Hours
-
-      let jobs = await this.extractQueue.getJobs();
-      jobs = jobs.filter((job) => job.name === name && since < job.timestamp);
-
-      const array = [];
-      users.forEach((user) => {
-        if (jobs.find((job) => job.data.user.username === user.username)) {
-          // do nothing, job exists
-        } else {
-          array.push(user);
-        }
-      });
-
-      return array.map((user) => ({
-        queueName,
-        name,
-        data: { forum, user },
-      }));
     } catch (error) {
       throw error;
     }

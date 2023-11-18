@@ -3,10 +3,9 @@ import { QUEUES } from '../constants/queues.constants';
 import { JOBS } from '../constants/jobs.contants';
 import { CYPHERS } from '../constants/cyphers.constants';
 import { EtlService } from '../etl/etl.service';
-import { FlowProducer, Job, Queue } from 'bullmq';
-import { Forum } from '../forums/entities/forum.entity';
+import { FlowProducer, Job } from 'bullmq';
 import { DiscourseService } from '@app/discourse';
-import { InjectFlowProducer, InjectQueue } from '@nestjs/bullmq';
+import { InjectFlowProducer } from '@nestjs/bullmq';
 import { Neo4jService } from 'nest-neo4j';
 import { BaseTransformerService } from '../base-transformer/base-transformer.service';
 import { FLOW_PRODUCER } from '../constants/flows.constants';
@@ -19,7 +18,6 @@ export class UsersService extends EtlService {
     protected readonly neo4jService: Neo4jService,
     @InjectFlowProducer(FLOW_PRODUCER)
     protected readonly flowProducer: FlowProducer,
-    @InjectQueue(QUEUES.EXTRACT) private readonly extractQueue: Queue,
   ) {
     super(discourseService, baseTransformerService, neo4jService, flowProducer);
   }
@@ -44,18 +42,16 @@ export class UsersService extends EtlService {
           name: JOBS.USER,
           data: { batch },
         },
-        ...(await this.uniqueJobs(
-          QUEUES.EXTRACT,
-          JOBS.USER_ACTION,
-          forum,
-          batch,
-        )),
-        ...(await this.uniqueJobs(
-          QUEUES.EXTRACT,
-          JOBS.USER_BADGE,
-          forum,
-          batch,
-        )),
+        ...batch.map((user) => ({
+          queueName: QUEUES.EXTRACT,
+          name: JOBS.USER_ACTION,
+          data: { forum, user },
+        })),
+        ...batch.map((user) => ({
+          queueName: QUEUES.EXTRACT,
+          name: JOBS.USER_BADGE,
+          data: { forum, user },
+        })),
       ]);
     } catch (error) {
       job.log(error.message);
@@ -68,43 +64,6 @@ export class UsersService extends EtlService {
       await this.neo4jService.write(CYPHERS.BULK_CREATE_USER, job.data);
     } catch (error) {
       job.log(error.message);
-      throw error;
-    }
-  }
-
-  private async uniqueJobs(
-    queueName: string,
-    name: string,
-    forum: Forum,
-    users: GroupMember[],
-  ) {
-    try {
-      const since = Date.now() - 24 * 60 * 60 * 1000; // 24 Hours
-
-      let jobs = await this.extractQueue.getJobs([
-        'completed',
-        'waiting',
-        'active',
-        'delayed',
-        'failed',
-      ]);
-      jobs = jobs.filter((job) => job.name === name && since < job.timestamp);
-
-      const array = [];
-      users.forEach((user) => {
-        const jobExists = jobs.some(
-          (job) => job.data?.user?.username === user.username,
-        );
-        if (!jobExists) {
-          array.push({
-            queueName,
-            name,
-            data: { forum, user },
-          });
-        }
-      });
-      return array;
-    } catch (error) {
       throw error;
     }
   }
