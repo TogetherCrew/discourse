@@ -1,18 +1,16 @@
-import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
-import { AxiosError, AxiosResponse } from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import Bottleneck from 'bottleneck';
-import { lastValueFrom } from 'rxjs';
 import { BottleneckService } from './bottleneck/bottleneck.service';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import { ConfigService } from '@nestjs/config';
+import { defaultOpts, proxyOpts } from './bottleneck/options.constants';
 
 @Injectable()
 export class DiscourseService {
   proxyAgent: HttpsProxyAgent<string>;
 
   constructor(
-    private httpService: HttpService,
     private bottleneckService: BottleneckService,
     private readonly configService: ConfigService,
   ) {
@@ -119,20 +117,18 @@ export class DiscourseService {
   private async get(endpoint: string, path: string, scheme = 'https') {
     const url = `${scheme}://${endpoint}${path}`;
     if (this.proxyAgent) {
-      return this.req(url, { httpsAgent: this.proxyAgent });
+      const limiter: Bottleneck = this.getLimiter(endpoint, proxyOpts);
+      return limiter.schedule(() =>
+        this.req(url, { httpsAgent: this.proxyAgent }),
+      );
     } else {
-      const limiter: Bottleneck = this.getLimiter(endpoint);
+      const limiter: Bottleneck = this.getLimiter(endpoint, defaultOpts);
       return limiter.schedule(() => this.req(url));
     }
   }
 
-  private async req(url: string, opts = {}): Promise<AxiosResponse<any, any>> {
-    try {
-      const obs = this.httpService.get(url, opts);
-      return await lastValueFrom(obs);
-    } catch (error) {
-      throw error;
-    }
+  private req(url: string, opts = {}): Promise<AxiosResponse<any, any>> {
+    return axios.get(url, opts);
   }
 
   private getLimiter(

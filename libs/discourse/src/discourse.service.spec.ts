@@ -1,19 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DiscourseService } from './discourse.service';
-import { HttpService } from '@nestjs/axios';
 import { BottleneckService } from './bottleneck/bottleneck.service';
-import { EMPTY, of } from 'rxjs';
-import { AxiosResponse } from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import Bottleneck from 'bottleneck';
 import { ConfigService } from '@nestjs/config';
 
+jest.mock('axios');
+const mockedAxios = axios as jest.Mocked<typeof axios>;
 describe('DiscourseService', () => {
   let service: DiscourseService;
-
-  const mockHttpService = {
-    get: jest.fn(),
-    permissions$: EMPTY,
-  };
 
   let mockBottleneckService: any;
 
@@ -27,10 +22,6 @@ describe('DiscourseService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         DiscourseService,
-        {
-          provide: HttpService,
-          useValue: mockHttpService,
-        },
         {
           provide: BottleneckService,
           useValue: mockBottleneckService,
@@ -64,11 +55,11 @@ describe('DiscourseService', () => {
       const mockResponse: Partial<AxiosResponse<BadgesResponse>> = {
         data: { badges: [] },
       };
-      mockHttpService.get.mockReturnValueOnce(of(mockResponse));
+      mockedAxios.get.mockResolvedValueOnce(mockResponse);
 
       const result = await service.getBadges(endpoint);
 
-      expect(mockHttpService.get).toHaveBeenCalledWith(
+      expect(mockedAxios.get).toHaveBeenCalledWith(
         'https://test.endpoint/badges.json',
         {},
       );
@@ -95,11 +86,11 @@ describe('DiscourseService', () => {
           },
         },
       };
-      mockHttpService.get.mockReturnValueOnce(of(mockResponse));
+      mockedAxios.get.mockResolvedValueOnce(mockResponse);
 
       const result = await service.getCategories(endpoint);
 
-      expect(mockHttpService.get).toHaveBeenCalledWith(
+      expect(mockedAxios.get).toHaveBeenCalledWith(
         'https://test.endpoint/categories.json',
         {},
       );
@@ -122,11 +113,11 @@ describe('DiscourseService', () => {
           tag_groups: [],
         },
       };
-      mockHttpService.get.mockReturnValueOnce(of(mockResponse));
+      mockedAxios.get.mockResolvedValueOnce(mockResponse);
 
       const result = await service.getTagGroups(endpoint);
 
-      expect(mockHttpService.get).toHaveBeenCalledWith(
+      expect(mockedAxios.get).toHaveBeenCalledWith(
         'https://test.endpoint/tag_groups.json',
         {},
       );
@@ -152,11 +143,11 @@ describe('DiscourseService', () => {
           },
         },
       };
-      mockHttpService.get.mockReturnValueOnce(of(mockResponse));
+      mockedAxios.get.mockResolvedValueOnce(mockResponse);
 
       const result = await service.getTags(endpoint);
 
-      expect(mockHttpService.get).toHaveBeenCalledWith(
+      expect(mockedAxios.get).toHaveBeenCalledWith(
         'https://test.endpoint/tags.json',
         {},
       );
@@ -184,11 +175,11 @@ describe('DiscourseService', () => {
           load_more_groups: '',
         },
       };
-      mockHttpService.get.mockReturnValueOnce(of(mockResponse));
+      mockedAxios.get.mockResolvedValueOnce(mockResponse);
 
       const result = await service.getGroups(endpoint);
 
-      expect(mockHttpService.get).toHaveBeenCalledWith(
+      expect(mockedAxios.get).toHaveBeenCalledWith(
         'https://test.endpoint/groups.json?page=0',
         {},
       );
@@ -221,11 +212,11 @@ describe('DiscourseService', () => {
           },
         },
       };
-      mockHttpService.get.mockReturnValueOnce(of(mockResponse));
+      mockedAxios.get.mockResolvedValueOnce(mockResponse);
 
       const result = await service.getLatestTopics(endpoint, 0, 'created');
 
-      expect(mockHttpService.get).toHaveBeenCalledWith(
+      expect(mockedAxios.get).toHaveBeenCalledWith(
         'https://test.endpoint/latest.json?order=created&page=0',
         {},
       );
@@ -251,11 +242,11 @@ describe('DiscourseService', () => {
           id: 0,
         },
       };
-      mockHttpService.get.mockReturnValueOnce(of(mockResponse));
+      mockedAxios.get.mockResolvedValueOnce(mockResponse);
 
       const result = await service.getPosts(endpoint, 0);
 
-      expect(mockHttpService.get).toHaveBeenCalledWith(
+      expect(mockedAxios.get).toHaveBeenCalledWith(
         'https://test.endpoint/t/0/posts.json',
         {},
       );
@@ -342,11 +333,11 @@ describe('DiscourseService', () => {
           },
         },
       };
-      mockHttpService.get.mockReturnValueOnce(of(mockResponse));
+      mockedAxios.get.mockResolvedValueOnce(mockResponse);
 
       const result = await service.getUser(endpoint, 'test-username');
 
-      expect(mockHttpService.get).toHaveBeenCalledWith(
+      expect(mockedAxios.get).toHaveBeenCalledWith(
         'https://test.endpoint/u/test-username.json',
         {},
       );
@@ -375,11 +366,11 @@ describe('DiscourseService', () => {
           },
         },
       };
-      mockHttpService.get.mockReturnValueOnce(of(mockResponse));
+      mockedAxios.get.mockResolvedValueOnce(mockResponse);
 
       const result = await service.getGroupMembers(endpoint, 'group');
 
-      expect(mockHttpService.get).toHaveBeenCalledWith(
+      expect(mockedAxios.get).toHaveBeenCalledWith(
         'https://test.endpoint/groups/group/members.json?limit=50&offset=0',
         {},
       );
@@ -402,11 +393,11 @@ describe('DiscourseService', () => {
           user_actions: [],
         },
       };
-      mockHttpService.get.mockReturnValueOnce(of(mockResponse));
+      mockedAxios.get.mockResolvedValueOnce(mockResponse);
 
       const result = await service.getUserActions(endpoint, 'username');
 
-      expect(mockHttpService.get).toHaveBeenCalledWith(
+      expect(mockedAxios.get).toHaveBeenCalledWith(
         'https://test.endpoint/user_actions.json?username=username&limit=50&offset=0',
         {},
       );
@@ -429,12 +420,12 @@ describe('DiscourseService', () => {
           user_badges: [],
         },
       };
-      mockHttpService.get.mockReturnValueOnce(of(mockResponse));
+      mockedAxios.get.mockResolvedValueOnce(mockResponse);
 
-      const result = await service.getUserActions(endpoint, 'username');
+      const result = await service.getUserBadges(endpoint, 'username');
 
-      expect(mockHttpService.get).toHaveBeenCalledWith(
-        'https://test.endpoint/user_actions.json?username=username&limit=50&offset=0',
+      expect(mockedAxios.get).toHaveBeenCalledWith(
+        'https://test.endpoint/user-badges/username.json',
         {},
       );
       expect(result).toEqual(mockResponse);
