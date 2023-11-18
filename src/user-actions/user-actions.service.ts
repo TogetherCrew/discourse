@@ -5,6 +5,7 @@ import { QUEUES } from '../constants/queues.constants';
 import { JOBS } from '../constants/jobs.contants';
 import { Forum } from '../forums/entities/forum.entity';
 import { CYPHERS } from '../constants/cyphers.constants';
+import { AxiosError } from 'axios';
 
 type TransformDto = UserActionsExtractDto & {
   user_actions: UserAction[];
@@ -58,28 +59,46 @@ export class UserActionsService extends EtlService {
     user: GroupMember | BasicUser,
     offset = 0,
     limit = 50,
-  ) {
+  ): Promise<void> {
+    const user_actions = await this.getUserActions(
+      forum.endpoint,
+      user.username,
+      offset,
+      limit,
+    );
+    if (user_actions.length > 0) {
+      await this.flowProducer.add({
+        queueName: QUEUES.TRANSFORM,
+        name: JOBS.USER_ACTION,
+        data: { forum, user_actions },
+      });
+      await this.iterate(job, forum, user, offset + limit, limit);
+    }
+  }
+
+  private async getUserActions(
+    endpoint: string,
+    username: string,
+    offset: number,
+    limit: number,
+  ): Promise<UserAction[]> {
     try {
       const { data } = await this.discourseService.getUserActions(
-        forum.endpoint,
-        user.username,
+        endpoint,
+        username,
         offset,
         limit,
       );
-      const { user_actions }: UserActionsResponse = data;
-
-      if (user_actions.length == 0) {
-        return;
-      } else {
-        await this.flowProducer.add({
-          queueName: QUEUES.TRANSFORM,
-          name: JOBS.USER,
-          data: { forum, user_actions },
-        });
-        return await this.iterate(job, forum, user, offset + limit, limit);
-      }
+      const { user_actions } = data;
+      return user_actions;
     } catch (error) {
-      throw error;
+      const err = error as AxiosError;
+      switch (err.status) {
+        case 404:
+          return [];
+        default:
+          throw error;
+      }
     }
   }
 }

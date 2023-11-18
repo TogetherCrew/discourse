@@ -57,33 +57,34 @@ export class PostsService extends EtlService {
   }
 
   private async iterate(forum: Forum, topicIds: number[]) {
-    try {
-      topicIds.forEach(async (id) => {
-        try {
-          const posts = await this.getPosts(forum.endpoint, id);
+    topicIds.forEach(async (id) => {
+      try {
+        const posts = await this.getPosts(forum.endpoint, id);
+        if (posts.length > 0) {
           await this.flowProducer.add({
             queueName: QUEUES.TRANSFORM,
             name: JOBS.POST,
             data: { forum, posts },
           });
-        } catch (error) {
-          throw error;
         }
-      });
-    } catch (error) {
-      throw error;
-    }
+      } catch (error) {
+        throw error;
+      }
+    });
   }
 
   private async getPosts(endpoint: string, topicId: number) {
-    try {
-      const { data } = await this.discourseService.getPosts(endpoint, topicId);
-      const {
-        post_stream: { posts },
-      } = data as PostsResponse;
-      return posts;
-    } catch (error) {
-      throw error;
+    const response = await this.discourseService.getPosts(endpoint, topicId);
+    switch (response.status) {
+      case 200:
+        const {
+          post_stream: { posts },
+        } = response.data as PostsResponse;
+        return posts;
+      case 404:
+        return [];
+      default:
+        throw new Error(response.statusText);
     }
   }
 }

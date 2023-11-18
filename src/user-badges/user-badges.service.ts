@@ -17,17 +17,18 @@ export class UserBadgesService extends EtlService {
   async extract(job: Job<UserBadgesExtractDto, any, string>): Promise<any> {
     try {
       const { forum, user } = job.data;
-
-      const { data } = await this.discourseService.getUserBadges(
+      const user_badges = await this.getUserBadges(
         forum.endpoint,
         user.username,
       );
-      const { user_badges } = data;
-      await this.flowProducer.add({
-        queueName: QUEUES.TRANSFORM,
-        name: JOBS.USER_BADGE,
-        data: { forum, user_badges, user },
-      });
+
+      if (user_badges.length > 0) {
+        await this.flowProducer.add({
+          queueName: QUEUES.TRANSFORM,
+          name: JOBS.USER_BADGE,
+          data: { forum, user_badges, user },
+        });
+      }
     } catch (error) {
       job.log(error.message);
       throw error;
@@ -61,6 +62,22 @@ export class UserBadgesService extends EtlService {
     } catch (error) {
       job.log(error.message);
       throw error;
+    }
+  }
+
+  private async getUserBadges(endpoint: string, username: string) {
+    const response = await this.discourseService.getUserBadges(
+      endpoint,
+      username,
+    );
+    switch (response.status) {
+      case 200:
+        const { user_badges } = response.data;
+        return user_badges;
+      case 404:
+        return [];
+      default:
+        throw new Error(response.statusText);
     }
   }
 }
