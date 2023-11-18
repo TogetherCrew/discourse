@@ -15,7 +15,6 @@ import { ExtractProcessor } from './extract.processor';
 
 describe('ExtractProcessor', () => {
   let processor: ExtractProcessor;
-  let mockQueue: jest.Mocked<Queue>;
   let mockBadgesService: jest.Mocked<BadgesService>;
   let mockGroupsService: jest.Mocked<GroupsService>;
   let mockGroupMembersService: jest.Mocked<GroupMembersService>;
@@ -27,7 +26,6 @@ describe('ExtractProcessor', () => {
   let mockUserBadgesService: jest.Mocked<UserBadgesService>;
 
   beforeEach(async () => {
-    mockQueue = {} as unknown as jest.Mocked<Queue>;
     mockBadgesService = {
       extract: jest.fn(),
     } as unknown as jest.Mocked<BadgesService>;
@@ -96,10 +94,6 @@ describe('ExtractProcessor', () => {
           useValue: mockUserBadgesService,
         },
         // Provide other services...
-        {
-          provide: `BullQueue_EXTRACT`,
-          useValue: mockQueue,
-        },
       ],
     }).compile();
 

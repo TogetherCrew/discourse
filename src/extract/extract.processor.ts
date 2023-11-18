@@ -1,5 +1,5 @@
-import { InjectQueue, Processor, WorkerHost } from '@nestjs/bullmq';
-import { Job, Queue } from 'bullmq';
+import { Processor, WorkerHost } from '@nestjs/bullmq';
+import { Job } from 'bullmq';
 import { BadgesService } from '../badges/badges.service';
 import { CategoriesService } from '../categories/categories.service';
 import { JOBS } from '../constants/jobs.contants';
@@ -12,7 +12,7 @@ import { TopicsService } from '../topics/topics.service';
 import { UserActionsService } from '../user-actions/user-actions.service';
 import { UserBadgesService } from '../user-badges/user-badges.service';
 
-@Processor(QUEUES.EXTRACT, { concurrency: 2 })
+@Processor(QUEUES.EXTRACT, { concurrency: 5 })
 export class ExtractProcessor extends WorkerHost {
   constructor(
     private readonly badgesService: BadgesService,
@@ -24,7 +24,6 @@ export class ExtractProcessor extends WorkerHost {
     private readonly categoriesService: CategoriesService,
     private readonly userActionsService: UserActionsService,
     private readonly userBadgesService: UserBadgesService,
-    @InjectQueue(QUEUES.EXTRACT) private readonly extractQueue: Queue,
   ) {
     super();
   }
