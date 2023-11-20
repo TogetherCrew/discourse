@@ -93,7 +93,7 @@ export class UserActionsService extends EtlService {
       return user_actions;
     } catch (error) {
       const err = error as AxiosError;
-      switch (err.status) {
+      switch (err.response.status) {
         case 404:
           return [];
         default:

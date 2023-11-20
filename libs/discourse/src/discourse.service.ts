@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import axios, { AxiosResponse } from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 import Bottleneck from 'bottleneck';
 import { BottleneckService } from './bottleneck/bottleneck.service';
 import { HttpsProxyAgent } from 'https-proxy-agent';
@@ -17,6 +17,7 @@ export class DiscourseService {
     const uri = configService.get<string>('PROXY_URI');
     if (uri) {
       this.proxyAgent = new HttpsProxyAgent(uri);
+      this.proxyAgent.keepAlive = true;
     }
   }
 
@@ -128,7 +129,13 @@ export class DiscourseService {
   }
 
   private req(url: string, opts = {}): Promise<AxiosResponse<any, any>> {
-    return axios.get(url, opts);
+    try {
+      return axios.get(url, opts);
+    } catch (error) {
+      const err = error as AxiosError;
+      console.error(err);
+      throw error;
+    }
   }
 
   private getLimiter(

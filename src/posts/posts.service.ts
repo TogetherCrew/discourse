@@ -5,6 +5,7 @@ import { Forum } from '../forums/entities/forum.entity';
 import { JOBS } from '../constants/jobs.contants';
 import { CYPHERS } from '../constants/cyphers.constants';
 import { EtlService } from '../etl/etl.service';
+import { AxiosError } from 'axios';
 
 @Injectable()
 export class PostsService extends EtlService {
@@ -74,17 +75,20 @@ export class PostsService extends EtlService {
   }
 
   private async getPosts(endpoint: string, topicId: number) {
-    const response = await this.discourseService.getPosts(endpoint, topicId);
-    switch (response.status) {
-      case 200:
-        const {
-          post_stream: { posts },
-        } = response.data as PostsResponse;
-        return posts;
-      case 404:
-        return [];
-      default:
-        throw new Error(response.statusText);
+    try {
+      const { data } = await this.discourseService.getPosts(endpoint, topicId);
+      const {
+        post_stream: { posts },
+      } = data as PostsResponse;
+      return posts;
+    } catch (error) {
+      const err = error as AxiosError;
+      switch (err.response.status) {
+        case 404:
+          return [];
+        default:
+          throw error;
+      }
     }
   }
 }

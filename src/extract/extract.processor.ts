@@ -12,7 +12,7 @@ import { TopicsService } from '../topics/topics.service';
 import { UserActionsService } from '../user-actions/user-actions.service';
 import { UserBadgesService } from '../user-badges/user-badges.service';
 
-@Processor(QUEUES.EXTRACT, { concurrency: 5 })
+@Processor(QUEUES.EXTRACT, { concurrency: 20 })
 export class ExtractProcessor extends WorkerHost {
   constructor(
     private readonly badgesService: BadgesService,

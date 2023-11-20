@@ -5,6 +5,7 @@ import { CYPHERS } from '../constants/cyphers.constants';
 import { EtlService } from '../etl/etl.service';
 import { Job } from 'bullmq';
 import { Forum } from '../forums/entities/forum.entity';
+import { AxiosError } from 'axios';
 
 type TransformDto = {
   forum: Forum;
@@ -66,18 +67,21 @@ export class UserBadgesService extends EtlService {
   }
 
   private async getUserBadges(endpoint: string, username: string) {
-    const response = await this.discourseService.getUserBadges(
-      endpoint,
-      username,
-    );
-    switch (response.status) {
-      case 200:
-        const { user_badges } = response.data;
-        return user_badges;
-      case 404:
-        return [];
-      default:
-        throw new Error(response.statusText);
+    try {
+      const { data } = await this.discourseService.getUserBadges(
+        endpoint,
+        username,
+      );
+      const { user_badges } = data;
+      return user_badges;
+    } catch (error) {
+      const err = error as AxiosError;
+      switch (err.response.status) {
+        case 404:
+          return [];
+        default:
+          throw error;
+      }
     }
   }
 }

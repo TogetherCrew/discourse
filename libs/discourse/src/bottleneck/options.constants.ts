@@ -11,5 +11,5 @@ export const proxyOpts = {
   reservoir: 500,
   reservoirRefreshAmount: 500,
   reservoirRefreshInterval: 60 * 1000,
-  maxConcurrent: 20,
+  maxConcurrent: 100,
 };
