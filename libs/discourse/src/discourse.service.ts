@@ -29,7 +29,7 @@ export class DiscourseService {
   async getCategories(
     endpoint: string,
   ): Promise<AxiosResponse<CategoriesResponse>> {
-    const path = '/categories.json';
+    const path = '/categories.json?include_subcategories=true';
     return this.get(endpoint, path);
   }
 

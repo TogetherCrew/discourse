@@ -91,7 +91,7 @@ describe('DiscourseService', () => {
       const result = await service.getCategories(endpoint);
 
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        'https://test.endpoint/categories.json',
+        'https://test.endpoint/categories.json?include_subcategories=true',
         {},
       );
       expect(result).toEqual(mockResponse);
