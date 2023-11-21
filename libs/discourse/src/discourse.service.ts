@@ -75,7 +75,7 @@ export class DiscourseService {
     endpoint: string,
     topicId: number,
   ): Promise<AxiosResponse<PostsResponse>> {
-    const path = `/t/${topicId}/posts.json`;
+    const path = `/t/-/${topicId}.json&print=true`; // https://meta.discourse.org/t/get-all-posts-from-topic/71056/2
     return this.get(endpoint, path);
   }
 
