@@ -84,7 +84,13 @@ const BULK_CREATE_GROUP_OWNERS = generateCypher(
 
 const BULK_CREATE_CATEGORY = generateCypher(
   'UNWIND $batch AS category RETURN category',
-  'MERGE (c:Category { id: category.id, forumUuid: category.forumUuid }) SET c += category',
+  [
+    'MERGE (c:Category { id: category.id, forumUuid: category.forumUuid }) SET c += category',
+    'WITH c',
+    'WHERE c.parentCategoryId IS NOT NULL',
+    'MERGE (p:Category { id: c.parentCategoryId, forumUuid: c.forumUuid })',
+    'MERGE (c)-[:HAS_PARENT]->(p)',
+  ].join(' '),
 );
 
 const BULK_CREATE_TOPIC = generateCypher(

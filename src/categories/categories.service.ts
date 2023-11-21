@@ -11,7 +11,7 @@ type ExtractDto = {
 };
 
 type TransformDto = ExtractDto & {
-  batch: Badge[];
+  categories: Category[];
 };
 
 type LoadDto = {
@@ -33,7 +33,7 @@ export class CategoriesService extends EtlService {
       this.flowProducer.add({
         queueName: QUEUES.TRANSFORM,
         name: JOBS.CATEGORY,
-        data: { forum, batch: categories },
+        data: { forum, categories },
       });
     } catch (error) {
       job.log(error.message);
@@ -43,14 +43,32 @@ export class CategoriesService extends EtlService {
 
   async transform(job: Job<TransformDto, any, string>): Promise<any> {
     try {
-      const { forum, batch } = job.data;
-      const output = batch.map((obj) =>
-        this.baseTransformerService.transform(obj, { forum_uuid: forum.uuid }),
-      );
+      const { forum, categories } = job.data;
+      const subcategories: Category[] = [];
+      const batch = categories.map((category) => {
+        if (category.subcategory_list && category.subcategory_list.length > 0) {
+          category.subcategory_list.forEach((subcategory) => {
+            subcategories.push(subcategory);
+          });
+        }
+        const output = this.baseTransformerService.transform(category, {
+          forum_uuid: forum.uuid,
+        });
+        delete output.subcategoryIds;
+        delete output.subcategoryList;
+        return output;
+      });
+      subcategories.forEach((subcategory) => {
+        const output = this.baseTransformerService.transform(subcategory, {
+          forum_uuid: forum.uuid,
+        });
+        batch.push(output);
+      });
+
       await this.flowProducer.add({
         queueName: QUEUES.LOAD,
         name: JOBS.CATEGORY,
-        data: { batch: output },
+        data: { batch },
       });
     } catch (error) {
       job.log(error.message);
