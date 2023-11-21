@@ -20,12 +20,12 @@ function generateCypher(
 
 const BULK_CREATE_BADGE_TYPE = generateCypher(
   'UNWIND $batch AS badgeType RETURN badgeType',
-  'MERGE (b:BadgeType { id: badgeType.id, forumUuid: badgeType.forumUuid }) SET b = badgeType',
+  'MERGE (b:BadgeType { id: badgeType.id, forumUuid: badgeType.forumUuid }) SET b += badgeType',
 );
 
 const BULK_CREATE_BADGE_GROUPING = generateCypher(
   'UNWIND $batch AS badgeGrouping return badgeGrouping',
-  'MERGE (b:BadgeGrouping { id: badgeGrouping.id, forumUuid: badgeGrouping.forumUuid }) SET b = badgeGrouping',
+  'MERGE (b:BadgeGrouping { id: badgeGrouping.id, forumUuid: badgeGrouping.forumUuid }) SET b += badgeGrouping',
 );
 
 const BULK_CREATE_BADGE = generateCypher(
@@ -33,7 +33,7 @@ const BULK_CREATE_BADGE = generateCypher(
   [
     'MERGE (bg:BadgeGrouping {id: badge.badgeGroupingId, forumUuid: badge.forumUuid })',
     'MERGE (bt:BadgeType {id: badge.badgeTypeId, forumUuid: badge.forumUuid })',
-    'MERGE (b:Badge { id: badge.id, forumUuid: badge.forumUuid }) SET b = badge',
+    'MERGE (b:Badge { id: badge.id, forumUuid: badge.forumUuid }) SET b += badge',
     'MERGE (b)-[:HAS_GROUPING]->(bg)',
     'MERGE (b)-[:HAS_TYPE]->(bt)',
   ].join(' '),
@@ -46,7 +46,7 @@ const BULK_CREATE_TAG_GROUP = generateCypher(
     'SET tg.name = tagGroup.name',
     'WITH tg, tagGroup.tags AS tags',
     'UNWIND tags as tag',
-    'MERGE (t:Tag { id: tag.id, forumUuid: tg.forumUuid }) SET t = tag',
+    'MERGE (t:Tag { id: tag.id, forumUuid: tg.forumUuid }) SET t += tag',
     'SET t.forumUuid = tg.forumUuid',
     'MERGE (tg)-[:CONTAINS]->(t)',
   ].join(' '),
@@ -54,18 +54,18 @@ const BULK_CREATE_TAG_GROUP = generateCypher(
 
 const BULK_CREATE_TAG = generateCypher(
   'UNWIND $batch AS tag RETURN tag',
-  'MERGE (t:Tag { id: tag.id, forumUuid: tag.forumUuid}) SET t = tag',
+  'MERGE (t:Tag { id: tag.id, forumUuid: tag.forumUuid}) SET t += tag',
 );
 
 const BULK_CREATE_GROUP = generateCypher(
   'UNWIND $batch AS group RETURN group',
-  'MERGE (g:Group { id: group.id, forumUuid: group.forumUuid }) SET g = group',
+  'MERGE (g:Group { id: group.id, forumUuid: group.forumUuid }) SET g += group',
 );
 
 const BULK_CREATE_GROUP_MEMBERS = generateCypher(
   'UNWIND $batch AS member RETURN member',
   [
-    'MERGE(u:User { id: member.id, forumUuid: member.forumUuid }) SET u = member',
+    'MERGE(u:User { id: member.id, forumUuid: member.forumUuid }) SET u += member',
     'MERGE(g:Group { id: $groupId, forumUuid: member.forumUuid })',
     'MERGE (g)-[:HAS_MEMBER]->(u)',
   ].join(' '),
@@ -75,7 +75,7 @@ const BULK_CREATE_GROUP_MEMBERS = generateCypher(
 const BULK_CREATE_GROUP_OWNERS = generateCypher(
   'UNWIND $batch AS owner RETURN owner',
   [
-    'MERGE(u:User { id: owner.id, forumUuid: owner.forumUuid }) SET u = owner',
+    'MERGE(u:User { id: owner.id, forumUuid: owner.forumUuid }) SET u += owner',
     'MERGE(g:Group { id: $groupId, forumUuid: owner.forumUuid })',
     'MERGE (g)-[:HAS_OWNER]->(u)',
   ].join(' '),
@@ -90,7 +90,7 @@ const BULK_CREATE_CATEGORY = generateCypher(
 const BULK_CREATE_TOPIC = generateCypher(
   'UNWIND $batch AS topic RETURN topic',
   [
-    'MERGE (t:Topic { id: topic.id, forumUuid: topic.forumUuid }) SET t = topic',
+    'MERGE (t:Topic { id: topic.id, forumUuid: topic.forumUuid }) SET t += topic',
     'MERGE (c:Category { id: t.categoryId, forumUuid: t.forumUuid })',
     'MERGE (c)-[:HAS_TOPIC]->(t)',
   ].join(' '),
@@ -101,7 +101,7 @@ const BULK_CREATE_POST = generateCypher(
   [
     'MERGE (t:Topic { id: post.topicId, forumUuid: post.forumUuid })',
     'MERGE (u:User { id: post.userId, forumUuid: post.forumUuid })',
-    'MERGE (p:Post { id: post.id, forumUuid: post.forumUuid }) SET p = post',
+    'MERGE (p:Post { id: post.id, forumUuid: post.forumUuid }) SET p += post',
     'MERGE (u)-[r:POSTED]->(p)',
     'MERGE (t)-[:HAS_POST]->(p)',
     'ON CREATE SET r.createdAt = p.createdAt',
@@ -116,7 +116,7 @@ const BULK_CREATE_USER = generateCypher(
   'UNWIND $batch AS user RETURN user',
   [
     'MATCH (f:Forum { uuid: user.forumUuid })', // This is a MATCH because we don't want to recreate a forum
-    'MERGE (u:User { id: user.id, forumUuid: user.forumUuid }) SET u = user',
+    'MERGE (u:User { id: user.id, forumUuid: user.forumUuid }) SET u += user',
     'MERGE (u)-[:HAS_JOINED]->(f)',
   ].join(' '),
 );
