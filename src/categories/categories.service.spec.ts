@@ -50,7 +50,11 @@ describe('CategoriesService', () => {
       const mockJob = {
         data: {
           forum: { uuid: 'test-uuid' },
-          batch: [{ name: 'badge1' }, { name: 'badge2' }],
+          categories: [
+            { name: 'cat1', subcategory_list: [{ name: 'sub1' }] },
+            { name: 'cat2', subcategory_list: [{ name: 'sub2' }] },
+            { name: 'cat3' },
+          ],
         },
       };
 
@@ -61,8 +65,11 @@ describe('CategoriesService', () => {
         name: JOBS.CATEGORY,
         data: {
           batch: [
-            { name: 'badge1', forumUuid: 'test-uuid' },
-            { name: 'badge2', forumUuid: 'test-uuid' },
+            { name: 'cat1', forumUuid: 'test-uuid' },
+            { name: 'cat2', forumUuid: 'test-uuid' },
+            { name: 'cat3', forumUuid: 'test-uuid' },
+            { name: 'sub1', forumUuid: 'test-uuid' },
+            { name: 'sub2', forumUuid: 'test-uuid' },
           ],
         },
       });
