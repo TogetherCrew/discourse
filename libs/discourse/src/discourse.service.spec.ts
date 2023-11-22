@@ -247,7 +247,7 @@ describe('DiscourseService', () => {
       const result = await service.getPosts(endpoint, 0);
 
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        'https://test.endpoint/t/-/0.json&print=true',
+        'https://test.endpoint/t/-/0.json?print=true',
         {},
       );
       expect(result).toEqual(mockResponse);
