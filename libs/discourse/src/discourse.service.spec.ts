@@ -244,10 +244,10 @@ describe('DiscourseService', () => {
       };
       mockedAxios.get.mockResolvedValueOnce(mockResponse);
 
-      const result = await service.getPosts(endpoint, 0);
+      const result = await service.getPosts(endpoint, 0, 0);
 
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        'https://test.endpoint/t/-/0.json?print=true',
+        'https://test.endpoint/t/0.json?page=0',
         {},
       );
       expect(result).toEqual(mockResponse);

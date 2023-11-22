@@ -74,8 +74,9 @@ export class DiscourseService {
   async getPosts(
     endpoint: string,
     topicId: number,
+    page: number,
   ): Promise<AxiosResponse<PostsResponse>> {
-    const path = `/t/-/${topicId}.json?print=true`; // https://meta.discourse.org/t/get-all-posts-from-topic/71056/2
+    const path = `/t/${topicId}.json?page=${page}`; // https://meta.discourse.org/t/get-all-posts-from-topic/71056/2
     return this.get(endpoint, path);
   }
 
@@ -130,6 +131,7 @@ export class DiscourseService {
 
   private req(url: string, opts = {}): Promise<AxiosResponse<any, any>> {
     try {
+      console.log(url);
       return axios.get(url, opts);
     } catch (error) {
       const err = error as AxiosError;
