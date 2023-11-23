@@ -7,15 +7,14 @@ import { CYPHERS } from '../constants/cyphers.constants';
 import { EtlService } from '../etl/etl.service';
 import { AxiosError } from 'axios';
 
+const BATCH_SIZE = 20;
+
 @Injectable()
 export class PostsService extends EtlService {
   async extract(job: Job<any, any, string>): Promise<any> {
     try {
-      const { forum, topics } = job.data;
-      this.iterate(
-        forum,
-        topics.map((t) => t.id),
-      );
+      const { forum, topic } = job.data;
+      this.iterate(forum, topic);
     } catch (error) {
       job.log(error.message);
       throw error;
@@ -57,10 +56,14 @@ export class PostsService extends EtlService {
     }
   }
 
-  private async iterate(forum: Forum, topicIds: number[]) {
-    topicIds.forEach(async (id) => {
+  private async iterate(forum: Forum, topic: Topic) {
+    const count = Math.ceil(topic.posts_count / BATCH_SIZE);
+    if (count > 1) {
+      console.log(`${topic.id} has ${topic.posts_count} posts.`);
+    }
+    [...Array<number>(count)].forEach(async (_, index) => {
       try {
-        const posts = await this.getPosts(forum.endpoint, id);
+        const posts = await this.getPosts(forum.endpoint, topic.id, index + 1);
         if (posts.length > 0) {
           await this.flowProducer.add({
             queueName: QUEUES.TRANSFORM,
@@ -74,9 +77,13 @@ export class PostsService extends EtlService {
     });
   }
 
-  private async getPosts(endpoint: string, topicId: number) {
+  private async getPosts(endpoint: string, topicId: number, page: number = 1) {
     try {
-      const { data } = await this.discourseService.getPosts(endpoint, topicId);
+      const { data } = await this.discourseService.getPosts(
+        endpoint,
+        topicId,
+        page,
+      );
       const {
         post_stream: { posts },
       } = data as PostsResponse;

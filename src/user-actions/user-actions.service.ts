@@ -31,7 +31,9 @@ export class UserActionsService extends EtlService {
     try {
       const { forum, user_actions } = job.data;
       const batch = user_actions.map((obj) =>
-        this.baseTransformerService.transform(obj, { forum_uuid: forum.uuid }),
+        this.baseTransformerService.transform(obj, {
+          forum_uuid: forum.uuid,
+        }),
       );
       await this.flowProducer.add({
         queueName: QUEUES.LOAD,
@@ -45,6 +47,7 @@ export class UserActionsService extends EtlService {
   }
 
   async load(job: Job<LoadDto, any, string>) {
+    // console.log(job.data);
     try {
       await this.neo4jService.write(CYPHERS.BULK_CREATE_ACTION, job.data);
     } catch (error) {
@@ -88,6 +91,8 @@ export class UserActionsService extends EtlService {
         username,
         offset,
         limit,
+        [1],
+        username,
       );
       const { user_actions } = data;
       return user_actions;

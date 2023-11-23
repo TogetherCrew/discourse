@@ -74,7 +74,7 @@ export class DiscourseService {
   async getPosts(
     endpoint: string,
     topicId: number,
-    page: number,
+    page: number = 1,
   ): Promise<AxiosResponse<PostsResponse>> {
     const path = `/t/${topicId}.json?page=${page}`; // https://meta.discourse.org/t/get-all-posts-from-topic/71056/2
     return this.get(endpoint, path);
@@ -103,8 +103,17 @@ export class DiscourseService {
     username: string,
     offset = 0,
     limit = 50,
+    filters: number[] = [1],
+    actingUsername?: string,
   ): Promise<AxiosResponse<UserActionsResponse>> {
-    const path = `/user_actions.json?username=${username}&limit=${limit}&offset=${offset}`;
+    const path = [
+      `/user_actions.json?`,
+      `username=${username}`,
+      `&limit=${limit}`,
+      `&offset=${offset}`,
+      `&filter=${filters.join(',')}`,
+      `&action_username=${actingUsername}`,
+    ].join('');
     return this.get(endpoint, path);
   }
 

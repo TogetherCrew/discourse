@@ -41,7 +41,7 @@ export class TransformProcessor extends WorkerHost {
   }
 
   process(job: Job<any, any, string>): Promise<any> {
-    console.log(job.queueName, job.name);
+    // console.log(job.queueName, job.name);
 
     switch (job.name) {
       case JOBS.BADGE_GROUPING:

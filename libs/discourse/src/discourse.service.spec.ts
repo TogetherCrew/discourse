@@ -395,10 +395,17 @@ describe('DiscourseService', () => {
       };
       mockedAxios.get.mockResolvedValueOnce(mockResponse);
 
-      const result = await service.getUserActions(endpoint, 'username');
+      const result = await service.getUserActions(
+        endpoint,
+        'username',
+        0,
+        50,
+        [1],
+        'username',
+      );
 
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        'https://test.endpoint/user_actions.json?username=username&limit=50&offset=0',
+        'https://test.endpoint/user_actions.json?username=username&limit=50&offset=0&filter=1&action_username=username',
         {},
       );
       expect(result).toEqual(mockResponse);

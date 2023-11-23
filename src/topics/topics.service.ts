@@ -68,11 +68,11 @@ export class TopicsService extends EtlService {
       const { topics, more_topics_url } = topic_list;
 
       await this.flowProducer.addBulk([
-        {
+        ...topics.map((topic) => ({
           queueName: QUEUES.EXTRACT,
           name: JOBS.POST,
-          data: { forum, topics },
-        },
+          data: { forum, topic },
+        })),
         {
           queueName: QUEUES.TRANSFORM,
           name: JOBS.USER,
