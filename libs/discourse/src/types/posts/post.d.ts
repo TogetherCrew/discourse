@@ -2,13 +2,13 @@ type Post = {
   id: number;
   username: string;
   avatar_template: string;
-  created_at: string;
+  created_at: Date;
   cooked: string;
   post_number: number;
   post_type: number;
-  updated_at: string;
+  updated_at: Date;
   reply_count: number;
-  reply_to_post_number?: string;
+  reply_to_post_number?: number;
   quote_count: number;
   incoming_link_count: number;
   reads: number;
@@ -39,7 +39,7 @@ type Post = {
   user_id: number;
   hidden: boolean;
   trust_level: number;
-  deleted_at?: string;
+  deleted_at?: Date;
   user_deleted: boolean;
   edit_reason?: string;
   can_view_edit_history: boolean;

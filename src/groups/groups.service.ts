@@ -5,6 +5,7 @@ import { QUEUES } from '../constants/queues.constants';
 import { JOBS } from '../constants/jobs.contants';
 import { Forum } from '../forums/entities/forum.entity';
 import { CYPHERS } from '../constants/cyphers.constants';
+import { handleError } from '../errorHandler';
 
 type ExtractDto = {
   forum: Forum;
@@ -26,6 +27,7 @@ export class GroupsService extends EtlService {
       return this.iterate(forum);
     } catch (error) {
       job.log(error.message);
+      handleError(error);
     }
   }
 

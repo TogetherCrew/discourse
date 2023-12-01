@@ -5,6 +5,7 @@ import { JOBS } from '../constants/jobs.contants';
 import { CYPHERS } from '../constants/cyphers.constants';
 import { EtlService } from '../etl/etl.service';
 import { Job } from 'bullmq';
+import { handleError } from '../errorHandler';
 
 type ExtractDto = {
   forum: Forum;
@@ -37,7 +38,7 @@ export class CategoriesService extends EtlService {
       });
     } catch (error) {
       job.log(error.message);
-      throw error;
+      handleError(error);
     }
   }
 

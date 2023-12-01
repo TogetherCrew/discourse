@@ -1,25 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import axios, { AxiosError, AxiosResponse } from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import Bottleneck from 'bottleneck';
 import { BottleneckService } from './bottleneck/bottleneck.service';
-import { HttpsProxyAgent } from 'https-proxy-agent';
-import { ConfigService } from '@nestjs/config';
 import { defaultOpts, proxyOpts } from './bottleneck/options.constants';
+import { ProxyService } from './proxy/proxy.service';
+import { HistoryService } from './history/history.service';
 
 @Injectable()
 export class DiscourseService {
-  proxyAgent: HttpsProxyAgent<string>;
-
   constructor(
     private bottleneckService: BottleneckService,
-    private readonly configService: ConfigService,
-  ) {
-    const uri = configService.get<string>('PROXY_URI');
-    if (uri) {
-      this.proxyAgent = new HttpsProxyAgent(uri);
-      this.proxyAgent.keepAlive = true;
-    }
-  }
+    private proxyService: ProxyService,
+    private historyService: HistoryService,
+  ) {}
 
   async getBadges(endpoint: string): Promise<AxiosResponse<BadgesResponse>> {
     const path = '/badges.json';
@@ -71,12 +64,28 @@ export class DiscourseService {
     return this.get(endpoint, path);
   }
 
+  async getTopic(
+    endpoint: string,
+    topicId: number,
+  ): Promise<AxiosResponse<Topic>> {
+    const path = `/t/${topicId}.json`;
+    return this.get(endpoint, path);
+  }
+
+  async getPost(
+    endpoint: string,
+    postId: number,
+  ): Promise<AxiosResponse<Post>> {
+    const path = `/posts/${postId}.json`;
+    return this.get(endpoint, path);
+  }
+
   async getPosts(
     endpoint: string,
     topicId: number,
     page: number = 1,
   ): Promise<AxiosResponse<PostsResponse>> {
-    const path = `/t/${topicId}.json?page=${page}`; // https://meta.discourse.org/t/get-all-posts-from-topic/71056/2
+    const path = `/t/${topicId}.json?page=${page}`;
     return this.get(endpoint, path);
   }
 
@@ -127,24 +136,26 @@ export class DiscourseService {
 
   private async get(endpoint: string, path: string, scheme = 'https') {
     const url = `${scheme}://${endpoint}${path}`;
-    if (this.proxyAgent) {
+    const valid = await this.historyService.valid(url);
+    if (!valid) {
+      await this.historyService.set(url);
       const limiter: Bottleneck = this.getLimiter(endpoint, proxyOpts);
       return limiter.schedule(() =>
-        this.req(url, { httpsAgent: this.proxyAgent }),
+        this.req(url, { httpsAgent: this.proxyService.getProxy() }),
       );
     } else {
-      const limiter: Bottleneck = this.getLimiter(endpoint, defaultOpts);
-      return limiter.schedule(() => this.req(url));
+      throw new Error('Duplicate request');
     }
   }
 
-  private req(url: string, opts = {}): Promise<AxiosResponse<any, any>> {
+  private async req(url: string, opts = {}): Promise<AxiosResponse<any, any>> {
     try {
       console.log(url);
       return axios.get(url, opts);
     } catch (error) {
-      const err = error as AxiosError;
-      console.error(err);
+      if (axios.isAxiosError(error)) {
+        await this.historyService.set(url, error.response.status);
+      }
       throw error;
     }
   }

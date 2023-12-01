@@ -6,6 +6,7 @@ import { EtlService } from '../etl/etl.service';
 import { Job } from 'bullmq';
 import { Forum } from '../forums/entities/forum.entity';
 import { AxiosError } from 'axios';
+import { handleError } from '../errorHandler';
 
 type TransformDto = {
   forum: Forum;
@@ -32,7 +33,7 @@ export class UserBadgesService extends EtlService {
       }
     } catch (error) {
       job.log(error.message);
-      throw error;
+      handleError(error);
     }
   }
 

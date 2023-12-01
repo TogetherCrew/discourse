@@ -5,7 +5,12 @@ import { QUEUES } from '../constants/queues.constants';
 import { JOBS } from '../constants/jobs.contants';
 import { Forum } from '../forums/entities/forum.entity';
 import { CYPHERS } from '../constants/cyphers.constants';
-import { AxiosError } from 'axios';
+import { handleError } from '../errorHandler';
+
+type ExtractDto = {
+  forum: Forum;
+  username: string;
+};
 
 type TransformDto = UserActionsExtractDto & {
   user_actions: UserAction[];
@@ -17,13 +22,13 @@ type LoadDto = {
 
 @Injectable()
 export class UserActionsService extends EtlService {
-  async extract(job: Job<UserActionsExtractDto, any, string>): Promise<any> {
-    const { forum, user } = job.data;
+  async extract(job: Job<ExtractDto, any, string>): Promise<any> {
+    const { forum, username } = job.data;
     try {
-      return this.iterate(job, forum, user);
+      return this.iterate(job, forum, username);
     } catch (error) {
-      job.log(error.log);
-      throw error;
+      job.log(error.message);
+      handleError(error);
     }
   }
 
@@ -47,7 +52,6 @@ export class UserActionsService extends EtlService {
   }
 
   async load(job: Job<LoadDto, any, string>) {
-    // console.log(job.data);
     try {
       await this.neo4jService.write(CYPHERS.BULK_CREATE_ACTION, job.data);
     } catch (error) {
@@ -57,15 +61,16 @@ export class UserActionsService extends EtlService {
   }
 
   private async iterate(
-    job: Job<UserActionsExtractDto, any, string>,
+    job: Job<ExtractDto, any, string>,
     forum: Forum,
-    user: GroupMember | BasicUser,
+    username: string,
     offset = 0,
     limit = 50,
   ): Promise<void> {
     const user_actions = await this.getUserActions(
+      job,
       forum.endpoint,
-      user.username,
+      username,
       offset,
       limit,
     );
@@ -75,11 +80,12 @@ export class UserActionsService extends EtlService {
         name: JOBS.USER_ACTION,
         data: { forum, user_actions },
       });
-      await this.iterate(job, forum, user, offset + limit, limit);
+      await this.iterate(job, forum, username, offset + limit, limit);
     }
   }
 
   private async getUserActions(
+    job: Job,
     endpoint: string,
     username: string,
     offset: number,
@@ -97,13 +103,8 @@ export class UserActionsService extends EtlService {
       const { user_actions } = data;
       return user_actions;
     } catch (error) {
-      const err = error as AxiosError;
-      switch (err.response.status) {
-        case 404:
-          return [];
-        default:
-          throw error;
-      }
+      job.log(error.message);
+      handleError(error);
     }
   }
 }

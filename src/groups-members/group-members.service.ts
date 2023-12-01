@@ -97,26 +97,26 @@ export class GroupMembersService extends EtlService {
           name: JOBS.GROUP_OWNER,
           data: { forum, group, owners },
         },
-        ...members.map((user) => ({
-          queueName: QUEUES.EXTRACT,
-          name: JOBS.USER_ACTION,
-          data: { forum, user },
-        })),
-        ...members.map((user) => ({
-          queueName: QUEUES.EXTRACT,
-          name: JOBS.USER_BADGE,
-          data: { forum, user },
-        })),
-        ...owners.map((user) => ({
-          queueName: QUEUES.EXTRACT,
-          name: JOBS.USER_ACTION,
-          data: { forum, user },
-        })),
-        ...owners.map((user) => ({
-          queueName: QUEUES.EXTRACT,
-          name: JOBS.USER_BADGE,
-          data: { forum, user },
-        })),
+        // ...members.map((user) => ({
+        //   queueName: QUEUES.EXTRACT,
+        //   name: JOBS.USER_ACTION,
+        //   data: { forum, user },
+        // })),
+        // ...members.map((user) => ({
+        //   queueName: QUEUES.EXTRACT,
+        //   name: JOBS.USER_BADGE,
+        //   data: { forum, user },
+        // })),
+        // ...owners.map((user) => ({
+        //   queueName: QUEUES.EXTRACT,
+        //   name: JOBS.USER_ACTION,
+        //   data: { forum, user },
+        // })),
+        // ...owners.map((user) => ({
+        //   queueName: QUEUES.EXTRACT,
+        //   name: JOBS.USER_BADGE,
+        //   data: { forum, user },
+        // })),
       ]);
 
       offset += limit;

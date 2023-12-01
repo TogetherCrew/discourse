@@ -21,6 +21,7 @@ describe('PostsService', () => {
     } as unknown as jest.Mocked<Neo4jService>;
     mockFlowProducer = {
       add: jest.fn(),
+      addBulk: jest.fn(),
     } as unknown as jest.Mocked<FlowProducer>;
 
     const module: TestingModule = await Test.createTestingModule({
@@ -47,25 +48,67 @@ describe('PostsService', () => {
 
   describe('transform method', () => {
     it('should process data and add a job to the flowProducer', async () => {
+      const d = new Date();
+      const forum = { uuid: 'test-uuid' };
+      const username = 'username';
       const mockJob = {
         data: {
-          forum: { uuid: 'test-uuid' },
-          posts: [{ id: 1 }, { id: 2 }],
+          forum,
+          data: {
+            id: 1,
+            topic_id: 1,
+            user_id: 1,
+            username,
+            user_deleted: false,
+            created_at: d,
+            updated_at: d,
+            deleted_at: d,
+            post_type: 1,
+            post_number: 1,
+            reply_to_post_number: 1,
+            hidden: false,
+            cooked: 'cooked',
+            raw: 'raw',
+            score: 1000,
+          },
         },
+        log: jest.fn(),
       };
 
       await service.transform(mockJob as any);
 
-      expect(mockFlowProducer.add).toHaveBeenCalledWith({
-        queueName: QUEUES.LOAD,
-        name: JOBS.POST,
-        data: {
-          batch: [
-            { id: 1, forumUuid: 'test-uuid' },
-            { id: 2, forumUuid: 'test-uuid' },
-          ],
+      expect(mockFlowProducer.addBulk).toHaveBeenCalledWith([
+        {
+          queueName: QUEUES.LOAD,
+          name: JOBS.POST,
+          data: {
+            post: {
+              id: 1,
+              topicId: 1,
+              userId: 1,
+              username,
+              userDeleted: false,
+              createdAt: d,
+              updatedAt: d,
+              deletedAt: d,
+              postType: 1,
+              postNumber: 1,
+              replyToPostNumber: 1,
+              hidden: false,
+              cooked: 'cooked',
+              raw: 'raw',
+              score: 1000,
+              forumUuid: forum.uuid,
+            },
+          },
         },
-      });
+        {
+          name: JOBS.USER,
+          queueName: QUEUES.EXTRACT,
+          data: { forum, username },
+          opts: { priority: 8 },
+        },
+      ]);
     });
   });
 
@@ -73,12 +116,20 @@ describe('PostsService', () => {
     it('should call neo4jService.write with correct parameters', async () => {
       const mockJob = {
         data: {
-          batch: [], // Replace with actual mock data
+          post: {},
         },
       };
       await service.load(mockJob as any);
       expect(mockNeo4jService.write).toHaveBeenCalledWith(
-        CYPHERS.BULK_CREATE_POST,
+        CYPHERS.CREATE_POST,
+        mockJob.data,
+      );
+      expect(mockNeo4jService.write).toHaveBeenCalledWith(
+        CYPHERS.CREATE_POST_USER,
+        mockJob.data,
+      );
+      expect(mockNeo4jService.write).toHaveBeenCalledWith(
+        CYPHERS.CREATE_REPLIED_TO_EDGE,
         mockJob.data,
       );
     });

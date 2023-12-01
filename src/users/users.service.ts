@@ -9,6 +9,38 @@ import { InjectFlowProducer } from '@nestjs/bullmq';
 import { Neo4jService } from 'nest-neo4j';
 import { BaseTransformerService } from '../base-transformer/base-transformer.service';
 import { FLOW_PRODUCER } from '../constants/flows.constants';
+import { Forum } from '../forums/entities/forum.entity';
+import { AxiosError } from 'axios';
+import { handleError } from '../errorHandler';
+
+type ExtractDto = {
+  forum: Forum;
+  username: string;
+};
+type TransformDto = {
+  forum: Forum;
+  data: UserResponse;
+};
+type UserDto = {
+  id: number;
+  username: string;
+  createdAt: Date;
+  name: string;
+  title?: string;
+  trustLevel: number;
+  moderator: boolean;
+  admin: boolean;
+  avatarTemplate: string;
+  invitedById?: number;
+  locale?: string;
+  forumUuid: string;
+};
+type LoadDto = {
+  user: UserDto;
+  userBadges: any[];
+  badges: any[];
+  badgeTypes: any[];
+};
 
 @Injectable()
 export class UsersService extends EtlService {
@@ -22,36 +54,79 @@ export class UsersService extends EtlService {
     super(discourseService, baseTransformerService, neo4jService, flowProducer);
   }
 
-  async transform(job: Job<any, any, string>): Promise<any> {
+  async extract(job: Job<ExtractDto, any, string>) {
     try {
-      const { forum, users } = job.data;
-      const batch = users.map((user) => {
-        const obj = this.baseTransformerService.transform(user, {
-          forum_uuid: forum.uuid,
-        });
-        delete obj.associatedAccounts;
-        delete obj.groups;
-        delete obj.approvedBy;
-        delete obj.penaltyCounts;
-        delete obj.externalIds;
-        return obj;
+      const { forum, username } = job.data;
+      const { data } = await this.discourseService.getUser(
+        forum.endpoint,
+        username,
+      );
+      await this.flowProducer.add({
+        name: JOBS.USER,
+        queueName: QUEUES.TRANSFORM,
+        data: { forum, data },
       });
+    } catch (error) {
+      job.log(error.message);
+      handleError(error);
+    }
+  }
+
+  async transform(job: Job<TransformDto, any, string>): Promise<any> {
+    try {
+      const { forum, data } = job.data;
+      const user: UserDto = {
+        id: data.user.id,
+        username: data.user.username,
+        name: data.user.name,
+        title: data.user.title,
+        trustLevel: data.user.trust_level,
+        moderator: data.user.moderator,
+        admin: data.user.admin,
+        createdAt: data.user.created_at,
+        avatarTemplate: data.user.avatar_template,
+        invitedById: data.user.invited_by?.id,
+        locale: data.user.locale,
+        forumUuid: forum.uuid,
+      };
+      const userBadges = data.user_badges?.map((user_badge) => ({
+        id: user_badge.id,
+        grantedAt: user_badge.granted_at,
+        createdAt: user_badge.created_at,
+        badgeId: user_badge.badge_id,
+        userId: user_badge.user_id,
+        grantedById: user_badge.granted_by_id,
+        forumUuid: forum.uuid,
+      }));
+      const badges = data.badges?.map((badge) => ({
+        id: badge.id,
+        name: badge.name,
+        description: badge.description,
+        longDescription: badge.long_description,
+        icon: badge.icon,
+        badgeGroupingId: badge.badge_grouping_id,
+        badgeTypeId: badge.badge_type_id,
+        imageUrl: badge.image_url,
+        forumUuid: forum.uuid,
+      }));
+      const badgeTypes = data.badge_types?.map((badgeType) => ({
+        id: badgeType.id,
+        name: badgeType.name,
+        forumUuid: forum.uuid,
+      }));
+      const { username } = data.user;
+
       await this.flowProducer.addBulk([
         {
-          queueName: QUEUES.LOAD,
           name: JOBS.USER,
-          data: { batch },
+          queueName: QUEUES.LOAD,
+          data: { user, userBadges, badges, badgeTypes },
         },
-        ...batch.map((user) => ({
-          queueName: QUEUES.EXTRACT,
+        {
           name: JOBS.USER_ACTION,
-          data: { forum, user },
-        })),
-        ...batch.map((user) => ({
           queueName: QUEUES.EXTRACT,
-          name: JOBS.USER_BADGE,
-          data: { forum, user },
-        })),
+          data: { forum, username },
+        },
       ]);
     } catch (error) {
       job.log(error.message);
@@ -59,9 +134,18 @@ export class UsersService extends EtlService {
     }
   }
 
-  async load(job: Job<any, any, string>): Promise<any> {
+  async load(job: Job<LoadDto, any, string>): Promise<any> {
     try {
-      await this.neo4jService.write(CYPHERS.BULK_CREATE_USER, job.data);
+      if (job.data.badgeTypes) {
+        // Create BadgeTypes
+        await this.neo4jService.write(CYPHERS.BULK_CREATE_BADGE_TYPE, job.data);
+      }
+      if (job.data.badges) {
+        // Create Badges
+        await this.neo4jService.write(CYPHERS.BULK_CREATE_BADGE, job.data);
+      }
+      await this.neo4jService.write(CYPHERS.CREATE_USER, job.data);
+      await this.neo4jService.write(CYPHERS.BULK_CREATE_USER_BADGES, job.data);
     } catch (error) {
       job.log(error.message);
       throw error;

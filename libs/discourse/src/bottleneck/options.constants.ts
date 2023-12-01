@@ -7,9 +7,9 @@ export const defaultOpts = {
 };
 
 export const proxyOpts = {
-  minTime: (60 * 1000) / 500,
-  reservoir: 500,
-  reservoirRefreshAmount: 500,
+  minTime: (60 * 1000) / 1000,
+  reservoir: 1000,
+  reservoirRefreshAmount: 1000,
   reservoirRefreshInterval: 60 * 1000,
-  maxConcurrent: 100,
+  maxConcurrent: 1000,
 };

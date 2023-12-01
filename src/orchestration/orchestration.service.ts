@@ -1,25 +1,33 @@
 import { InjectFlowProducer } from '@nestjs/bullmq';
 import { Injectable } from '@nestjs/common';
-import { FlowProducer } from 'bullmq';
+import { FlowJob, FlowProducer } from 'bullmq';
 import { FLOW_PRODUCER } from '../constants/flows.constants';
 import { QUEUES } from '../constants/queues.constants';
 import { Forum } from '../forums/entities/forum.entity';
 import { JOBS } from '../constants/jobs.contants';
+import { DiscourseService } from '@app/discourse';
 
 @Injectable()
 export class OrchestrationService {
   constructor(
     @InjectFlowProducer(FLOW_PRODUCER)
     private readonly flowProducer: FlowProducer,
+    private discourseService: DiscourseService,
   ) {}
 
   async run(forum: Forum) {
-    this.flowProducer.addBulk([
-      {
-        queueName: QUEUES.EXTRACT,
-        name: JOBS.TOPIC,
-        data: { forum },
-      },
+    const latestTopicId = await this.getLatestTopicId(forum);
+
+    await this.flowProducer.addBulk([
+      ...[...Array<number>(latestTopicId)].map(
+        (_, idx) =>
+          ({
+            queueName: QUEUES.EXTRACT,
+            name: JOBS.TOPIC,
+            data: { forum, topicId: idx + 1 },
+            opts: { priority: 10 },
+          }) as FlowJob,
+      ),
       {
         queueName: QUEUES.EXTRACT,
         name: JOBS.CATEGORY,
@@ -41,5 +49,17 @@ export class OrchestrationService {
         data: { forum },
       },
     ]);
+  }
+
+  private async getLatestTopicId(forum: Forum): Promise<number> {
+    const { data } = await this.discourseService.getLatestTopics(
+      forum.endpoint,
+      0,
+      'created',
+    );
+    const { topic_list } = data;
+    const { topics } = topic_list;
+    const topicIds = topics.map((topic) => topic.id);
+    return Math.max(...topicIds);
   }
 }

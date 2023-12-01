@@ -10,6 +10,7 @@ import { QUEUES } from '../constants/queues.constants';
 import { JOBS } from '../constants/jobs.contants';
 import { CYPHERS } from '../constants/cyphers.constants';
 import { EtlService } from '../etl/etl.service';
+import { handleError } from '../errorHandler';
 
 type ExtractDto = {
   forum: Forum;
@@ -60,7 +61,7 @@ export class BadgesService extends EtlService {
       ]);
     } catch (error) {
       job.log(error.message);
-      throw error;
+      handleError(error);
     }
   }
 

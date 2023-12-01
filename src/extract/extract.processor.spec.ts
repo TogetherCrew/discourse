@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { Job, Queue } from 'bullmq';
+import { Job } from 'bullmq';
 import { CategoriesService } from '../categories/categories.service';
 import { GroupMembersService } from '../groups-members/group-members.service';
 import { GroupsService } from '../groups/groups.service';
@@ -12,6 +12,7 @@ import { BadgesService } from '../badges/badges.service';
 import { JOBS } from '../constants/jobs.contants';
 import { QUEUES } from '../constants/queues.constants';
 import { ExtractProcessor } from './extract.processor';
+import { UsersService } from '../users/users.service';
 
 describe('ExtractProcessor', () => {
   let processor: ExtractProcessor;
@@ -24,6 +25,7 @@ describe('ExtractProcessor', () => {
   let mockCategoriesService: jest.Mocked<CategoriesService>;
   let mockUserActionsService: jest.Mocked<UserActionsService>;
   let mockUserBadgesService: jest.Mocked<UserBadgesService>;
+  let mockUsersService: jest.Mocked<UsersService>;
 
   beforeEach(async () => {
     mockBadgesService = {
@@ -53,6 +55,9 @@ describe('ExtractProcessor', () => {
     mockUserBadgesService = {
       extract: jest.fn(),
     } as unknown as jest.Mocked<UserBadgesService>;
+    mockUsersService = {
+      extract: jest.fn(),
+    } as unknown as jest.Mocked<UsersService>;
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -93,6 +98,10 @@ describe('ExtractProcessor', () => {
           provide: UserBadgesService,
           useValue: mockUserBadgesService,
         },
+        {
+          provide: UsersService,
+          useValue: mockUsersService,
+        },
         // Provide other services...
       ],
     }).compile();
@@ -131,6 +140,10 @@ describe('ExtractProcessor', () => {
       name: JOBS.USER_BADGE,
       queueName: QUEUES.EXTRACT,
     } as Job;
+    const mockUsersJob = {
+      name: JOBS.USER,
+      queueName: QUEUES.EXTRACT,
+    } as Job;
 
     await processor.process(mockBadgesJob as any);
     expect(mockBadgesService.extract).toHaveBeenCalledWith(mockBadgesJob);
@@ -166,5 +179,8 @@ describe('ExtractProcessor', () => {
     expect(mockUserBadgesService.extract).toHaveBeenCalledWith(
       mockUserBadgesJob,
     );
+
+    await processor.process(mockUsersJob as any);
+    expect(mockUsersService.extract).toHaveBeenCalledWith(mockUsersJob);
   });
 });

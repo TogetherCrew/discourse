@@ -11,8 +11,9 @@ import { TagsService } from '../tags/tags.service';
 import { TopicsService } from '../topics/topics.service';
 import { UserActionsService } from '../user-actions/user-actions.service';
 import { UserBadgesService } from '../user-badges/user-badges.service';
+import { UsersService } from '../users/users.service';
 
-@Processor(QUEUES.EXTRACT, { concurrency: 20 })
+@Processor(QUEUES.EXTRACT, { concurrency: 100 })
 export class ExtractProcessor extends WorkerHost {
   constructor(
     private readonly badgesService: BadgesService,
@@ -24,6 +25,7 @@ export class ExtractProcessor extends WorkerHost {
     private readonly categoriesService: CategoriesService,
     private readonly userActionsService: UserActionsService,
     private readonly userBadgesService: UserBadgesService,
+    private readonly usersService: UsersService,
   ) {
     super();
   }
@@ -50,6 +52,8 @@ export class ExtractProcessor extends WorkerHost {
         return this.userActionsService.extract(job);
       case JOBS.USER_BADGE:
         return this.userBadgesService.extract(job);
+      case JOBS.USER:
+        return this.usersService.extract(job);
       default:
         break;
     }
