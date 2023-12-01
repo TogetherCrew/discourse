@@ -1,6 +1,6 @@
 type TagsResponse = {
   tags: Tag[];
   extras: {
-    categories: any[];
+    tag_groups: TagGroup[];
   };
 };

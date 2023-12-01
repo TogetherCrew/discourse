@@ -1,20 +1,20 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DiscourseService } from './discourse.service';
-import { HttpService } from '@nestjs/axios';
 import { BottleneckService } from './bottleneck/bottleneck.service';
-import { EMPTY, of } from 'rxjs';
-import { AxiosResponse } from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import Bottleneck from 'bottleneck';
+import { ConfigService } from '@nestjs/config';
+import { HistoryService } from './history/history.service';
+import { ProxyService } from './proxy/proxy.service';
 
+jest.mock('axios');
+const mockedAxios = axios as jest.Mocked<typeof axios>;
 describe('DiscourseService', () => {
   let service: DiscourseService;
 
-  const mockHttpService = {
-    get: jest.fn(),
-    permissions$: EMPTY,
-  };
-
   let mockBottleneckService: any;
+  let mockProxyService: any;
+  let mockHistoryService: any;
 
   beforeEach(async () => {
     mockBottleneckService = {
@@ -22,17 +22,35 @@ describe('DiscourseService', () => {
       createClusterLimiter: jest.fn(),
       setLimiter: jest.fn(),
     };
+    mockProxyService = {
+      getProxy: jest.fn(),
+    };
+    mockHistoryService = {
+      set: jest.fn(),
+      get: jest.fn(),
+      valid: jest.fn(),
+    };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         DiscourseService,
         {
-          provide: HttpService,
-          useValue: mockHttpService,
-        },
-        {
           provide: BottleneckService,
           useValue: mockBottleneckService,
+        },
+        {
+          provide: ProxyService,
+          useValue: mockProxyService,
+        },
+        {
+          provide: HistoryService,
+          useValue: mockHistoryService,
+        },
+        {
+          provide: ConfigService,
+          useValue: {
+            get: jest.fn().mockReturnValue(null),
+          },
         },
       ],
     }).compile();
@@ -57,12 +75,13 @@ describe('DiscourseService', () => {
       const mockResponse: Partial<AxiosResponse<BadgesResponse>> = {
         data: { badges: [] },
       };
-      mockHttpService.get.mockReturnValueOnce(of(mockResponse));
+      mockedAxios.get.mockResolvedValueOnce(mockResponse);
 
       const result = await service.getBadges(endpoint);
 
-      expect(mockHttpService.get).toHaveBeenCalledWith(
+      expect(mockedAxios.get).toHaveBeenCalledWith(
         'https://test.endpoint/badges.json',
+        {},
       );
       expect(result).toEqual(mockResponse);
     });
@@ -87,12 +106,13 @@ describe('DiscourseService', () => {
           },
         },
       };
-      mockHttpService.get.mockReturnValueOnce(of(mockResponse));
+      mockedAxios.get.mockResolvedValueOnce(mockResponse);
 
       const result = await service.getCategories(endpoint);
 
-      expect(mockHttpService.get).toHaveBeenCalledWith(
-        'https://test.endpoint/categories.json',
+      expect(mockedAxios.get).toHaveBeenCalledWith(
+        'https://test.endpoint/categories.json?include_subcategories=true',
+        {},
       );
       expect(result).toEqual(mockResponse);
     });
@@ -113,12 +133,13 @@ describe('DiscourseService', () => {
           tag_groups: [],
         },
       };
-      mockHttpService.get.mockReturnValueOnce(of(mockResponse));
+      mockedAxios.get.mockResolvedValueOnce(mockResponse);
 
       const result = await service.getTagGroups(endpoint);
 
-      expect(mockHttpService.get).toHaveBeenCalledWith(
+      expect(mockedAxios.get).toHaveBeenCalledWith(
         'https://test.endpoint/tag_groups.json',
+        {},
       );
       expect(result).toEqual(mockResponse);
     });
@@ -138,16 +159,17 @@ describe('DiscourseService', () => {
         data: {
           tags: [],
           extras: {
-            categories: [],
+            tag_groups: [],
           },
         },
       };
-      mockHttpService.get.mockReturnValueOnce(of(mockResponse));
+      mockedAxios.get.mockResolvedValueOnce(mockResponse);
 
       const result = await service.getTags(endpoint);
 
-      expect(mockHttpService.get).toHaveBeenCalledWith(
+      expect(mockedAxios.get).toHaveBeenCalledWith(
         'https://test.endpoint/tags.json',
+        {},
       );
       expect(result).toEqual(mockResponse);
     });
@@ -173,12 +195,13 @@ describe('DiscourseService', () => {
           load_more_groups: '',
         },
       };
-      mockHttpService.get.mockReturnValueOnce(of(mockResponse));
+      mockedAxios.get.mockResolvedValueOnce(mockResponse);
 
       const result = await service.getGroups(endpoint);
 
-      expect(mockHttpService.get).toHaveBeenCalledWith(
+      expect(mockedAxios.get).toHaveBeenCalledWith(
         'https://test.endpoint/groups.json?page=0',
+        {},
       );
       expect(result).toEqual(mockResponse);
     });
@@ -209,12 +232,168 @@ describe('DiscourseService', () => {
           },
         },
       };
-      mockHttpService.get.mockReturnValueOnce(of(mockResponse));
+      mockedAxios.get.mockResolvedValueOnce(mockResponse);
 
       const result = await service.getLatestTopics(endpoint, 0, 'created');
 
-      expect(mockHttpService.get).toHaveBeenCalledWith(
+      expect(mockedAxios.get).toHaveBeenCalledWith(
         'https://test.endpoint/latest.json?order=created&page=0',
+        {},
+      );
+      expect(result).toEqual(mockResponse);
+    });
+  });
+
+  describe('getPosts', () => {
+    let mockLimiter: Bottleneck;
+
+    beforeEach(() => {
+      mockLimiter = new Bottleneck();
+      mockBottleneckService.getLimiter.mockReturnValueOnce(mockLimiter);
+    });
+
+    it('should call the correct URL', async () => {
+      const endpoint = 'test.endpoint';
+      const mockResponse: Partial<AxiosResponse<PostsResponse>> = {
+        data: {
+          post_stream: {
+            posts: [],
+          },
+          id: 0,
+        },
+      };
+      mockedAxios.get.mockResolvedValueOnce(mockResponse);
+
+      const result = await service.getPosts(endpoint, 0, 0);
+
+      expect(mockedAxios.get).toHaveBeenCalledWith(
+        'https://test.endpoint/t/0.json?page=0',
+        {},
+      );
+      expect(result).toEqual(mockResponse);
+    });
+  });
+
+  describe('getUser', () => {
+    let mockLimiter: Bottleneck;
+
+    beforeEach(() => {
+      mockLimiter = new Bottleneck();
+      mockBottleneckService.getLimiter.mockReturnValueOnce(mockLimiter);
+    });
+
+    it('should call the correct URL', async () => {
+      const endpoint = 'test.endpoint';
+      const mockResponse: Partial<AxiosResponse<UserResponse>> = {
+        data: {
+          user_badges: [],
+          badges: [],
+          badge_types: [],
+          users: [],
+          user: {} as DetailUser,
+        },
+      };
+      mockedAxios.get.mockResolvedValueOnce(mockResponse);
+
+      const result = await service.getUser(endpoint, 'test-username');
+
+      expect(mockedAxios.get).toHaveBeenCalledWith(
+        'https://test.endpoint/u/test-username.json',
+        {},
+      );
+      expect(result).toEqual(mockResponse);
+    });
+  });
+
+  describe('getGroupMembers', () => {
+    let mockLimiter: Bottleneck;
+
+    beforeEach(() => {
+      mockLimiter = new Bottleneck();
+      mockBottleneckService.getLimiter.mockReturnValueOnce(mockLimiter);
+    });
+
+    it('should call the correct URL', async () => {
+      const endpoint = 'test.endpoint';
+      const mockResponse: Partial<AxiosResponse<GroupMembersResponse>> = {
+        data: {
+          members: [],
+          owners: [],
+          meta: {
+            total: 0,
+            limit: 0,
+            offset: 0,
+          },
+        },
+      };
+      mockedAxios.get.mockResolvedValueOnce(mockResponse);
+
+      const result = await service.getGroupMembers(endpoint, 'group');
+
+      expect(mockedAxios.get).toHaveBeenCalledWith(
+        'https://test.endpoint/groups/group/members.json?limit=50&offset=0',
+        {},
+      );
+      expect(result).toEqual(mockResponse);
+    });
+  });
+
+  describe('getUserActions', () => {
+    let mockLimiter: Bottleneck;
+
+    beforeEach(() => {
+      mockLimiter = new Bottleneck();
+      mockBottleneckService.getLimiter.mockReturnValueOnce(mockLimiter);
+    });
+
+    it('should call the correct URL', async () => {
+      const endpoint = 'test.endpoint';
+      const mockResponse: Partial<AxiosResponse<UserActionsResponse>> = {
+        data: {
+          user_actions: [],
+        },
+      };
+      mockedAxios.get.mockResolvedValueOnce(mockResponse);
+
+      const result = await service.getUserActions(
+        endpoint,
+        'username',
+        0,
+        50,
+        [1],
+        'username',
+      );
+
+      expect(mockedAxios.get).toHaveBeenCalledWith(
+        'https://test.endpoint/user_actions.json?username=username&limit=50&offset=0&filter=1&action_username=username',
+        {},
+      );
+      expect(result).toEqual(mockResponse);
+    });
+  });
+
+  describe('getUserBadges', () => {
+    let mockLimiter: Bottleneck;
+
+    beforeEach(() => {
+      mockLimiter = new Bottleneck();
+      mockBottleneckService.getLimiter.mockReturnValueOnce(mockLimiter);
+    });
+
+    it('should call the correct URL', async () => {
+      const endpoint = 'test.endpoint';
+      const mockResponse: Partial<AxiosResponse<UserBadgesResponse>> = {
+        data: {
+          user_badges: [],
+        },
+      };
+      mockedAxios.get.mockResolvedValueOnce(mockResponse);
+
+      const result = await service.getUserBadges(endpoint, 'username');
+
+      expect(mockedAxios.get).toHaveBeenCalledWith(
+        'https://test.endpoint/user-badges/username.json',
+        {},
       );
       expect(result).toEqual(mockResponse);
     });
@@ -234,7 +413,7 @@ describe('DiscourseService', () => {
 
     it('should create a new limiter if it does not exist', () => {
       const id = 'test.id';
-      const mockLimiter = { id };
+      const mockLimiter = { id, on: jest.fn() };
       mockBottleneckService.getLimiter.mockReturnValueOnce(null);
       mockBottleneckService.createClusterLimiter.mockReturnValueOnce(
         mockLimiter,

@@ -1,14 +1,19 @@
 import { Module } from '@nestjs/common';
-import { TagGroupsProcessor } from './tag-groups.processor';
 import { BullModule } from '@nestjs/bullmq';
-import { BaseEtlModule } from 'src/base-etl/base-etl.module';
-import { QUEUES } from 'src/constants/queues.constants';
+import { TagGroupsService } from './tag-groups.service';
+import { DiscourseModule } from '@app/discourse';
+import { Neo4jModule } from 'nest-neo4j/dist';
+import { BaseTransformerModule } from '../base-transformer/base-transformer.module';
+import { FLOW_PRODUCER } from '../constants/flows.constants';
 
 @Module({
   imports: [
-    BullModule.registerQueue({ name: QUEUES.TAG_GROUP }),
-    BaseEtlModule,
+    BullModule.registerFlowProducer({ name: FLOW_PRODUCER }),
+    DiscourseModule,
+    BaseTransformerModule,
+    Neo4jModule,
   ],
-  providers: [TagGroupsProcessor],
+  providers: [TagGroupsService],
+  exports: [TagGroupsService],
 })
 export class TagGroupsModule {}

@@ -1,14 +1,19 @@
 import { Module } from '@nestjs/common';
-import { BadgeGroupingsProcessor } from './badge-groupings.processor';
 import { BullModule } from '@nestjs/bullmq';
-import { BaseEtlModule } from 'src/base-etl/base-etl.module';
-import { QUEUES } from 'src/constants/queues.constants';
+import { FLOW_PRODUCER } from '../constants/flows.constants';
+import { DiscourseModule } from '@app/discourse';
+import { Neo4jModule } from 'nest-neo4j/dist';
+import { BaseTransformerModule } from '../base-transformer/base-transformer.module';
+import { BadgeGroupingsService } from './badge-groupings.service';
 
 @Module({
   imports: [
-    BullModule.registerQueue({ name: QUEUES.BADGE_GROUPING }),
-    BaseEtlModule,
+    BullModule.registerFlowProducer({ name: FLOW_PRODUCER }),
+    DiscourseModule,
+    BaseTransformerModule,
+    Neo4jModule,
   ],
-  providers: [BadgeGroupingsProcessor],
+  providers: [BadgeGroupingsService],
+  exports: [BadgeGroupingsService],
 })
 export class BadgeGroupingsModule {}

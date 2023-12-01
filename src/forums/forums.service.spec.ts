@@ -3,11 +3,13 @@ import { ForumsService } from './forums.service';
 import { CreateForumDto } from './dto/create-forum.dto';
 import { ForumsRepository } from './forums.repository';
 import { OrchestrationService } from '../orchestration/orchestration.service';
+import { UpdateForumDto } from './dto/update-forum.dto';
 
 describe('ForumsService', () => {
   let service: ForumsService;
   const mockForumsRepository = {
     insertOne: jest.fn(),
+    updateOne: jest.fn(),
   };
   const mockOrchestrationService = {
     run: jest.fn(),
@@ -42,6 +44,24 @@ describe('ForumsService', () => {
         createForumDto,
       );
       expect(result).toEqual({ endpoint: 'some-endpoint', uuid: 'some-uuid' });
+    });
+  });
+
+  describe('update', () => {
+    it('should return the data that was generated from repository', async () => {
+      const uuid = 'uuid-test';
+      const updateForumDto: UpdateForumDto = { endpoint: 'some-endpoint' };
+      mockForumsRepository.updateOne.mockResolvedValueOnce({
+        ...updateForumDto,
+        uuid,
+      });
+
+      const result = await service.update(uuid, updateForumDto);
+      expect(mockForumsRepository.updateOne).toHaveBeenCalledWith(
+        uuid,
+        updateForumDto,
+      );
+      expect(result).toEqual({ endpoint: 'some-endpoint', uuid: 'uuid-test' });
     });
   });
 });

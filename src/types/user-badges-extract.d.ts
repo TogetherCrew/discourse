@@ -1,0 +1,1 @@
+type UserBadgesExtractDto = UserActionsExtractDto;

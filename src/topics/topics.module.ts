@@ -1,19 +1,19 @@
 import { Module } from '@nestjs/common';
-import { TopicsProcessor } from './topics.processor';
 import { BullModule } from '@nestjs/bullmq';
-import { BaseEtlModule } from '../base-etl/base-etl.module';
-import { QUEUES } from '../constants/queues.constants';
-import { TopicsEtlService } from './topics-etl.service';
+import { TopicsService } from './topics.service';
 import { DiscourseModule } from '@app/discourse';
-import { BaseTransformerModule } from 'src/base-transformer/base-transformer.module';
+import { BaseTransformerModule } from '../base-transformer/base-transformer.module';
+import { FLOW_PRODUCER } from '../constants/flows.constants';
 
 @Module({
   imports: [
-    BullModule.registerQueue({ name: QUEUES.TOPIC }),
-    BaseEtlModule,
+    BullModule.registerFlowProducer({
+      name: FLOW_PRODUCER,
+    }),
     DiscourseModule,
     BaseTransformerModule,
   ],
-  providers: [TopicsProcessor, TopicsEtlService],
+  providers: [TopicsService],
+  exports: [TopicsService],
 })
 export class TopicsModule {}

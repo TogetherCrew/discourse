@@ -9,15 +9,21 @@ import { Neo4jModule } from 'nest-neo4j';
 import { ForumsModule } from './forums/forums.module';
 import { BullModule } from '@nestjs/bullmq';
 import { OrchestrationModule } from './orchestration/orchestration.module';
-import { TopicsModule } from './topics/topics.module';
 import redisConfig from './config/redis.config';
+import { BullBoardModule } from '@bull-board/nestjs';
+import { ExpressAdapter } from '@bull-board/express';
+import { ExtractModule } from './extract/extract.module';
+import { TransformModule } from './transform/transform.module';
+import proxyConfig from './config/proxy.config';
+import { LoadModule } from './load/load.module';
+import { CronQueueModule } from './cron-queue/cron-queue.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       validationSchema: validationSchema,
       isGlobal: true,
-      load: [baseConfig, neo4jConfig, redisConfig],
+      load: [baseConfig, neo4jConfig, redisConfig, proxyConfig],
     }),
     Neo4jModule.forRootAsync({
       import: [ConfigModule],
@@ -32,8 +38,15 @@ import redisConfig from './config/redis.config';
       }),
       inject: [ConfigService],
     }),
+    BullBoardModule.forRoot({
+      route: '/queues',
+      adapter: ExpressAdapter,
+    }),
     OrchestrationModule,
-    TopicsModule,
+    ExtractModule,
+    TransformModule,
+    LoadModule,
+    CronQueueModule,
   ],
   controllers: [AppController],
   providers: [AppService],

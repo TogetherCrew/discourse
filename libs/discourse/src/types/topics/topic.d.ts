@@ -8,6 +8,7 @@ type Topic = {
   highest_post_number: number;
   image_url: string;
   created_at: Date;
+  deleted_at?: Date;
   last_posted_at: Date;
   bumped: boolean;
   bumped_at: Date;
@@ -32,4 +33,9 @@ type Topic = {
   pinned_globally: boolean;
   featured_link?: string;
   posters: Poster[];
+  tags: any[];
+  post_stream: {
+    posts: Post[];
+    stream: any[];
+  };
 };

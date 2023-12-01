@@ -1,38 +1,86 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { TestingModule, Test } from '@nestjs/testing';
+import { FlowProducer } from 'bullmq';
+import { Neo4jService } from 'nest-neo4j/dist';
+import { BaseTransformerService } from '../base-transformer/base-transformer.service';
+import { CYPHERS } from '../constants/cyphers.constants';
+import { DiscourseService } from '@app/discourse';
+import { FLOW_PRODUCER } from '../constants/flows.constants';
+import { QUEUES } from '../constants/queues.constants';
+import { JOBS } from '../constants/jobs.contants';
 import { BadgesService } from './badges.service';
-import { BadgesRepository } from './badges.repository';
-import { LoadBadgeDto } from './dto/load-badges.dto';
-
-jest.mock('./badges.repository');
 
 describe('BadgesService', () => {
   let service: BadgesService;
-  let repository: jest.Mocked<BadgesRepository>;
+  let mockDiscourseService: jest.Mocked<DiscourseService>;
+  let mockNeo4jService: jest.Mocked<Neo4jService>;
+  let mockFlowProducer: jest.Mocked<FlowProducer>;
 
   beforeEach(async () => {
+    mockNeo4jService = {
+      write: jest.fn(),
+    } as unknown as jest.Mocked<Neo4jService>;
+    mockFlowProducer = {
+      add: jest.fn(),
+    } as unknown as jest.Mocked<FlowProducer>;
+
     const module: TestingModule = await Test.createTestingModule({
-      providers: [BadgesService, BadgesRepository],
+      providers: [
+        BadgesService,
+        BaseTransformerService,
+        {
+          provide: DiscourseService,
+          useValue: mockDiscourseService,
+        },
+        {
+          provide: Neo4jService,
+          useValue: mockNeo4jService,
+        },
+        {
+          provide: `BullFlowProducer_${FLOW_PRODUCER}`,
+          useValue: mockFlowProducer,
+        },
+      ],
     }).compile();
 
     service = module.get<BadgesService>(BadgesService);
-    repository = module.get(BadgesRepository);
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
+  describe('transform method', () => {
+    it('should process data and add a job to the flowProducer', async () => {
+      const mockJob = {
+        data: {
+          forum: { uuid: 'test-uuid' },
+          batch: [{ name: 'badge1' }, { name: 'badge2' }],
+        },
+      };
+
+      await service.transform(mockJob as any);
+
+      expect(mockFlowProducer.add).toHaveBeenCalledWith({
+        queueName: QUEUES.LOAD,
+        name: JOBS.BADGE,
+        data: {
+          batch: [
+            { name: 'badge1', forumUuid: 'test-uuid' },
+            { name: 'badge2', forumUuid: 'test-uuid' },
+          ],
+        },
+      });
+    });
   });
 
-  describe('insertMany', () => {
-    it('should call the repository insertMany method with the provided badges', async () => {
-      const mockBadges = [
-        { name: 'test-badge-1', forumUUID: 'uuid-1' },
-        { name: 'test-badge-2', forumUUID: 'uuid-2' },
-        // Add more badges as needed
-      ] as LoadBadgeDto[];
-
-      await service.insertMany(mockBadges);
-
-      expect(repository.insertMany).toHaveBeenCalledWith(mockBadges);
+  describe('load method', () => {
+    it('should call neo4jService.write with correct parameters', async () => {
+      const mockJob = {
+        data: {
+          batch: [], // Replace with actual mock data
+        },
+      };
+      await service.load(mockJob as any);
+      expect(mockNeo4jService.write).toHaveBeenCalledWith(
+        CYPHERS.BULK_CREATE_BADGE,
+        mockJob.data,
+      );
     });
   });
 });

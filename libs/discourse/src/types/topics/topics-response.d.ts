@@ -1,5 +1,5 @@
 type TopicsResponse = {
-  users: User[];
+  users: BasicUser[];
   primary_groups: any[];
   topic_list: {
     can_create_topic: boolean;

@@ -1,11 +1,19 @@
 import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bullmq';
-import { QUEUES } from 'src/constants/queues.constants';
-import { BadgesProcessor } from './badges.processor';
-import { BaseEtlModule } from 'src/base-etl/base-etl.module';
+import { BadgesService } from './badges.service';
+import { DiscourseModule } from '@app/discourse';
+import { Neo4jModule } from 'nest-neo4j/dist';
+import { BaseTransformerModule } from '../base-transformer/base-transformer.module';
+import { FLOW_PRODUCER } from '../constants/flows.constants';
 
 @Module({
-  imports: [BullModule.registerQueue({ name: QUEUES.BADGE }), BaseEtlModule],
-  providers: [BadgesProcessor],
+  imports: [
+    BullModule.registerFlowProducer({ name: FLOW_PRODUCER }),
+    DiscourseModule,
+    BaseTransformerModule,
+    Neo4jModule,
+  ],
+  providers: [BadgesService],
+  exports: [BadgesService],
 })
 export class BadgesModule {}
