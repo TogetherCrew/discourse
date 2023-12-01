@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import axios, { AxiosResponse } from 'axios';
 import Bottleneck from 'bottleneck';
 import { BottleneckService } from './bottleneck/bottleneck.service';
-import { defaultOpts, proxyOpts } from './bottleneck/options.constants';
+import { proxyOpts } from './bottleneck/options.constants';
 import { ProxyService } from './proxy/proxy.service';
 import { HistoryService } from './history/history.service';
 

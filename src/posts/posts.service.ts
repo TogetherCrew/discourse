@@ -7,8 +7,6 @@ import { CYPHERS } from '../constants/cyphers.constants';
 import { EtlService } from '../etl/etl.service';
 import { AxiosError } from 'axios';
 
-const BATCH_SIZE = 20;
-
 type PostExtractDto = {
   forum: Forum;
   postId: number;
