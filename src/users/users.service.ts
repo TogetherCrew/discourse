@@ -10,7 +10,6 @@ import { Neo4jService } from 'nest-neo4j';
 import { BaseTransformerService } from '../base-transformer/base-transformer.service';
 import { FLOW_PRODUCER } from '../constants/flows.constants';
 import { Forum } from '../forums/entities/forum.entity';
-import { AxiosError } from 'axios';
 import { handleError } from '../errorHandler';
 
 type ExtractDto = {
