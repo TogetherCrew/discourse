@@ -16,39 +16,43 @@ export class OrchestrationService {
   ) {}
 
   async run(forum: Forum) {
-    const latestTopicId = await this.getLatestTopicId(forum);
-
-    await this.flowProducer.addBulk([
-      ...[...Array<number>(latestTopicId)].map(
-        (_, idx) =>
-          ({
-            queueName: QUEUES.EXTRACT,
-            name: JOBS.TOPIC,
-            data: { forum, topicId: idx + 1 },
-            opts: { priority: 10 },
-          }) as FlowJob,
-      ),
-      {
-        queueName: QUEUES.EXTRACT,
-        name: JOBS.CATEGORY,
-        data: { forum },
-      },
-      {
-        queueName: QUEUES.EXTRACT,
-        name: JOBS.BADGE,
-        data: { forum },
-      },
-      {
-        queueName: QUEUES.EXTRACT,
-        name: JOBS.TAG,
-        data: { forum },
-      },
-      {
-        queueName: QUEUES.EXTRACT,
-        name: JOBS.GROUP,
-        data: { forum },
-      },
-    ]);
+    try {
+      console.log('Running job for', forum);
+      const latestTopicId = await this.getLatestTopicId(forum);
+      await this.flowProducer.addBulk([
+        ...[...Array<number>(latestTopicId)].map(
+          (_, idx) =>
+            ({
+              queueName: QUEUES.EXTRACT,
+              name: JOBS.TOPIC,
+              data: { forum, topicId: idx + 1 },
+              opts: { priority: 10 },
+            }) as FlowJob,
+        ),
+        {
+          queueName: QUEUES.EXTRACT,
+          name: JOBS.CATEGORY,
+          data: { forum },
+        },
+        {
+          queueName: QUEUES.EXTRACT,
+          name: JOBS.BADGE,
+          data: { forum },
+        },
+        {
+          queueName: QUEUES.EXTRACT,
+          name: JOBS.TAG,
+          data: { forum },
+        },
+        {
+          queueName: QUEUES.EXTRACT,
+          name: JOBS.GROUP,
+          data: { forum },
+        },
+      ]);
+    } catch (error) {
+      console.error(error.message);
+    }
   }
 
   private async getLatestTopicId(forum: Forum): Promise<number> {

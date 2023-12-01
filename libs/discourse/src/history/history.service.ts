@@ -16,20 +16,30 @@ export class HistoryService {
   }
 
   async set(url: string, code: number = 0) {
-    // console.log(`SET(${url})`);
     await this.redis.hset(`history:${url}`, {
-      ts: new Date().getTime().toString(),
+      timestamp: new Date().getTime().toString(),
       code: code.toString(),
     });
   }
   async get(url: string): Promise<HistoryStore> {
-    const result = await this.redis.hgetall(`history:${url}`);
-    return {
-      timestamp: Number(result.timestamp),
-      code: Number(result.code),
-    };
+    try {
+      const result = await this.redis.hgetall(`history:${url}`);
+      if (Object.keys(result).length == 0) {
+        throw new Error('Empty object');
+      } else {
+        return {
+          timestamp: Number(result.timestamp),
+          code: Number(result.code),
+        };
+      }
+    } catch (error) {
+      return {
+        timestamp: 0,
+        code: 0,
+      };
+    }
   }
-  async valid(url: string, ms: number = 1000 * 60 * 60 * 24): Promise<boolean> {
+  async valid(url: string, ms: number = 1000 * 60 * 60 * 23): Promise<boolean> {
     const prev = await this.get(url);
     if (prev.timestamp == 0) {
       return false;

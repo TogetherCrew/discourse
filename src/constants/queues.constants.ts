@@ -2,5 +2,5 @@ export const QUEUES = {
   EXTRACT: 'EXTRACT',
   TRANSFORM: 'TRANSFORM',
   LOAD: 'LOAD',
-  MANAGEMENT: 'MANAGEMENT',
+  CRON: 'CRON',
 };

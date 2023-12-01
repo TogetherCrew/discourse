@@ -16,6 +16,7 @@ import { ExtractModule } from './extract/extract.module';
 import { TransformModule } from './transform/transform.module';
 import proxyConfig from './config/proxy.config';
 import { LoadModule } from './load/load.module';
+import { CronQueueModule } from './cron-queue/cron-queue.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { LoadModule } from './load/load.module';
     ExtractModule,
     TransformModule,
     LoadModule,
+    CronQueueModule,
   ],
   controllers: [AppController],
   providers: [AppService],
