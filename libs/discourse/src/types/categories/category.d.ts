@@ -39,4 +39,5 @@ type Category = {
   uploaded_logo_dark?: string;
   uploaded_background?: string;
   uploaded_background_dark: string;
+  parent_category_id?: number;
 };

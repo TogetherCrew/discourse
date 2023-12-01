@@ -52,18 +52,11 @@ export class CategoriesService extends EtlService {
             subcategories.push(subcategory);
           });
         }
-        const output = this.baseTransformerService.transform(category, {
-          forum_uuid: forum.uuid,
-        });
-        delete output.subcategoryIds;
-        delete output.subcategoryList;
-        return output;
+        return this.formatCategory(category, forum);
       });
+
       subcategories.forEach((subcategory) => {
-        const output = this.baseTransformerService.transform(subcategory, {
-          forum_uuid: forum.uuid,
-        });
-        batch.push(output);
+        batch.push(this.formatCategory(subcategory, forum));
       });
 
       await this.flowProducer.add({
@@ -84,5 +77,16 @@ export class CategoriesService extends EtlService {
       job.log(error.message);
       throw error;
     }
+  }
+
+  private formatCategory(category: Category, forum: Forum) {
+    return {
+      id: category.id,
+      name: category.name,
+      color: category.color,
+      descriptionText: category.description_text,
+      forumUuid: forum.uuid,
+      parentCategoryId: category.parent_category_id,
+    };
   }
 }
