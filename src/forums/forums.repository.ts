@@ -12,7 +12,7 @@ export class ForumsRepository {
     const { endpoint } = createForumDto;
 
     const neoResult = await this.neo4jService.write(
-      'CREATE (f:Forum { uuid: randomUUID(), endpoint: $endpoint, createdAt: datetime(), updatedAt: datetime() }) RETURN f',
+      'CREATE (f:DiscourseForum { uuid: randomUUID(), endpoint: $endpoint, createdAt: datetime(), updatedAt: datetime() }) RETURN f',
       { endpoint },
     );
 
@@ -32,7 +32,7 @@ export class ForumsRepository {
   ): Promise<Forum> {
     const neoResult = await this.neo4jService.write(
       [
-        'MATCH (f:Forum { uuid: $uuid })',
+        'MATCH (f:DiscourseForum { uuid: $uuid })',
         'SET',
         'f += $updateForumDto,',
         'f.updatedAt = datetime()',
