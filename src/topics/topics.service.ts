@@ -16,6 +16,7 @@ type TopicLoad = {
   id: number;
   title: string;
   fancyTitle: string;
+  slug: string;
   createdAt: Date;
   deletedAt: Date;
   imageUrl: string;
@@ -60,6 +61,7 @@ export class TopicsService extends EtlService {
         id: data.id,
         title: data.title,
         fancyTitle: data.fancy_title,
+        slug: data.slug,
         createdAt: data.created_at,
         deletedAt: data.deleted_at,
         imageUrl: data.image_url,
