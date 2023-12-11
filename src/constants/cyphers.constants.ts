@@ -209,6 +209,7 @@ const CREATE_TOPIC = [
   't.forumUuid = $topic.forumUuid,',
   't.title = $topic.title,',
   't.fancyTitle = $topic.fancyTitle,',
+  't.slug = $topic.slug,',
   't.createdAt = $topic.createdAt,',
   't.deletedAt = $topic.deletedAt,',
   't.imageUrl = $topic.imageUrl,',
