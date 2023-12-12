@@ -18,7 +18,11 @@ import { GroupOwnersService } from '../groups-owners/group-owners.service';
 import { TopicTagsService } from '../topic-tags/topic-tags.service';
 import { UsersService } from '../users/users.service';
 
-@Processor(QUEUES.LOAD, { concurrency: 1 })
+@Processor(QUEUES.LOAD, {
+  concurrency: 1,
+  removeOnComplete: { age: 60 * 60 * 24 * 7 },
+  removeOnFail: { age: 60 * 60 * 24 * 7 },
+})
 export class LoadProcessor extends WorkerHost {
   constructor(
     private readonly badgeGroupingsService: BadgeGroupingsService,
