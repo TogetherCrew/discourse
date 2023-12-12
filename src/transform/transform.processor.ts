@@ -18,7 +18,11 @@ import { GroupOwnersService } from '../groups-owners/group-owners.service';
 import { TopicTagsService } from '../topic-tags/topic-tags.service';
 import { UsersService } from '../users/users.service';
 
-@Processor(QUEUES.TRANSFORM, { concurrency: 20 })
+@Processor(QUEUES.TRANSFORM, {
+  concurrency: 20,
+  removeOnComplete: { age: 60 * 60 * 24 * 7 },
+  removeOnFail: { age: 60 * 60 * 24 * 7 },
+})
 export class TransformProcessor extends WorkerHost {
   constructor(
     private readonly badgeGroupingsService: BadgeGroupingsService,

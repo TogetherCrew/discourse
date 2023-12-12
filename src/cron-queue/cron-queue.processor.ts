@@ -12,7 +12,10 @@ import { FLOW_PRODUCER } from '../constants/flows.constants';
 import { Forum } from '../forums/entities/forum.entity';
 import { OrchestrationService } from '../orchestration/orchestration.service';
 
-@Processor(QUEUES.CRON)
+@Processor(QUEUES.CRON, {
+  removeOnComplete: { age: 60 * 60 * 24 * 7 },
+  removeOnFail: { age: 60 * 60 * 24 * 7 },
+})
 export class CronQueueProcessor extends WorkerHost {
   constructor(
     protected readonly neo4jService: Neo4jService,

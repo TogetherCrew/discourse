@@ -13,7 +13,11 @@ import { UserActionsService } from '../user-actions/user-actions.service';
 import { UserBadgesService } from '../user-badges/user-badges.service';
 import { UsersService } from '../users/users.service';
 
-@Processor(QUEUES.EXTRACT, { concurrency: 100 })
+@Processor(QUEUES.EXTRACT, {
+  concurrency: 100,
+  removeOnComplete: { age: 60 * 60 * 24 * 7 },
+  removeOnFail: { age: 60 * 60 * 24 * 7 },
+})
 export class ExtractProcessor extends WorkerHost {
   constructor(
     private readonly badgesService: BadgesService,
