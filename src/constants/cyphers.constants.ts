@@ -262,6 +262,7 @@ const CREATE_POST = [
   'p.raw = $post.raw,',
   'p.score = $post.score',
   'ON MATCH SET',
+  'p.id = $post.id,',
   'p.createdAt = $post.createdAt,',
   'p.updatedAt = $post.updatedAt,',
   'p.deletedAt = $post.deletedAt,',
