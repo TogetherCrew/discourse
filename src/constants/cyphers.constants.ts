@@ -133,22 +133,6 @@ const BULK_CREATE_TOPIC = generateCypher(
   ].join(' '),
 );
 
-const BULK_CREATE_POST = generateCypher(
-  'UNWIND $batch AS post RETURN post',
-  [
-    'MERGE (t:DiscourseTopic { id: post.topicId, forumUuid: post.forumUuid })',
-    'MERGE (u:DiscourseUser { id: post.userId, forumUuid: post.forumUuid })',
-    'MERGE (p:DiscoursePost { id: post.id, forumUuid: post.forumUuid }) SET p += post',
-    'MERGE (u)-[r:POSTED]->(p)',
-    'MERGE (t)-[:HAS_POST]->(p)',
-    'ON CREATE SET r.createdAt = p.createdAt',
-    'WITH p, post',
-    'WHERE post.replyToPostNumber IS NOT NULL',
-    'MERGE (rT:DiscoursePost { postNumber: post.replyToPostNumber, topicId: post.topicId, forumUuid: post.forumUuid })',
-    'MERGE (p)-[:REPLIED]->(rT)',
-  ].join(' '),
-);
-
 // const BULK_CREATE_USER = generateCypher(
 //   'UNWIND $batch AS user RETURN user',
 //   [
@@ -164,7 +148,7 @@ const BULK_CREATE_ACTION = generateCypher(
     // LIKE = 1
     'WHERE action.actionType = 1',
     'MERGE (u:DiscourseUser { id: action.actingUserId, forumUuid: action.forumUuid })',
-    'MERGE (p:DiscoursePost { id: action.postId, forumUuid: action.forumUuid })',
+    'MERGE (p:DiscoursePost { topicId: action.topicId, postNumber: action.postNumber, forumUuid: action.forumUuid })',
     'MERGE (u)-[l:LIKED]->(p)',
     'SET',
     'l.createdAt = action.createdAt,',
@@ -339,16 +323,16 @@ const CREATE_POST_USER = [
   'MERGE (u)-[:HAS_JOINED]->(f)',
   // Step 4: Create a POSTED edge if it doesn't exist
   'WITH u',
-  'MERGE (p:DiscoursePost { id: $post.id, forumUuid: $post.forumUuid })',
+  'MERGE (p:DiscoursePost { topicId: $post.topicId, postNumber: $post.postNumber, forumUuid: $post.forumUuid })',
   'MERGE (u)-[:POSTED]->(p)',
 ].join(' ');
 
 const CREATE_REPLIED_TO_EDGE = [
   // Step 1: Handling replyToPostNumber
-  'MERGE (p:DiscoursePost { id: $post.id, forumUuid: $post.forumUuid })',
+  'MERGE (p:DiscoursePost { topicId: $post.topicId, postNumber: $post.postNumber, forumUuid: $post.forumUuid })',
   'WITH p',
   'WHERE $post.replyToPostNumber IS NOT NULL',
-  'MERGE (rp:DiscoursePost { postNumber: $post.replyToPostNumber, topicId: $post.topicId, forumUuid: $post.forumUuid })',
+  'MERGE (rp:DiscoursePost { topicId: $post.topicId, postNumber: $post.replyToPostNumber, forumUuid: $post.forumUuid })',
   'ON CREATE SET',
   'rp.postNumber = $post.replyToPostNumber,',
   'rp.topicId = $post.topicId,',
@@ -368,7 +352,7 @@ export const CYPHERS = {
   BULK_CREATE_GROUP,
   BULK_CREATE_CATEGORY,
   BULK_CREATE_TOPIC,
-  BULK_CREATE_POST,
+  // BULK_CREATE_POST,
   // BULK_CREATE_USER,
   BULK_CREATE_GROUP_MEMBERS,
   BULK_CREATE_GROUP_OWNERS,
