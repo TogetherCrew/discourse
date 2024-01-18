@@ -15,7 +15,7 @@ import { UsersService } from '../users/users.service';
 
 @Processor(QUEUES.EXTRACT, {
   concurrency: 100,
-  removeOnComplete: { age: 60 * 60 * 24 * 7 },
+  removeOnComplete: 20 * 1000,
   removeOnFail: { age: 60 * 60 * 24 * 7 },
 })
 export class ExtractProcessor extends WorkerHost {

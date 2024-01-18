@@ -13,7 +13,7 @@ import { Forum } from '../forums/entities/forum.entity';
 import { OrchestrationService } from '../orchestration/orchestration.service';
 
 @Processor(QUEUES.CRON, {
-  removeOnComplete: { age: 60 * 60 * 24 * 7 },
+  removeOnComplete: 1000,
   removeOnFail: { age: 60 * 60 * 24 * 7 },
 })
 export class CronQueueProcessor extends WorkerHost {
