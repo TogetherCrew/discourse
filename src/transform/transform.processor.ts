@@ -20,7 +20,7 @@ import { UsersService } from '../users/users.service';
 
 @Processor(QUEUES.TRANSFORM, {
   concurrency: 20,
-  removeOnComplete: 20 * 1000,
+  removeOnComplete: { age: 60 * 60 * 24 * 1 },
   removeOnFail: { age: 60 * 60 * 24 * 7 },
 })
 export class TransformProcessor extends WorkerHost {
