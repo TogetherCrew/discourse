@@ -19,7 +19,7 @@ export class OrchestrationService {
 
   async run(forum: Forum) {
     try {
-      this.logger.log('Running job for', forum);
+      this.logger.log('Running job for', forum.endpoint);
       const latestTopicId = await this.getLatestTopicId(forum);
       await this.flowProducer.addBulk([
         ...[...Array<number>(latestTopicId)].map(
