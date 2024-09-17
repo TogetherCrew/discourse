@@ -1,5 +1,5 @@
 import { InjectFlowProducer } from '@nestjs/bullmq';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { FlowJob, FlowProducer } from 'bullmq';
 import { FLOW_PRODUCER } from '../constants/flows.constants';
 import { QUEUES } from '../constants/queues.constants';
@@ -9,15 +9,17 @@ import { DiscourseService } from '@app/discourse';
 
 @Injectable()
 export class OrchestrationService {
+  private readonly logger = new Logger(OrchestrationService.name);
+
   constructor(
     @InjectFlowProducer(FLOW_PRODUCER)
     private readonly flowProducer: FlowProducer,
     private discourseService: DiscourseService,
-  ) {}
+  ) { }
 
   async run(forum: Forum) {
     try {
-      console.log('Running job for', forum);
+      this.logger.log('Running job for', forum);
       const latestTopicId = await this.getLatestTopicId(forum);
       await this.flowProducer.addBulk([
         ...[...Array<number>(latestTopicId)].map(

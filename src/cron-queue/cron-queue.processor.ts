@@ -11,12 +11,15 @@ import { CYPHERS } from '../constants/cyphers.constants';
 import { FLOW_PRODUCER } from '../constants/flows.constants';
 import { Forum } from '../forums/entities/forum.entity';
 import { OrchestrationService } from '../orchestration/orchestration.service';
+import { Logger } from '@nestjs/common';
 
 @Processor(QUEUES.CRON, {
   removeOnComplete: { age: 60 * 60 * 24 * 1 },
   removeOnFail: { age: 60 * 60 * 24 * 7 },
 })
 export class CronQueueProcessor extends WorkerHost {
+  private readonly logger = new Logger(CronQueueProcessor.name);
+
   constructor(
     protected readonly neo4jService: Neo4jService,
     @InjectFlowProducer(FLOW_PRODUCER)
@@ -29,7 +32,7 @@ export class CronQueueProcessor extends WorkerHost {
   }
 
   async process(): Promise<any> {
-    console.log('Starting cron job...');
+    this.logger.log('Starting cron job...');
     const { records } = await this.neo4jService.read(CYPHERS.GET_ALL_FORUMS);
     records.forEach(async (record) => {
       const f = record.toObject()['f'];

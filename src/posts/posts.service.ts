@@ -128,7 +128,7 @@ export class PostsService extends EtlService {
   // private async iterate(forum: Forum, topic: Topic) {
   //   const count = Math.ceil(topic.posts_count / BATCH_SIZE);
   //   if (count > 1) {
-  //     console.log(`${topic.id} has ${topic.posts_count} posts.`);
+  //     this.logger.log(`${topic.id} has ${topic.posts_count} posts.`);
   //   }
   //   [...Array<number>(count)].forEach(async (_, index) => {
   //     try {
