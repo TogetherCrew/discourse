@@ -1,6 +1,0 @@
-export const QUEUES = {
-  EXTRACT: 'EXTRACT',
-  TRANSFORM: 'TRANSFORM',
-  LOAD: 'LOAD',
-  CRON: 'CRON',
-};
