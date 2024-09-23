@@ -33,6 +33,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/common/tsconfig.lib.json"
       }
+    },
+    "graph": {
+      "type": "application",
+      "root": "apps/graph",
+      "entryFile": "main",
+      "sourceRoot": "apps/graph/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/graph/tsconfig.app.json"
+      }
     }
   },
   "monorepo": true,

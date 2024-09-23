@@ -11,10 +11,10 @@ import {
   proxyConfig,
   redisConfig,
   schemaConfig,
-  RmqModule,
-  Services,
   rmqConfig,
 } from '@app/common';
+import { ProcessorsModule } from '../processors/processors.modules';
+import { DiscourseModule } from '@app/discourse';
 
 @Module({
   imports: [
@@ -23,7 +23,6 @@ import {
       isGlobal: true,
       load: [baseConfig, redisConfig, proxyConfig, rmqConfig],
     }),
-    RmqModule.register(Services.neo4j),
     BullModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
@@ -38,6 +37,8 @@ import {
       route: '/queues',
       adapter: ExpressAdapter,
     }),
+    ProcessorsModule,
+    DiscourseModule,
   ],
   controllers: [ExtractorController],
   providers: [ExtractorService],

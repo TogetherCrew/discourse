@@ -3,12 +3,8 @@ export const Services = {
     name: 'ExtractorService',
     queue: 'ExtractorQueue',
   },
-  mongo: {
-    name: 'MongoService',
-    queue: 'MongoQueue',
-  },
-  neo4j: {
-    name: 'Neo4jService',
-    queue: 'Neo4jQueue',
+  graph: {
+    name: 'GraphService',
+    queue: 'GraphQueue',
   },
 };

@@ -7,7 +7,7 @@ export class ExtractorController {
   constructor(private readonly extractorService: ExtractorService) { }
 
   @Post()
-  extract(@Body() extractDto: ExtractDto): string {
+  extract(@Body() extractDto: ExtractDto): Promise<string> {
     return this.extractorService.extract(extractDto);
   }
 }

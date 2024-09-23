@@ -1,3 +1,24 @@
+x-app-common: &app-common
+  build:
+    context: .
+    dockerfile: Dockerfile
+    target: development
+  restart: always
+  env_file:
+    - .env
+  volumes:
+    - .:/usr/src/app
+    - ./node_modules:/usr/src/app/node_modules
+  depends_on:
+    redis:
+      condition: service_healthy
+    rabbitmq:
+      condition: service_healthy
+    neo4j:
+      condition: service_healthy
+    mongodb:
+      condition: service_healthy
+
 services:
   redis:
     image: redis:7.0.11
@@ -65,28 +86,13 @@ services:
       - 7474:7474
 
   extractor:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: development
+    <<: [ *app-common ]
     command: yarn run start:dev extractor
-    restart: always
     ports:
       - 3000:3000
-    env_file:
-      - .env
-    volumes:
-      - .:/usr/src/app
-      - ./node_modules:/usr/src/app/node_modules
-    depends_on:
-      redis:
-        condition: service_healthy
-      rabbitmq:
-        condition: service_healthy
-      neo4j:
-        condition: service_healthy
-      mongodb:
-        condition: service_healthy
+  graph:
+    <<: [ *app-common ]
+    command: yarn run start:dev graph
 
 volumes:
   neo4j_data:
