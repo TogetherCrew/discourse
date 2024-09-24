@@ -9,11 +9,11 @@ export class BadgeService {
   private readonly CREATE = [
     'MERGE (obj:DiscourseBadge { id: $obj.id, endpoint: $obj.endpoint })',
     'SET obj += $obj',
-    'WITH obj',
-    'MERGE (bt:DiscourseBadgeType { id: obj.badgeTypeId, endpoint: obj.endpoint })',
-    'MERGE (obj)-[:HAS_TYPE]->(bt)',
-    'MERGE (bg:DiscourseBadgeGrouping { id: obj.badgeGroupingId, endpoint: obj.endpoint })',
-    'MERGE (obj)-[:HAS_GROUPING]->(bg)',
+    // 'WITH obj',
+    // 'MERGE (bt:DiscourseBadgeType { id: obj.badgeTypeId, endpoint: obj.endpoint })',
+    // 'MERGE (obj)-[:HAS_TYPE]->(bt)',
+    // 'MERGE (bg:DiscourseBadgeGrouping { id: obj.badgeGroupingId, endpoint: obj.endpoint })',
+    // 'MERGE (obj)-[:HAS_GROUPING]->(bg)',
   ].join(' ');
 
   constructor(

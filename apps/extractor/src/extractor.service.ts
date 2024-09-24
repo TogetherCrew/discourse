@@ -38,6 +38,7 @@ export class ExtractorService {
         // )),
         this.createBadgeJob(endpoint),
         this.createCategoryJob(endpoint),
+        this.createGroupJob(endpoint),
       ],
     });
     return node.job.id;
@@ -70,6 +71,14 @@ export class ExtractorService {
   private createCategoryJob(endpoint: string): FlowChildJob {
     return {
       name: JOBS.CATEGORY,
+      queueName: QUEUES.EXTRACT,
+      data: { endpoint },
+      opts,
+    };
+  }
+  private createGroupJob(endpoint: string): FlowChildJob {
+    return {
+      name: JOBS.GROUP,
       queueName: QUEUES.EXTRACT,
       data: { endpoint },
       opts,

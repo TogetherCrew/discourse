@@ -13,7 +13,7 @@ import {
   schemaConfig,
   rmqConfig,
 } from '@app/common';
-import { ProcessorsModule } from '../processors/processors.modules';
+import { ProcessorsModule } from './processors/processors.modules';
 import { DiscourseModule } from '@app/discourse';
 
 @Module({

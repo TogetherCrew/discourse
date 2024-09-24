@@ -15,5 +15,11 @@ export const Patterns = {
     Group: {
       Create: 'Group.Create',
     },
+    Post: {
+      Create: 'Post.Create',
+    },
+    Topic: {
+      Create: 'Topic.Create',
+    },
   },
 };
