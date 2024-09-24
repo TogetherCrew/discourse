@@ -37,6 +37,7 @@ export class ExtractorService {
         //   await this.getLatestPostId(endpoint),
         // )),
         this.createBadgeJob(endpoint),
+        this.createCategoryJob(endpoint),
       ],
     });
     return node.job.id;
@@ -61,6 +62,14 @@ export class ExtractorService {
   private createBadgeJob(endpoint: string): FlowChildJob {
     return {
       name: JOBS.BADGE,
+      queueName: QUEUES.EXTRACT,
+      data: { endpoint },
+      opts,
+    };
+  }
+  private createCategoryJob(endpoint: string): FlowChildJob {
+    return {
+      name: JOBS.CATEGORY,
       queueName: QUEUES.EXTRACT,
       data: { endpoint },
       opts,

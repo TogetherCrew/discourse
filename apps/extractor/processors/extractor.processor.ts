@@ -1,4 +1,4 @@
-import { Services } from '@app/common';
+import { Patterns, Services } from '@app/common';
 import { DiscourseService } from '@app/discourse';
 import { QUEUES, JOBS } from '@app/discourse/constants';
 import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
@@ -27,10 +27,37 @@ export class ExtractorProcessor extends WorkerHost {
         return this.handlePostJob(job);
       case JOBS.BADGE:
         return this.handleBadgeJob(job);
+      case JOBS.CATEGORY:
+        return this.handleCategoryJob(job);
       case JOBS.EXTRACT:
       // Do nothing
       default:
         break;
+    }
+  }
+  private async handleCategoryJob(
+    job: Job<any, any, typeof JOBS.CATEGORY>,
+  ): Promise<any> {
+    const { endpoint } = job.data;
+    const {
+      data: {
+        category_list: { categories },
+      },
+    } = await this.discourseService.getCategories(endpoint);
+
+    for (const category of categories) {
+      await this.graphClient.emit(Patterns.Graph.Category.Create, {
+        category,
+        endpoint,
+      });
+      if (category.subcategory_list) {
+        for (const sub of category.subcategory_list) {
+          await this.graphClient.emit(Patterns.Graph.Category.Create, {
+            category: sub,
+            endpoint,
+          });
+        }
+      }
     }
   }
   private async handleBadgeJob(
@@ -42,16 +69,22 @@ export class ExtractorProcessor extends WorkerHost {
     } = await this.discourseService.getBadges(endpoint);
 
     for (const badge_grouping of badge_groupings) {
-      await this.graphClient.emit('createBadgeGrouping', {
+      await this.graphClient.emit(Patterns.Graph.BadgeGrouping.Create, {
         badge_grouping,
         endpoint,
       });
     }
     for (const badge_type of badge_types) {
-      await this.graphClient.emit('createBadgeType', { badge_type, endpoint });
+      await this.graphClient.emit(Patterns.Graph.BadgeType.Create, {
+        badge_type,
+        endpoint,
+      });
     }
     for (const badge of badges) {
-      await this.graphClient.emit('createBadge', { badge, endpoint });
+      await this.graphClient.emit(Patterns.Graph.Badge.Create, {
+        badge,
+        endpoint,
+      });
     }
   }
 

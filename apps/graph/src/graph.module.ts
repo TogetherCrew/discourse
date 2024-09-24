@@ -1,27 +1,10 @@
 import { Module } from '@nestjs/common';
-import { GraphController } from './graph.controller';
-import { GraphService } from './graph.service';
-import { schemaConfig, rmqConfig, neo4jConfig, RmqModule } from '@app/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TransformModule } from './transform/transform.module';
-import { Neo4jModule } from 'nest-neo4j/dist';
+import { BadgeGroupingModule } from './badge-grouping/badge-grouping.module';
+import { BadgeTypeModule } from './badge-type/badge-type.module';
+import { BadgeModule } from './badge/badge.module';
+import { CategoryModule } from './category/category.module';
 
 @Module({
-  imports: [
-    ConfigModule.forRoot({
-      validationSchema: schemaConfig,
-      load: [rmqConfig, neo4jConfig],
-      isGlobal: true,
-    }),
-    RmqModule,
-    TransformModule,
-    Neo4jModule.forRootAsync({
-      import: [ConfigModule],
-      useFactory: (configService: ConfigService) => configService.get('neo4j'),
-      inject: [ConfigService],
-    }),
-  ],
-  controllers: [GraphController],
-  providers: [GraphService],
+  imports: [BadgeGroupingModule, BadgeTypeModule, BadgeModule, CategoryModule],
 })
 export class GraphModule { }

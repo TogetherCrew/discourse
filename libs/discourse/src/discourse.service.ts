@@ -21,8 +21,9 @@ export class DiscourseService {
 
   async getCategories(
     endpoint: string,
+    include_subcategories = true,
   ): Promise<AxiosResponse<CategoriesResponse>> {
-    const path = '/categories.json?include_subcategories=true';
+    const path = `/categories.json?include_subcategories=${include_subcategories}`;
     return this.get(endpoint, path);
   }
 
