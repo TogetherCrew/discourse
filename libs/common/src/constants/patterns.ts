@@ -12,5 +12,8 @@ export const Patterns = {
     Category: {
       Create: 'Category.Create',
     },
+    Group: {
+      Create: 'Group.Create',
+    },
   },
 };
