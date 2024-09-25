@@ -1,3 +1,16 @@
+# Neo4j Constraints
+
+```
+CREATE CONSTRAINT FOR (c:DiscourseBadgeGrouping) REQUIRE (c.id, c.endpoint) IS UNIQUE;
+CREATE CONSTRAINT FOR (c:DiscourseBadgeType) REQUIRE (c.id, c.endpoint) IS UNIQUE;
+CREATE CONSTRAINT FOR (c:DiscourseBadge) REQUIRE (c.id, c.endpoint) IS UNIQUE;
+CREATE CONSTRAINT FOR (c:DiscourseGroup) REQUIRE (c.id, c.endpoint) IS UNIQUE;
+CREATE CONSTRAINT FOR (c:DiscourseCategory) REQUIRE (c.id, c.endpoint) IS UNIQUE;
+CREATE CONSTRAINT FOR (c:DiscourseTopic) REQUIRE (c.id, c.endpoint) IS UNIQUE;
+CREATE CONSTRAINT FOR (c:DiscoursePost) REQUIRE (c.id, c.endpoint) IS UNIQUE;
+```
+
+
 ### Process
 
 forumMaster

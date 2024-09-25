@@ -22,10 +22,10 @@ export class CategoryService {
     'obj.description = $obj.description,',
     'obj.descriptionText = $obj.descriptionText,',
     'obj.parentCategoryId = $obj.parentCategoryId',
-    // 'WITH obj, $obj as data',
-    // 'WHERE data.parentCategoryId IS NOT NULL',
-    // 'MERGE (p:DiscourseCategory { id: data.parentCategoryId, endpoint: data.endpoint })',
-    // 'MERGE (obj)-[:HAS_PARENT]->(p)',
+    'WITH obj, $obj as data',
+    'WHERE data.parentCategoryId IS NOT NULL',
+    'MERGE (p:DiscourseCategory { id: data.parentCategoryId, endpoint: data.endpoint })',
+    'MERGE (obj)-[:HAS_PARENT]->(p)',
   ].join(' ');
 
   constructor(
