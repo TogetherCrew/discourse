@@ -10,6 +10,7 @@ import { GroupModule } from '../group/group.module';
 import { PostModule } from '../post/post.module';
 import { TopicModule } from '../topic/topic.module';
 import { TagGroupModule } from '../tag-group/tag-group.module';
+import { TagModule } from '../tag/tag.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { TagGroupModule } from '../tag-group/tag-group.module';
     PostModule,
     TopicModule,
     TagGroupModule,
+    TagModule,
   ],
   providers: [ExtractorProcessor],
 })

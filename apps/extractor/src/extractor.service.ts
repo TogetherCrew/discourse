@@ -24,22 +24,23 @@ export class ExtractorService {
       name: JOBS.EXTRACT,
       queueName: QUEUES.EXTRACT,
       children: [
-        // ...(await this.createJobs(
-        //   endpoint,
-        //   JOBS.TOPIC,
-        //   QUEUES.EXTRACT,
-        //   await this.getLatestTopicId(endpoint),
-        // )),
-        // ...(await this.createJobs(
-        //   endpoint,
-        //   JOBS.POST,
-        //   QUEUES.EXTRACT,
-        //   await this.getLatestPostId(endpoint),
-        // )),
-        // this.createBadgeJob(endpoint),
-        // this.createCategoryJob(endpoint),
-        // this.createGroupJob(endpoint),
+        ...(await this.createJobs(
+          endpoint,
+          JOBS.TOPIC,
+          QUEUES.EXTRACT,
+          await this.getLatestTopicId(endpoint),
+        )),
+        ...(await this.createJobs(
+          endpoint,
+          JOBS.POST,
+          QUEUES.EXTRACT,
+          await this.getLatestPostId(endpoint),
+        )),
+        this.createBadgeJob(endpoint),
+        this.createCategoryJob(endpoint),
+        this.createGroupJob(endpoint),
         this.createTagGroupJob(endpoint),
+        this.createTagJob(endpoint),
       ],
     });
     return node.job.id;
@@ -61,6 +62,14 @@ export class ExtractorService {
     }));
   }
 
+  private createTagJob(endpoint: string): FlowChildJob {
+    return {
+      name: JOBS.TAG,
+      queueName: QUEUES.EXTRACT,
+      data: { endpoint },
+      opts,
+    };
+  }
   private createTagGroupJob(endpoint: string): FlowChildJob {
     return {
       name: JOBS.TAG_GROUP,
