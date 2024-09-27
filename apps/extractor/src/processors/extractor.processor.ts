@@ -7,6 +7,7 @@ import { CategoryService } from '../category/category.service';
 import { GroupService } from '../group/group.service';
 import { PostService } from '../post/post.service';
 import { TopicService } from '../topic/topic.service';
+import { TagGroupService } from '../tag-group/tag-group.service';
 
 @Processor(QUEUES.EXTRACT, { concurrency: 200 })
 export class ExtractorProcessor extends WorkerHost {
@@ -18,6 +19,7 @@ export class ExtractorProcessor extends WorkerHost {
     private readonly groupService: GroupService,
     private readonly topicService: TopicService,
     private readonly postService: PostService,
+    private readonly tagGroupService: TagGroupService,
   ) {
     super();
   }
@@ -36,6 +38,8 @@ export class ExtractorProcessor extends WorkerHost {
         return this.categoryService.handleJob(job);
       case JOBS.GROUP:
         return this.groupService.handleJob(job);
+      case JOBS.TAG_GROUP:
+        return this.tagGroupService.handleJob(job);
       case JOBS.EXTRACT:
       // Do nothing
       default:

@@ -8,6 +8,7 @@ CREATE CONSTRAINT FOR (c:DiscourseGroup) REQUIRE (c.id, c.endpoint) IS UNIQUE;
 CREATE CONSTRAINT FOR (c:DiscourseCategory) REQUIRE (c.id, c.endpoint) IS UNIQUE;
 CREATE CONSTRAINT FOR (c:DiscourseTopic) REQUIRE (c.id, c.endpoint) IS UNIQUE;
 CREATE CONSTRAINT FOR (c:DiscoursePost) REQUIRE (c.id, c.endpoint) IS UNIQUE;
+CREATE CONSTRAINT FOR (c:DiscourseTagGroup) REQUIRE (c.id, c.endpoint) IS UNIQUE;
 ```
 
 

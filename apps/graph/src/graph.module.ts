@@ -4,6 +4,7 @@ import { BadgeTypeModule } from './badge-type/badge-type.module';
 import { BadgeModule } from './badge/badge.module';
 import { CategoryModule } from './category/category.module';
 import { GroupModule } from './group/group.module';
+import { TagGroupModule } from './tag-group/tag-group.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { GroupModule } from './group/group.module';
     BadgeModule,
     CategoryModule,
     GroupModule,
+    TagGroupModule,
   ],
 })
 export class GraphModule { }

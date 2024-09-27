@@ -21,5 +21,11 @@ export const Patterns = {
     Topic: {
       Create: 'Topic.Create',
     },
+    TagGroup: {
+      Create: 'TagGroup.Create',
+    },
+    Tag: {
+      Create: 'Tag.Create',
+    },
   },
 };
