@@ -27,7 +27,7 @@ export class ExtractorProcessor extends WorkerHost {
   }
 
   async process(job: Job<any, any>): Promise<any> {
-    this.logger.debug(`Running ${job.name} [${job.id}]`);
+    // this.logger.debug(`Running ${job.name} [${job.id}]`);
 
     switch (job.name) {
       case JOBS.TOPIC:
@@ -53,6 +53,8 @@ export class ExtractorProcessor extends WorkerHost {
 
   @OnWorkerEvent('completed')
   onCompleted(job: Job<any, any, string>) {
-    this.logger.log(`Completed ${job.name} [${job.id}]`);
+    if (job.name === JOBS.EXTRACT) {
+      this.logger.log(`Completed ${job.name} [${job.id}]`);
+    }
   }
 }

@@ -1,4 +1,4 @@
-import { Services } from '@app/common';
+import { Patterns, Services } from '@app/common';
 import { DiscourseService } from '@app/discourse';
 import { JOBS } from '@app/discourse/constants';
 import { Inject, Injectable, Logger } from '@nestjs/common';
@@ -16,7 +16,7 @@ export class TopicService {
 
   async handleJob(job: Job<TopicData, any, typeof JOBS.TOPIC>): Promise<any> {
     const { endpoint, id } = job.data;
-    const { data } = await this.discourseService.getTopic(endpoint, id);
-    this.graphClient.emit('createTopic', data);
+    const { data: topic } = await this.discourseService.getTopic(endpoint, id);
+    this.graphClient.emit(Patterns.Graph.Topic.Create, { topic, endpoint });
   }
 }
