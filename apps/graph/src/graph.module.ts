@@ -6,6 +6,7 @@ import { CategoryModule } from './category/category.module';
 import { GroupModule } from './group/group.module';
 import { TagGroupModule } from './tag-group/tag-group.module';
 import { TagModule } from './tag/tag.module';
+import { PostModule } from './post/post.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { TagModule } from './tag/tag.module';
     GroupModule,
     TagGroupModule,
     TagModule,
+    PostModule,
   ],
 })
 export class GraphModule { }

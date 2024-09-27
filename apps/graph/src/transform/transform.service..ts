@@ -4,7 +4,9 @@ import { Injectable } from '@nestjs/common';
 export class TransformService {
   transform(obj: any, toMerge?: any): any {
     if (Array.isArray(obj)) {
-      return obj.map((o) => this.camelize(this.merge(o, toMerge)));
+      return JSON.stringify(
+        obj.map((o) => this.camelize(this.merge(o, toMerge))),
+      );
     } else {
       return this.camelize(this.merge(obj, toMerge));
     }
@@ -22,15 +24,22 @@ export class TransformService {
 
   private camelize(obj: any): any {
     if (Array.isArray(obj)) {
-      return obj.map((v) => this.camelize(v));
-    } else if (obj !== null && obj.constructor === Object) {
+      return JSON.stringify(obj.map((v) => this.camelize(v)));
+    } else if (this.isDictionary(obj)) {
       return Object.fromEntries(
         Object.entries(obj).map(([key, value]) => [
           this.toCamelCase(key),
-          this.camelize(value),
+          JSON.stringify(value),
+          // this.camelize(value),
         ]),
       );
     }
     return obj;
+  }
+
+  private isDictionary(obj: any): boolean {
+    return (
+      obj !== null && typeof obj === 'object' && obj.constructor === Object
+    );
   }
 }

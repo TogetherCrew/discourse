@@ -1,15 +1,16 @@
 # Neo4j Constraints
 
 ```
-CREATE CONSTRAINT FOR (c:DiscourseBadgeGrouping) REQUIRE (c.id, c.endpoint) IS UNIQUE;
-CREATE CONSTRAINT FOR (c:DiscourseBadgeType) REQUIRE (c.id, c.endpoint) IS UNIQUE;
-CREATE CONSTRAINT FOR (c:DiscourseBadge) REQUIRE (c.id, c.endpoint) IS UNIQUE;
-CREATE CONSTRAINT FOR (c:DiscourseGroup) REQUIRE (c.id, c.endpoint) IS UNIQUE;
-CREATE CONSTRAINT FOR (c:DiscourseCategory) REQUIRE (c.id, c.endpoint) IS UNIQUE;
-CREATE CONSTRAINT FOR (c:DiscourseTopic) REQUIRE (c.id, c.endpoint) IS UNIQUE;
-CREATE CONSTRAINT FOR (c:DiscoursePost) REQUIRE (c.id, c.endpoint) IS UNIQUE;
-CREATE CONSTRAINT FOR (c:DiscourseTagGroup) REQUIRE (c.id, c.endpoint) IS UNIQUE;
-CREATE CONSTRAINT FOR (c:DiscourseTag) REQUIRE (c.id, c.endpoint) IS UNIQUE;
+CREATE CONSTRAINT FOR (obj:DiscourseBadgeGrouping) REQUIRE (obj.id, obj.endpoint) IS UNIQUE;
+CREATE CONSTRAINT FOR (obj:DiscourseBadgeType) REQUIRE (obj.id, obj.endpoint) IS UNIQUE;
+CREATE CONSTRAINT FOR (obj:DiscourseBadge) REQUIRE (obj.id, obj.endpoint) IS UNIQUE;
+CREATE CONSTRAINT FOR (obj:DiscourseGroup) REQUIRE (obj.id, obj.endpoint) IS UNIQUE;
+CREATE CONSTRAINT FOR (obj:DiscourseCategory) REQUIRE (obj.id, obj.endpoint) IS UNIQUE;
+CREATE CONSTRAINT FOR (obj:DiscourseTagGroup) REQUIRE (obj.id, obj.endpoint) IS UNIQUE;
+CREATE CONSTRAINT FOR (obj:DiscourseTag) REQUIRE (obj.id, obj.endpoint) IS UNIQUE;
+CREATE CONSTRAINT FOR (obj:DiscoursePost) REQUIRE (obj.topicId, obj.endpoint, obj.postNumber) IS UNIQUE;
+CREATE CONSTRAINT FOR (obj:DiscoursePost) REQUIRE (obj.id, obj.endpoint) IS UNIQUE;
+CREATE CONSTRAINT FOR (obj:DiscourseTopic) REQUIRE (obj.id, obj.endpoint) IS UNIQUE;
 ```
 
 

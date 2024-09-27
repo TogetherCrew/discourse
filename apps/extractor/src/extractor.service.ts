@@ -24,12 +24,12 @@ export class ExtractorService {
       name: JOBS.EXTRACT,
       queueName: QUEUES.EXTRACT,
       children: [
-        ...(await this.createJobs(
-          endpoint,
-          JOBS.TOPIC,
-          QUEUES.EXTRACT,
-          await this.getLatestTopicId(endpoint),
-        )),
+        // ...(await this.createJobs(
+        //   endpoint,
+        //   JOBS.TOPIC,
+        //   QUEUES.EXTRACT,
+        //   await this.getLatestTopicId(endpoint),
+        // )),
         ...(await this.createJobs(
           endpoint,
           JOBS.POST,
@@ -119,6 +119,6 @@ export class ExtractorService {
     const { data } = await this.discourseService.getLatestPosts(endpoint);
     const { latest_posts } = data;
     const postIds = latest_posts.map((post) => post.id);
-    return Math.max(...postIds);
+    return 500; // Math.max(...postIds);
   }
 }

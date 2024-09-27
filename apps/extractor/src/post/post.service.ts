@@ -16,7 +16,7 @@ export class PostService {
 
   async handleJob(job: Job<PostData, any, typeof JOBS.POST>): Promise<any> {
     const { endpoint, id } = job.data;
-    const { data } = await this.discourseService.getPost(endpoint, id);
-    await this.graphClient.emit(Patterns.Graph.Post.Create, data);
+    const { data: post } = await this.discourseService.getPost(endpoint, id);
+    await this.graphClient.emit(Patterns.Graph.Post.Create, { post, endpoint });
   }
 }
