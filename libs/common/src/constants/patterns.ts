@@ -27,5 +27,9 @@ export const Patterns = {
     Tag: {
       Create: 'Tag.Create',
     },
+    User: {
+      Create: 'User.Create',
+      GetUniqueUsersByPosts: 'User.GetUniqueUsersByPosts',
+    },
   },
 };

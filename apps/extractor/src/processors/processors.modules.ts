@@ -11,6 +11,8 @@ import { PostModule } from '../post/post.module';
 import { TopicModule } from '../topic/topic.module';
 import { TagGroupModule } from '../tag-group/tag-group.module';
 import { TagModule } from '../tag/tag.module';
+import { Phase1Module } from '../phase1/phase1.module';
+import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [
@@ -28,6 +30,8 @@ import { TagModule } from '../tag/tag.module';
     TopicModule,
     TagGroupModule,
     TagModule,
+    Phase1Module,
+    UserModule,
   ],
   providers: [ExtractorProcessor],
 })

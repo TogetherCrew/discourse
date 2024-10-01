@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ExtractDto } from './dto/extract.dto';
 import { InjectFlowProducer } from '@nestjs/bullmq';
 import { FLOW_PRODUCER, JOBS, QUEUES } from '@app/discourse/constants';
@@ -13,6 +13,8 @@ const opts = {
 
 @Injectable()
 export class ExtractorService {
+  private readonly logger = new Logger(ExtractorService.name);
+
   constructor(
     @InjectFlowProducer(FLOW_PRODUCER)
     private readonly flowProducer: FlowProducer,
@@ -20,9 +22,12 @@ export class ExtractorService {
   ) { }
 
   async extract({ endpoint }: ExtractDto): Promise<any> {
+    this.logger.debug(endpoint);
     const node = await this.flowProducer.add({
-      name: JOBS.EXTRACT,
+      name: JOBS.PHASE_1,
       queueName: QUEUES.EXTRACT,
+      data: { endpoint },
+      opts,
       children: [
         ...(await this.createJobs(
           endpoint,
@@ -43,6 +48,7 @@ export class ExtractorService {
         this.createTagJob(endpoint),
       ],
     });
+    this.logger.debug(node.job.data);
     return node.job.id;
   }
 

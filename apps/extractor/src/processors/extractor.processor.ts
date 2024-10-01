@@ -9,6 +9,8 @@ import { PostService } from '../post/post.service';
 import { TopicService } from '../topic/topic.service';
 import { TagGroupService } from '../tag-group/tag-group.service';
 import { TagService } from '../tag/tag.service';
+import { Phase1Service } from '../phase1/phase1.service';
+import { UserService } from '../user/user.service';
 
 @Processor(QUEUES.EXTRACT, { concurrency: 200 })
 export class ExtractorProcessor extends WorkerHost {
@@ -22,6 +24,8 @@ export class ExtractorProcessor extends WorkerHost {
     private readonly postService: PostService,
     private readonly tagGroupService: TagGroupService,
     private readonly tagService: TagService,
+    private readonly phase1Service: Phase1Service,
+    private readonly userService: UserService,
   ) {
     super();
   }
@@ -44,8 +48,10 @@ export class ExtractorProcessor extends WorkerHost {
         return this.tagGroupService.handleJob(job);
       case JOBS.TAG:
         return this.tagService.handleJob(job);
-      case JOBS.EXTRACT:
-      // Do nothing
+      case JOBS.PHASE_1:
+        return this.phase1Service.handleJob(job);
+      case JOBS.USER:
+        return this.userService.handleJob(job);
       default:
         break;
     }
@@ -53,8 +59,10 @@ export class ExtractorProcessor extends WorkerHost {
 
   @OnWorkerEvent('completed')
   onCompleted(job: Job<any, any, string>) {
-    if (job.name === JOBS.EXTRACT) {
+    if (job.name === JOBS.PHASE_1 || job.name === JOBS.PHASE_2) {
       this.logger.log(`Completed ${job.name} [${job.id}]`);
     }
   }
+
+  private setupPhase2;
 }

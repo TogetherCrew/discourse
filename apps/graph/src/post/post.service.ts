@@ -12,6 +12,14 @@ export class PostService {
     'WITH obj',
     'MERGE (t:DiscourseTopic { id: obj.topicId, endpoint: obj.endpoint })',
     'MERGE (t)-[:HAS_POST]->(obj)',
+    'WITH obj',
+    'MERGE (u:DiscourseUser { id: obj.userId, endpoint: obj.endpoint })',
+    'MERGE (u)-[:POSTED]->(obj)',
+    'WITH obj',
+    'FOREACH (ignoreMe IN CASE WHEN obj.replyToPostNumber IS NOT NULL THEN [1] ELSE [] END |',
+    'MERGE (rp:DiscoursePost { topicId: obj.topicId, postNumber: obj.replyToPostNumber, endpoint: obj.endpoint })',
+    'MERGE (obj)-[:REPLIED_TO]->(rp)',
+    ')',
   ].join(' ');
 
   constructor(

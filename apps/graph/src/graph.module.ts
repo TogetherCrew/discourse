@@ -8,6 +8,7 @@ import { TagGroupModule } from './tag-group/tag-group.module';
 import { TagModule } from './tag/tag.module';
 import { PostModule } from './post/post.module';
 import { TopicModule } from './topic/topic.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { TopicModule } from './topic/topic.module';
     TagModule,
     PostModule,
     TopicModule,
+    UserModule,
   ],
 })
 export class GraphModule { }

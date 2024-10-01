@@ -3,7 +3,8 @@ export const QUEUES = {
 };
 
 export const JOBS = {
-  EXTRACT: 'extractJob',
+  PHASE_1: 'phase1Job',
+  PHASE_2: 'phase2Job',
   TOPIC: 'topicJob',
   POST: 'postJob',
   BADGE: 'badgeJob',
@@ -11,6 +12,7 @@ export const JOBS = {
   GROUP: 'groupJob',
   TAG_GROUP: 'tagGroupJob',
   TAG: 'tagJob',
+  USER: 'userJob',
 };
 
 export const FLOW_PRODUCER = 'flowProducer';

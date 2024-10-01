@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ExtractorController } from './extractor.controller';
 import { ExtractorService } from './extractor.service';
-import { FLOW_PRODUCER } from '@app/discourse/constants';
+import { FLOW_PRODUCER, QUEUES } from '@app/discourse/constants';
 import { BullModule } from '@nestjs/bullmq';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ExpressAdapter } from '@bull-board/express';
@@ -15,6 +15,7 @@ import {
 } from '@app/common';
 import { ProcessorsModule } from './processors/processors.modules';
 import { DiscourseModule } from '@app/discourse';
+import { CommonModule } from './common/common.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { DiscourseModule } from '@app/discourse';
     }),
     ProcessorsModule,
     DiscourseModule,
+    CommonModule,
   ],
   controllers: [ExtractorController],
   providers: [ExtractorService],
