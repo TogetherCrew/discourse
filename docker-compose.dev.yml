@@ -93,6 +93,9 @@ services:
   graph:
     <<: [ *app-common ]
     command: yarn run start:dev graph
+  mongo:
+    <<: [ *app-common ]
+    command: yarn run start:dev mongo
 
 volumes:
   neo4j_data:

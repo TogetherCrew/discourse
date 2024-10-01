@@ -42,6 +42,15 @@
       "compilerOptions": {
         "tsConfigPath": "apps/graph/tsconfig.app.json"
       }
+    },
+    "mongo": {
+      "type": "application",
+      "root": "apps/mongo",
+      "entryFile": "main",
+      "sourceRoot": "apps/mongo/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/mongo/tsconfig.app.json"
+      }
     }
   },
   "monorepo": true,
