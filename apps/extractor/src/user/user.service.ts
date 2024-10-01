@@ -21,13 +21,15 @@ export class UserService {
     } = await this.discourseService.getUser(endpoint, username);
     this.graphClient.emit(Patterns.Graph.User.Create, { endpoint, user });
 
-    // const { data: badges } = await this.discourseService.getUserBadges(
-    //   endpoint,
-    //   username,
-    // );
-    // const { data: actions } = await this.discourseService.getUserActions(
-    //   endpoint,
-    //   username,
-    // );
+    const {
+      data: { user_actions },
+    } = await this.discourseService.getUserActions(endpoint, username);
+
+    user_actions.forEach((user_action) =>
+      this.graphClient.emit(Patterns.Graph.UserAction.Create, {
+        endpoint,
+        user_action,
+      }),
+    );
   }
 }

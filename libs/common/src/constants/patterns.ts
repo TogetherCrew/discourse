@@ -31,5 +31,8 @@ export const Patterns = {
       Create: 'User.Create',
       GetUniqueUsersByPosts: 'User.GetUniqueUsersByPosts',
     },
+    UserAction: {
+      Create: 'UserAction.Create',
+    },
   },
 };

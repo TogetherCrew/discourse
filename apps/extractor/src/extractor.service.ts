@@ -41,14 +41,13 @@ export class ExtractorService {
           QUEUES.EXTRACT,
           await this.getLatestPostId(endpoint),
         )),
-        this.createBadgeJob(endpoint),
         this.createCategoryJob(endpoint),
-        this.createGroupJob(endpoint),
-        this.createTagGroupJob(endpoint),
-        this.createTagJob(endpoint),
+        // this.createBadgeJob(endpoint),
+        // this.createGroupJob(endpoint),
+        // this.createTagGroupJob(endpoint),
+        // this.createTagJob(endpoint),
       ],
     });
-    this.logger.debug(node.job.data);
     return node.job.id;
   }
 

@@ -9,6 +9,7 @@ import { TagModule } from './tag/tag.module';
 import { PostModule } from './post/post.module';
 import { TopicModule } from './topic/topic.module';
 import { UserModule } from './user/user.module';
+import { UserActionModule } from './user-action/user-action.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { UserModule } from './user/user.module';
     PostModule,
     TopicModule,
     UserModule,
+    UserActionModule,
   ],
 })
 export class GraphModule { }
