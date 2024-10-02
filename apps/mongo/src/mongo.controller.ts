@@ -1,12 +1,25 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Logger, UseInterceptors } from '@nestjs/common';
 import { MongoService } from './mongo.service';
+import { MessagePattern, Payload } from '@nestjs/microservices';
+import { Patterns } from '@app/common';
+import { EventsInterceptor } from '@app/common/rmq/interceptors/events.interceptor';
 
 @Controller()
+@UseInterceptors(EventsInterceptor)
 export class MongoController {
-  constructor(private readonly mongoService: MongoService) {}
+  private readonly logger = new Logger(MongoController.name);
 
-  @Get()
-  getHello(): string {
-    return this.mongoService.getHello();
+  constructor(private readonly mongoService: MongoService) { }
+
+  @MessagePattern(Patterns.Mongo.Platform.Extraction.Start)
+  async start(@Payload('endpoint') endpoint: string): Promise<void> {
+    this.logger.debug(`endpoint: ${endpoint}`);
+    await this.mongoService.start(endpoint);
+  }
+
+  @MessagePattern(Patterns.Mongo.Platform.Extraction.Complete)
+  async complete(@Payload('endpoint') endpoint: string): Promise<void> {
+    this.logger.debug(`endpoint: ${endpoint}`);
+    await this.mongoService.complete(endpoint);
   }
 }

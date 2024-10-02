@@ -5,3 +5,4 @@ export * from './proxy.config';
 export * from './redis.config';
 export * from './schema.config';
 export * from './rmq.config';
+export * from './airflow.config';

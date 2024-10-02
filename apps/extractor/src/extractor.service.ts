@@ -1,9 +1,11 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ExtractDto } from './dto/extract.dto';
 import { InjectFlowProducer } from '@nestjs/bullmq';
 import { FLOW_PRODUCER, JOBS, QUEUES } from '@app/discourse/constants';
 import { FlowChildJob, FlowProducer } from 'bullmq';
 import { DiscourseService } from '@app/discourse';
+import { Patterns, Services } from '@app/common';
+import { ClientProxy } from '@nestjs/microservices';
 
 const opts = {
   attempts: 2,
@@ -19,34 +21,39 @@ export class ExtractorService {
     @InjectFlowProducer(FLOW_PRODUCER)
     private readonly flowProducer: FlowProducer,
     private readonly discourseService: DiscourseService,
+    @Inject(Services.mongo.name) private readonly mongoClient: ClientProxy,
   ) { }
 
   async extract({ endpoint }: ExtractDto): Promise<any> {
     this.logger.debug(endpoint);
+    this.mongoClient.emit(Patterns.Mongo.Platform.Extraction.Start, {
+      endpoint,
+    });
+
     const node = await this.flowProducer.add({
       name: JOBS.PHASE_1,
       queueName: QUEUES.EXTRACT,
       data: { endpoint },
       opts,
-      children: [
-        ...(await this.createJobs(
-          endpoint,
-          JOBS.TOPIC,
-          QUEUES.EXTRACT,
-          await this.getLatestTopicId(endpoint),
-        )),
-        ...(await this.createJobs(
-          endpoint,
-          JOBS.POST,
-          QUEUES.EXTRACT,
-          await this.getLatestPostId(endpoint),
-        )),
-        this.createCategoryJob(endpoint),
-        // this.createBadgeJob(endpoint),
-        // this.createGroupJob(endpoint),
-        // this.createTagGroupJob(endpoint),
-        // this.createTagJob(endpoint),
-      ],
+      // children: [
+      //   ...(await this.createJobs(
+      //     endpoint,
+      //     JOBS.TOPIC,
+      //     QUEUES.EXTRACT,
+      //     await this.getLatestTopicId(endpoint),
+      //   )),
+      //   ...(await this.createJobs(
+      //     endpoint,
+      //     JOBS.POST,
+      //     QUEUES.EXTRACT,
+      //     await this.getLatestPostId(endpoint),
+      //   )),
+      //   this.createCategoryJob(endpoint),
+      //   // this.createBadgeJob(endpoint),
+      //   // this.createGroupJob(endpoint),
+      //   // this.createTagGroupJob(endpoint),
+      //   // this.createTagJob(endpoint),
+      // ],
     });
     return node.job.id;
   }

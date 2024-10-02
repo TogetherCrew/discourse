@@ -35,4 +35,12 @@ export const Patterns = {
       Create: 'UserAction.Create',
     },
   },
+  Mongo: {
+    Platform: {
+      Extraction: {
+        Start: 'Mongo.Platform.Extraction.Start',
+        Complete: 'Mongo.Platform.Extraction.Complete',
+      },
+    },
+  },
 };

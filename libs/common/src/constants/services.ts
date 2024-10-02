@@ -7,4 +7,8 @@ export const Services = {
     name: 'GraphService',
     queue: 'GraphQueue',
   },
+  mongo: {
+    name: 'MongoService',
+    queue: 'MongoQueue',
+  },
 };

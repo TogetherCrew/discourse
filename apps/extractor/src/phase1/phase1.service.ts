@@ -39,6 +39,7 @@ export class Phase1Service {
     await this.flowProducer.add({
       name: JOBS.PHASE_2,
       queueName: QUEUES.EXTRACT,
+      data: { endpoint },
       children,
       opts,
     });

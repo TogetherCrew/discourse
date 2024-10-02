@@ -12,6 +12,9 @@ import {
   redisConfig,
   schemaConfig,
   rmqConfig,
+  RmqModule,
+  Services,
+  airflowConfig,
 } from '@app/common';
 import { ProcessorsModule } from './processors/processors.modules';
 import { DiscourseModule } from '@app/discourse';
@@ -22,7 +25,7 @@ import { CommonModule } from './common/common.module';
     ConfigModule.forRoot({
       validationSchema: schemaConfig,
       isGlobal: true,
-      load: [baseConfig, redisConfig, proxyConfig, rmqConfig],
+      load: [baseConfig, redisConfig, proxyConfig, rmqConfig, airflowConfig],
     }),
     BullModule.forRootAsync({
       imports: [ConfigModule],
@@ -38,6 +41,7 @@ import { CommonModule } from './common/common.module';
       route: '/queues',
       adapter: ExpressAdapter,
     }),
+    RmqModule.register(Services.mongo),
     ProcessorsModule,
     DiscourseModule,
     CommonModule,
