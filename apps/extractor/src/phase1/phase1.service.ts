@@ -23,8 +23,13 @@ export class Phase1Service {
   ) { }
 
   async handleJob(job: Job<any, any, typeof JOBS.GROUP>): Promise<any> {
-    const { endpoint } = job.data;
+    const { endpoint, platform } = job.data;
+    this.logger.debug(`endpoint: ${endpoint}`);
+    this.logger.debug(`platform: ${platform}`);
+
     const usernames: string[] = await this.getUsernames(endpoint);
+
+    this.graphClient.emit(Patterns.Graph.Post.UpdateRepliedTo, { endpoint });
 
     const children: FlowChildJob[] = usernames.map(
       (username: string) =>
@@ -36,13 +41,15 @@ export class Phase1Service {
         }) as FlowChildJob,
     );
 
-    await this.flowProducer.add({
+    this.logger.debug(`children: ${children.length}`);
+    const node = await this.flowProducer.add({
       name: JOBS.PHASE_2,
       queueName: QUEUES.EXTRACT,
-      data: { endpoint },
+      data: { endpoint, platform },
       children,
       opts,
     });
+    this.logger.debug(node.job.id);
   }
 
   private async getUsernames(

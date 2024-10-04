@@ -35,7 +35,11 @@ export class CategoryService {
 
   async create(dto: Category, endpoint): Promise<void> {
     const obj = this.transformService.transform(dto, { endpoint });
-    await this.neo4jService.write(this.CREATE, { obj });
+    try {
+      await this.neo4jService.write(this.CREATE, { obj });
+    } catch (error) {
+      this.logger.error(error);
+    }
     this.logger.log(`Category ${dto.id} created.`);
   }
 }

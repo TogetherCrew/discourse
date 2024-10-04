@@ -21,4 +21,8 @@ export const schemaConfig = Joi.object({
   RMQ_PORT: Joi.number().default(5672),
   RMQ_USER: Joi.string().required(),
   RMQ_PASS: Joi.string().required(),
+
+  AIRFLOW_USERNAME: Joi.string().required(),
+  AIRFLOW_PASSWORD: Joi.string().required(),
+  AIRFLOW_BASE_URL: Joi.string().required(),
 });

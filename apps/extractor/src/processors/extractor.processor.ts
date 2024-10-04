@@ -14,6 +14,7 @@ import { UserService } from '../user/user.service';
 import { Patterns, Services } from '@app/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { AirflowService } from '../airflow/airflow.service';
+import { PlatformDocument } from 'apps/mongo/src/schemas/platform.schema';
 
 @Processor(QUEUES.EXTRACT, { concurrency: 200 })
 export class ExtractorProcessor extends WorkerHost {
@@ -36,7 +37,7 @@ export class ExtractorProcessor extends WorkerHost {
   }
 
   async process(job: Job<any, any>): Promise<any> {
-    // this.logger.debug(`Running ${job.name} [${job.id}]`);
+    this.logger.debug(`Running ${job.name} [${job.id}]`);
 
     switch (job.name) {
       case JOBS.TOPIC:
@@ -71,11 +72,14 @@ export class ExtractorProcessor extends WorkerHost {
     }
 
     if (job.name === JOBS.PHASE_2) {
-      const { endpoint } = job.data;
-      this.mongoClient.emit(Patterns.Mongo.Platform.Extraction.Complete, {
-        endpoint,
+      const { platform } = job.data;
+      this.mongoClient.emit(Patterns.Mongo.Platform.UpdateOne, {
+        filter: { _id: (platform as PlatformDocument).id },
+        update: {
+          $set: { 'metadata.extraction.completedAt': new Date() },
+        },
       });
-      await this.airflowService.dagRuns(endpoint);
+      await this.airflowService.dagRuns(platform);
     }
   }
 

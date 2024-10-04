@@ -18,4 +18,10 @@ export class PostController {
   ): Promise<void> {
     await this.service.create(post, endpoint);
   }
+
+  @MessagePattern(Patterns.Graph.Post.UpdateRepliedTo)
+  async updateRepliedTo(@Payload('endpoint') endpoint: string): Promise<void> {
+    this.logger.debug(`updateRepliedTo(${endpoint})`);
+    return this.service.updateRepliedTo(endpoint);
+  }
 }

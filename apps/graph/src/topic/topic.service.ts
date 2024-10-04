@@ -21,7 +21,11 @@ export class TopicService {
 
   async create(dto: Topic, endpoint): Promise<void> {
     const obj = this.transformService.transform(dto, { endpoint });
-    await this.neo4jService.write(this.CREATE, { obj });
+    try {
+      await this.neo4jService.write(this.CREATE, { obj });
+    } catch (error) {
+      this.logger.error(error);
+    }
     this.logger.log(`Topic ${dto.id} created.`);
   }
 }

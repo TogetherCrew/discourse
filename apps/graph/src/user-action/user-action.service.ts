@@ -8,7 +8,7 @@ export class UserActionService {
 
   private readonly LIKED = [
     'MERGE (u:DiscourseUser { id: $obj.actingUserId, endpoint: $obj.endpoint })',
-    'MERGE (p:DiscoursePost { topicId: $obj.topicId, postNumber: $obj.postNumber, endpoint: $obj.endpoint })',
+    'MERGE (p:DiscoursePost { id: $obj.postId, endpoint: $obj.endpoint })',
     'MERGE (u)-[obj:LIKED]->(p)',
     'SET obj += $obj',
   ].join(' ');
@@ -19,15 +19,17 @@ export class UserActionService {
   ) { }
 
   async create(dto: UserAction, endpoint): Promise<void> {
-    this.logger.debug(`action code: ${dto.action_type}`);
     const obj = this.transformService.transform(dto, { endpoint });
-
-    switch (obj.action_type) {
-      case 1:
-        await this.neo4jService.write(this.LIKED, { obj });
-        break;
-      default:
-        break;
+    try {
+      switch (obj.actionType) {
+        case 1:
+          await this.neo4jService.write(this.LIKED, { obj });
+        default:
+          this.logger.log(`Created ${obj.actingUserId} LIKED ${obj.postId}`);
+          break;
+      }
+    } catch (error) {
+      this.logger.error(error);
     }
   }
 }

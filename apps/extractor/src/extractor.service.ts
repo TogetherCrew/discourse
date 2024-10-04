@@ -6,6 +6,8 @@ import { FlowChildJob, FlowProducer } from 'bullmq';
 import { DiscourseService } from '@app/discourse';
 import { Patterns, Services } from '@app/common';
 import { ClientProxy } from '@nestjs/microservices';
+import { firstValueFrom } from 'rxjs';
+import { PlatformDocument } from 'apps/mongo/src/schemas/platform.schema';
 
 const opts = {
   attempts: 2,
@@ -24,36 +26,56 @@ export class ExtractorService {
     @Inject(Services.mongo.name) private readonly mongoClient: ClientProxy,
   ) { }
 
-  async extract({ endpoint }: ExtractDto): Promise<any> {
-    this.logger.debug(endpoint);
-    this.mongoClient.emit(Patterns.Mongo.Platform.Extraction.Start, {
-      endpoint,
+  async extract(
+    platform_id: string,
+    from_topic_id = 0,
+    from_post_id = 0,
+  ): Promise<any> {
+    this.logger.debug(platform_id);
+
+    const platform: PlatformDocument = await firstValueFrom(
+      this.mongoClient.send(Patterns.Mongo.Platform.FindById, {
+        id: platform_id,
+      }),
+    );
+    this.logger.debug(platform);
+    const endpoint = platform.metadata.id;
+
+    this.mongoClient.emit(Patterns.Mongo.Platform.UpdateOne, {
+      filter: { _id: platform_id },
+      update: {
+        $set: {
+          'metadata.extraction.startedAt': new Date(),
+        },
+      },
     });
 
     const node = await this.flowProducer.add({
       name: JOBS.PHASE_1,
       queueName: QUEUES.EXTRACT,
-      data: { endpoint },
-      opts,
-      // children: [
-      //   ...(await this.createJobs(
-      //     endpoint,
-      //     JOBS.TOPIC,
-      //     QUEUES.EXTRACT,
-      //     await this.getLatestTopicId(endpoint),
-      //   )),
-      //   ...(await this.createJobs(
-      //     endpoint,
-      //     JOBS.POST,
-      //     QUEUES.EXTRACT,
-      //     await this.getLatestPostId(endpoint),
-      //   )),
-      //   this.createCategoryJob(endpoint),
-      //   // this.createBadgeJob(endpoint),
-      //   // this.createGroupJob(endpoint),
-      //   // this.createTagGroupJob(endpoint),
-      //   // this.createTagJob(endpoint),
-      // ],
+      data: { endpoint, platform },
+      opts: { ...opts, removeOnFail: false },
+      children: [
+        ...(await this.createJobs(
+          endpoint,
+          JOBS.TOPIC,
+          QUEUES.EXTRACT,
+          from_topic_id,
+          await this.getLatestTopicId(endpoint),
+        )),
+        ...(await this.createJobs(
+          endpoint,
+          JOBS.POST,
+          QUEUES.EXTRACT,
+          from_post_id,
+          await this.getLatestPostId(endpoint),
+        )),
+        this.createCategoryJob(endpoint),
+        // this.createBadgeJob(endpoint),
+        // this.createGroupJob(endpoint),
+        // this.createTagGroupJob(endpoint),
+        // this.createTagJob(endpoint),
+      ],
     });
     return node.job.id;
   }
@@ -62,9 +84,13 @@ export class ExtractorService {
     endpoint: string,
     name: string,
     queueName: string,
-    n: number,
+    from: number,
+    to: number,
   ): Promise<FlowChildJob[]> {
-    const array = [...Array(n + 1).keys()];
+    if (to <= from) {
+      throw new Error(`to (${to}) must be greater than from (${from}).`);
+    }
+    const array = Array.from({ length: to - from + 1 }, (_, i) => from + i);
     const reversed = array.reverse();
     return reversed.map((id) => ({
       name,

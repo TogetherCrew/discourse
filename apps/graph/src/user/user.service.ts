@@ -42,13 +42,11 @@ export class UserService {
   }
 
   async create(dto: any, endpoint): Promise<void> {
-    // this.logger.debug(dto);
     const obj = this.transformService.transform(dto, { endpoint });
     try {
       await this.neo4jService.write(this.CREATE, { obj });
     } catch (error) {
       this.logger.error(error);
-      this.logger.error(obj);
     }
     this.logger.log(`User ${dto.id} created.`);
   }

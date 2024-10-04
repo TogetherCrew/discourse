@@ -17,6 +17,7 @@ export const Patterns = {
     },
     Post: {
       Create: 'Post.Create',
+      UpdateRepliedTo: 'Post.UpdateRepliedTo',
     },
     Topic: {
       Create: 'Topic.Create',
@@ -37,10 +38,8 @@ export const Patterns = {
   },
   Mongo: {
     Platform: {
-      Extraction: {
-        Start: 'Mongo.Platform.Extraction.Start',
-        Complete: 'Mongo.Platform.Extraction.Complete',
-      },
+      FindById: 'Mongo.Platform.FindById',
+      UpdateOne: 'Mongo.Platform.UpdateOne',
     },
   },
 };

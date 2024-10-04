@@ -3,7 +3,7 @@ import mongoose, { HydratedDocument } from 'mongoose';
 
 export type PlatformDocument = HydratedDocument<Platform>;
 
-@Schema({ strict: true, timestamps: true }) // strict: false allows storing unstructured data
+@Schema({ strict: false, timestamps: true }) // strict: false allows storing unstructured data
 export class Platform {
   @Prop({ required: true })
   name: string;

@@ -15,11 +15,15 @@ export class PostService {
     'WITH obj',
     'MERGE (u:DiscourseUser { id: obj.userId, endpoint: obj.endpoint })',
     'MERGE (u)-[:POSTED]->(obj)',
+  ].join(' ');
+
+  private readonly REPLIED_TO = [
+    'MATCH (obj:DiscoursePost { endpoint: $endpoint })',
+    'WHERE obj.replyToPostNumber IS NOT NULL',
+    'AND obj.replyToPostNumber <> "null"',
     'WITH obj',
-    'FOREACH (ignoreMe IN CASE WHEN obj.replyToPostNumber IS NOT NULL THEN [1] ELSE [] END |',
     'MERGE (rp:DiscoursePost { topicId: obj.topicId, postNumber: obj.replyToPostNumber, endpoint: obj.endpoint })',
     'MERGE (obj)-[:REPLIED_TO]->(rp)',
-    ')',
   ].join(' ');
 
   constructor(
@@ -33,8 +37,16 @@ export class PostService {
       await this.neo4jService.write(this.CREATE, { obj });
     } catch (error) {
       this.logger.error(error);
-      this.logger.error(obj);
     }
     this.logger.log(`Post ${dto.id} created.`);
+  }
+
+  async updateRepliedTo(endpoint: string): Promise<void> {
+    try {
+      await this.neo4jService.write(this.REPLIED_TO, { endpoint });
+    } catch (error) {
+      this.logger.error(error);
+    }
+    this.logger.log(`Updated REPLIED_TO for ${endpoint}.`);
   }
 }
