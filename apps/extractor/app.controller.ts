@@ -6,7 +6,7 @@ import { ExtractorService } from './src/extractor/extractor.service';
 export class AppController {
   private readonly logger = new Logger(AppController.name);
 
-  constructor(private readonly appService: ExtractorService) { }
+  constructor(private readonly extractorService: ExtractorService) { }
 
   @Post()
   extract(@Body() dto: ExtractDto): Promise<string> {

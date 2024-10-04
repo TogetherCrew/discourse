@@ -29,14 +29,12 @@ export class MongoController {
     @Payload('filter') filter: any,
     @Payload('update') update: any,
   ): Promise<void> {
-    this.logger.debug(`updateOne: ${filter}`);
     await this.mongoService.updateOne(filter, update);
   }
 
   @MessagePattern(Patterns.Mongo.Platform.FindById)
   async findOne(@Payload('id') id: string): Promise<Platform> {
-    const result = await this.mongoService.findById(id);
-    return result;
+    return await this.mongoService.findById(id);
   }
 
   @MessagePattern(Patterns.Mongo.Platform.Find)
@@ -45,7 +43,6 @@ export class MongoController {
     @Payload('projection') projection: any,
     @Payload('options') options: any,
   ): Promise<any> {
-    const result = await this.mongoService.find(filter, projection, options);
-    return result;
+    return await this.mongoService.find(filter, projection, options);
   }
 }

@@ -21,32 +21,11 @@ export class MongoService {
     }
   }
 
-  // async start(endpoint: string) {
-  //   await this.db
-  //     .model(this.platformModel.collection.name)
-  //     .updateMany(
-  //       { name: 'discourse', metadata: { id: endpoint } },
-  //       { $set: { 'metadata.extraction.startedAt': new Date() } },
-  //     );
-  //   this.logger.log(`Updated startedAt for ${endpoint}.`);
-  // }
-  // async complete(endpoint: string) {
-  //   this.logger.debug(`endpoint: ${endpoint}`);
-  //   await this.db
-  //     .model(this.platformModel.collection.name)
-  //     .updateMany(
-  //       { name: 'discourse', metadata: { id: endpoint } },
-  //       { $set: { 'metadata.extraction.completedAt': new Date() } },
-  //     );
-  //   this.logger.log(`Updated completedAt for ${endpoint}.`);
-  // }
-
   async updateOne(filter: any, update: any) {
     try {
-      const result = await this.db
+      await this.db
         .model(this.platformModel.collection.name)
         .updateOne(filter, update);
-      this.logger.debug(result);
     } catch (error) {
       this.logger.error(error);
     }
@@ -64,7 +43,6 @@ export class MongoService {
       const result = await this.db
         .model(this.platformModel.collection.name)
         .find(filter, projection, options);
-      this.logger.debug(result);
       return result;
     } catch (error) {
       this.logger.error(error);
