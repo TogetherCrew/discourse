@@ -1,5 +1,4 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { ExtractDto } from './dto/extract.dto';
 import { InjectFlowProducer } from '@nestjs/bullmq';
 import { FLOW_PRODUCER, JOBS, QUEUES } from '@app/discourse/constants';
 import { FlowChildJob, FlowProducer } from 'bullmq';

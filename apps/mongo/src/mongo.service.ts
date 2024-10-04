@@ -58,4 +58,16 @@ export class MongoService {
       .findById(id);
     return result;
   }
+
+  async find(filter: any, projection: any, options: any): Promise<any | void> {
+    try {
+      const result = await this.db
+        .model(this.platformModel.collection.name)
+        .find(filter, projection, options);
+      this.logger.debug(result);
+      return result;
+    } catch (error) {
+      this.logger.error(error);
+    }
+  }
 }

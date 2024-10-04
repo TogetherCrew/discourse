@@ -14,6 +14,13 @@ export class TopicService {
     'MERGE (c)-[:HAS_TOPIC]->(obj)',
   ].join(' ');
 
+  private readonly LATEST_BY_ID = [
+    'MATCH (t:DiscourseTopic { endpoint: $endpoint })',
+    'RETURN t.id AS id',
+    'ORDER BY id DESC',
+    'LIMIT 1',
+  ].join(' ');
+
   constructor(
     private readonly transformService: TransformService,
     private readonly neo4jService: Neo4jService,
@@ -27,5 +34,16 @@ export class TopicService {
       this.logger.error(error);
     }
     this.logger.log(`Topic ${dto.id} created.`);
+  }
+
+  async latestById(endpoint: string) {
+    try {
+      const result = await this.neo4jService.read(this.LATEST_BY_ID, {
+        endpoint,
+      });
+      return result.records[0]['_fields'][0];
+    } catch (error) {
+      this.logger.error(error, endpoint);
+    }
   }
 }

@@ -1,43 +1,46 @@
 export const Patterns = {
   Graph: {
     BadgeGrouping: {
-      Create: 'BadgeGrouping.Create',
+      Create: 'Graph.BadgeGrouping.Create',
     },
     BadgeType: {
-      Create: 'BadgeType.Create',
+      Create: 'Graph.BadgeType.Create',
     },
     Badge: {
-      Create: 'Badge.Create',
+      Create: 'Graph.Badge.Create',
     },
     Category: {
-      Create: 'Category.Create',
+      Create: 'Graph.Category.Create',
     },
     Group: {
-      Create: 'Group.Create',
+      Create: 'Graph.Group.Create',
     },
     Post: {
-      Create: 'Post.Create',
-      UpdateRepliedTo: 'Post.UpdateRepliedTo',
+      Create: 'Graph.Post.Create',
+      UpdateRepliedTo: 'Graph.Post.UpdateRepliedTo',
+      LatestById: 'Graph.Post.LatestById',
     },
     Topic: {
-      Create: 'Topic.Create',
+      Create: 'Graph.Topic.Create',
+      LatestById: 'Graph.Topic.LatestById',
     },
     TagGroup: {
-      Create: 'TagGroup.Create',
+      Create: 'Graph.TagGroup.Create',
     },
     Tag: {
-      Create: 'Tag.Create',
+      Create: 'Graph.Tag.Create',
     },
     User: {
-      Create: 'User.Create',
-      GetUniqueUsersByPosts: 'User.GetUniqueUsersByPosts',
+      Create: 'Graph.User.Create',
+      GetUniqueUsersByPosts: 'Graph.User.GetUniqueUsersByPosts',
     },
     UserAction: {
-      Create: 'UserAction.Create',
+      Create: 'Graph.UserAction.Create',
     },
   },
   Mongo: {
     Platform: {
+      Find: 'Mongo.Platform.Find',
       FindById: 'Mongo.Platform.FindById',
       UpdateOne: 'Mongo.Platform.UpdateOne',
     },

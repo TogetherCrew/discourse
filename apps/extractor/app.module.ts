@@ -1,7 +1,4 @@
 import { Module } from '@nestjs/common';
-import { ExtractorController } from './extractor.controller';
-import { ExtractorService } from './extractor.service';
-import { FLOW_PRODUCER, QUEUES } from '@app/discourse/constants';
 import { BullModule } from '@nestjs/bullmq';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ExpressAdapter } from '@bull-board/express';
@@ -12,13 +9,11 @@ import {
   redisConfig,
   schemaConfig,
   rmqConfig,
-  RmqModule,
-  Services,
   airflowConfig,
 } from '@app/common';
-import { ProcessorsModule } from './processors/processors.modules';
-import { DiscourseModule } from '@app/discourse';
-import { CommonModule } from './common/common.module';
+import { CronModule } from './src/cron/cron.module';
+import { AppController } from './app.controller';
+import { ExtractorModule } from './src/extractor/extractor.module';
 
 @Module({
   imports: [
@@ -34,19 +29,13 @@ import { CommonModule } from './common/common.module';
       }),
       inject: [ConfigService],
     }),
-    BullModule.registerFlowProducer({
-      name: FLOW_PRODUCER,
-    }),
     BullBoardModule.forRoot({
       route: '/queues',
       adapter: ExpressAdapter,
     }),
-    RmqModule.register(Services.mongo),
-    ProcessorsModule,
-    DiscourseModule,
-    CommonModule,
+    CronModule,
+    ExtractorModule,
   ],
-  controllers: [ExtractorController],
-  providers: [ExtractorService],
+  controllers: [AppController],
 })
-export class ExtractorModule { }
+export class AppModule { }

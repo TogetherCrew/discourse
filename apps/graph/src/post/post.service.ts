@@ -26,6 +26,14 @@ export class PostService {
     'MERGE (obj)-[:REPLIED_TO]->(rp)',
   ].join(' ');
 
+  private readonly LATEST_BY_ID = [
+    'MATCH (t:DiscoursePost { endpoint: $endpoint })',
+    'WHERE t.id IS NOT NULL',
+    'RETURN t.id AS id',
+    'ORDER BY id DESC',
+    'LIMIT 1',
+  ].join(' ');
+
   constructor(
     private readonly transformService: TransformService,
     private readonly neo4jService: Neo4jService,
@@ -48,5 +56,17 @@ export class PostService {
       this.logger.error(error);
     }
     this.logger.log(`Updated REPLIED_TO for ${endpoint}.`);
+  }
+
+  async latestById(endpoint: string) {
+    this.logger.debug('latestById', endpoint);
+    try {
+      const result = await this.neo4jService.read(this.LATEST_BY_ID, {
+        endpoint,
+      });
+      return result.records[0]['_fields'][0];
+    } catch (error) {
+      this.logger.error(error, endpoint);
+    }
   }
 }

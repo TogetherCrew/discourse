@@ -1,11 +1,11 @@
 import { NestFactory } from '@nestjs/core';
-import { ExtractorModule } from './extractor.module';
 import { RmqService, Services } from '@app/common';
 import { VersioningType } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { AppModule } from '../app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(ExtractorModule);
+  const app = await NestFactory.create(AppModule);
   // VERSIONING
   app.enableVersioning({
     type: VersioningType.URI,

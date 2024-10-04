@@ -1,5 +1,6 @@
 export const QUEUES = {
   EXTRACT: 'extractQueue',
+  CRON: 'cronQueue',
 };
 
 export const JOBS = {

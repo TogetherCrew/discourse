@@ -24,4 +24,9 @@ export class PostController {
     this.logger.debug(`updateRepliedTo(${endpoint})`);
     return this.service.updateRepliedTo(endpoint);
   }
+
+  @MessagePattern(Patterns.Graph.Post.LatestById)
+  async latestById(@Payload('endpoint') endpoint: string): Promise<void> {
+    return await this.service.latestById(endpoint);
+  }
 }

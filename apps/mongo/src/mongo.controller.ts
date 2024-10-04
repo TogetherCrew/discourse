@@ -38,4 +38,14 @@ export class MongoController {
     const result = await this.mongoService.findById(id);
     return result;
   }
+
+  @MessagePattern(Patterns.Mongo.Platform.Find)
+  async find(
+    @Payload('filter') filter: any,
+    @Payload('projection') projection: any,
+    @Payload('options') options: any,
+  ): Promise<any> {
+    const result = await this.mongoService.find(filter, projection, options);
+    return result;
+  }
 }

@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { ExtractorModule } from './../src/extractor.module';
+import { ExtractorModule } from '../src/extractor/extractor.module';
 
 describe('ExtractorController (e2e)', () => {
   let app: INestApplication;

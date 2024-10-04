@@ -18,4 +18,9 @@ export class TopicController {
   ): Promise<void> {
     await this.service.create(topic, endpoint);
   }
+
+  @MessagePattern(Patterns.Graph.Topic.LatestById)
+  async latestById(@Payload('endpoint') endpoint: string): Promise<void> {
+    return await this.service.latestById(endpoint);
+  }
 }
