@@ -8,7 +8,9 @@ RUN yarn install
 
 COPY . .
 
-RUN yarn build
+RUN yarn build extractor
+RUN yarn build graph
+RUN yarn build mongo
 
 FROM node:alpine AS production
 
