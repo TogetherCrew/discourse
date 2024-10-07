@@ -164,11 +164,6 @@ export class DiscourseService {
 
   private async req(url: string, opts = {}): Promise<AxiosResponse<any, any>> {
     try {
-<<<<<<< HEAD
-      // console.log(url);
-=======
-      this.logger.log(url);
->>>>>>> main
       return axios.get(url, opts);
     } catch (error) {
       if (axios.isAxiosError(error)) {
