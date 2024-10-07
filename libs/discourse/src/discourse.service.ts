@@ -23,8 +23,9 @@ export class DiscourseService {
 
   async getCategories(
     endpoint: string,
+    include_subcategories = true,
   ): Promise<AxiosResponse<CategoriesResponse>> {
-    const path = '/categories.json?include_subcategories=true';
+    const path = `/categories.json?include_subcategories=${include_subcategories}`;
     return this.get(endpoint, path);
   }
 
@@ -63,6 +64,17 @@ export class DiscourseService {
       | 'posters' = 'default',
   ): Promise<AxiosResponse<TopicsResponse>> {
     const path = `/latest.json?order=${order}&page=${page}`;
+    return this.get(endpoint, path);
+  }
+
+  async getLatestPosts(
+    endpoint: string,
+    before = 0,
+  ): Promise<AxiosResponse<LatestPostsReponse>> {
+    let path = '/posts.json';
+    if (before != 0) {
+      path = path + `?before=${before}`;
+    }
     return this.get(endpoint, path);
   }
 
@@ -138,21 +150,20 @@ export class DiscourseService {
 
   private async get(endpoint: string, path: string, scheme = 'https') {
     const url = `${scheme}://${endpoint}${path}`;
-    const valid = await this.historyService.valid(url);
-    if (!valid) {
-      await this.historyService.set(url);
-      const limiter: Bottleneck = this.getLimiter(endpoint, proxyOpts);
-      return limiter.schedule(() =>
-        this.req(url, { httpsAgent: this.proxyService.getProxy() }),
-      );
-    } else {
-      throw new Error('Duplicate request');
-    }
+    // const valid = await this.historyService.valid(url);
+    // if (!valid) {
+    // await this.historyService.set(url);
+    const limiter: Bottleneck = this.getLimiter(endpoint, proxyOpts);
+    return limiter.schedule(() =>
+      this.req(url, { httpsAgent: this.proxyService.getProxy() }),
+    );
+    // } else {
+    //   throw new Error('Duplicate request');
+    // }
   }
 
   private async req(url: string, opts = {}): Promise<AxiosResponse<any, any>> {
     try {
-      this.logger.log(url);
       return axios.get(url, opts);
     } catch (error) {
       if (axios.isAxiosError(error)) {

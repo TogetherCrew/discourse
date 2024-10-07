@@ -1,3 +1,24 @@
+x-app-common: &app-common
+  build:
+    context: .
+    dockerfile: Dockerfile
+    target: development
+  restart: always
+  env_file:
+    - .env
+  volumes:
+    - .:/usr/src/app
+    - ./node_modules:/usr/src/app/node_modules
+  depends_on:
+    redis:
+      condition: service_healthy
+    rabbitmq:
+      condition: service_healthy
+    neo4j:
+      condition: service_healthy
+    mongodb:
+      condition: service_healthy
+
 services:
   redis:
     image: redis:7.0.11
@@ -12,13 +33,33 @@ services:
       - 6379:6379
 
   rabbitmq:
-    image: rabbitmq:3
+    image: rabbitmq:management-alpine
+    ports:
+      - 15672:15672
     healthcheck:
       test: rabbitmq-diagnostics -q ping
       interval: 10s
       timeout: 10s
       retries: 2
       start_period: 10s
+
+  mongodb:
+    container_name: mongodb
+    image: mongo:7.0.5
+    restart: unless-stopped
+    ports:
+      - 27017:27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=pass
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 1m30s
+      timeout: 10s
+      retries: 2
+      start_period: 30s
 
   neo4j:
     image: neo4j:5.9.0
@@ -32,8 +73,8 @@ services:
       - NEO4J_apoc.export.file.enabled=true
       - apoc.export.file.enabled=true
     volumes:
-      - data:/data
-      - backups:/backups
+      - neo4j_data:/data
+      - neo4j_backups:/backups
     healthcheck:
       test: [ "CMD", "wget", "http://localhost:7474" ]
       interval: 10s
@@ -44,28 +85,19 @@ services:
       - 7687:7687
       - 7474:7474
 
-  discourse:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: development
-    command: yarn run start:dev
-    restart: always
+  extractor:
+    <<: [ *app-common ]
+    command: yarn run start:dev extractor
     ports:
       - 3000:3000
-    env_file:
-      - .env
-    volumes:
-      - .:/usr/src/app
-      - ./node_modules:/usr/src/app/node_modules
-    depends_on:
-      redis:
-        condition: service_healthy
-      rabbitmq:
-        condition: service_healthy
-      neo4j:
-        condition: service_healthy
+  graph:
+    <<: [ *app-common ]
+    command: yarn run start:dev graph
+  mongo:
+    <<: [ *app-common ]
+    command: yarn run start:dev mongo
 
 volumes:
-  data:
-  backups:
+  neo4j_data:
+  neo4j_backups:
+  mongo_data:

@@ -23,6 +23,12 @@
       ],
       "@app/discourse/*": [
         "libs/discourse/src/*"
+      ],
+      "@app/common": [
+        "libs/common/src"
+      ],
+      "@app/common/*": [
+        "libs/common/src/*"
       ]
     }
   }
