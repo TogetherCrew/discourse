@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 x-app-common: &app-common
   build:
     context: .
@@ -19,6 +20,8 @@ x-app-common: &app-common
     mongodb:
       condition: service_healthy
 
+=======
+>>>>>>> main
 services:
   redis:
     image: redis:7.0.11
@@ -85,6 +88,7 @@ services:
       - 7687:7687
       - 7474:7474
 
+<<<<<<< HEAD
   extractor:
     <<: [ *app-common ]
     command: yarn run start:dev extractor
@@ -101,3 +105,30 @@ volumes:
   neo4j_data:
   neo4j_backups:
   mongo_data:
+=======
+  discourse:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    command: yarn run start:dev
+    restart: always
+    ports:
+      - 3000:3000
+    env_file:
+      - .env
+    volumes:
+      - .:/usr/src/app
+      - ./node_modules:/usr/src/app/node_modules
+    depends_on:
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+
+volumes:
+  data:
+  backups:
+>>>>>>> main

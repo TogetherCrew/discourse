@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import axios, { AxiosResponse } from 'axios';
 import Bottleneck from 'bottleneck';
 import { BottleneckService } from './bottleneck/bottleneck.service';
@@ -8,6 +8,8 @@ import { HistoryService } from './history/history.service';
 
 @Injectable()
 export class DiscourseService {
+  private readonly logger = new Logger(DiscourseService.name);
+
   constructor(
     private bottleneckService: BottleneckService,
     private proxyService: ProxyService,
@@ -162,7 +164,11 @@ export class DiscourseService {
 
   private async req(url: string, opts = {}): Promise<AxiosResponse<any, any>> {
     try {
+<<<<<<< HEAD
       // console.log(url);
+=======
+      this.logger.log(url);
+>>>>>>> main
       return axios.get(url, opts);
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -180,7 +186,7 @@ export class DiscourseService {
     if (limiter == undefined) {
       limiter = this.bottleneckService.createClusterLimiter(id, options);
       limiter.on('depleted', () => {
-        console.log('limiter.counts', limiter.counts());
+        this.logger.log('limiter.counts', limiter.counts());
       });
       this.bottleneckService.setLimiter(id, limiter);
     }
