@@ -10,10 +10,13 @@ import {
   schemaConfig,
   rmqConfig,
   airflowConfig,
+  Services,
+  RmqModule,
 } from '@app/common';
 import { CronModule } from './src/cron/cron.module';
 import { AppController } from './app.controller';
 import { ExtractorModule } from './src/extractor/extractor.module';
+import { AirflowModule } from './src/airflow/airflow.module';
 
 @Module({
   imports: [
@@ -35,6 +38,8 @@ import { ExtractorModule } from './src/extractor/extractor.module';
     }),
     CronModule,
     ExtractorModule,
+    AirflowModule,
+    RmqModule.register(Services.mongo),
   ],
   controllers: [AppController],
 })

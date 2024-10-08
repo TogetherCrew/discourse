@@ -32,7 +32,7 @@ export class CronProcessor extends WorkerHost implements OnModuleInit {
     this.logger.debug('endpoint', endpoint);
     const from_topic_id = await this.getLastestStoredTopicId(endpoint);
     const from_post_id = await this.getLastestStoredPostId(endpoint);
-    await this.extractorService.extract(id, from_topic_id, from_post_id);
+    return await this.extractorService.extract(id, from_topic_id, from_post_id);
   }
 
   async onModuleInit() {
