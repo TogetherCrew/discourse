@@ -47,7 +47,7 @@ export class AirflowService {
       await this.httpService.axiosRef.post(this.url, body, {
         headers: {
           'Content-Type': 'application/json',
-          Authorization: this.auth,
+          Authorization: `Basic ${this.auth}`,
         },
       });
     } catch (error) {
