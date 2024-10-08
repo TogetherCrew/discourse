@@ -22,5 +22,6 @@ import { ExtractorModule } from '../extractor/extractor.module';
     ExtractorModule,
   ],
   providers: [CronService, CronProcessor],
+  exports: [CronService],
 })
 export class CronModule { }

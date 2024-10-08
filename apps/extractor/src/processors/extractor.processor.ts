@@ -1,6 +1,6 @@
 import { QUEUES, JOBS } from '@app/discourse/constants';
 import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
-import { Inject, Logger } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import { Job } from 'bullmq';
 import { BadgeService } from '../badge/badge.service';
 import { CategoryService } from '../category/category.service';
@@ -11,10 +11,7 @@ import { TagGroupService } from '../tag-group/tag-group.service';
 import { TagService } from '../tag/tag.service';
 import { Phase1Service } from '../phase1/phase1.service';
 import { UserService } from '../user/user.service';
-import { Patterns, Services } from '@app/common';
-import { ClientProxy } from '@nestjs/microservices';
-import { AirflowService } from '../airflow/airflow.service';
-import { PlatformDocument } from 'apps/mongo/src/schemas/platform.schema';
+import { Phase2Service } from '../phase2/phase2.service';
 
 @Processor(QUEUES.EXTRACT, { concurrency: 200 })
 export class ExtractorProcessor extends WorkerHost {
@@ -29,9 +26,8 @@ export class ExtractorProcessor extends WorkerHost {
     private readonly tagGroupService: TagGroupService,
     private readonly tagService: TagService,
     private readonly phase1Service: Phase1Service,
+    private readonly phase2Service: Phase2Service,
     private readonly userService: UserService,
-    @Inject(Services.mongo.name) private readonly mongoClient: ClientProxy,
-    private readonly airflowService: AirflowService,
   ) {
     super();
   }
@@ -59,7 +55,7 @@ export class ExtractorProcessor extends WorkerHost {
       case JOBS.PHASE_1:
         return this.phase1Service.handleJob(job);
       case JOBS.PHASE_2:
-        return await this.wait(500);
+        return this.phase2Service.handleJob(job);
       default:
         break;
     }
@@ -70,20 +66,5 @@ export class ExtractorProcessor extends WorkerHost {
     if (job.name === JOBS.PHASE_1 || job.name === JOBS.PHASE_2) {
       this.logger.log(`Completed ${job.name} [${job.id}]`);
     }
-
-    if (job.name === JOBS.PHASE_2) {
-      const { platform } = job.data;
-      this.mongoClient.emit(Patterns.Mongo.Platform.UpdateOne, {
-        filter: { _id: (platform as PlatformDocument).id },
-        update: {
-          $set: { 'metadata.extraction.completedAt': new Date() },
-        },
-      });
-      await this.airflowService.dagRuns(platform);
-    }
-  }
-
-  private async wait(ms: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }

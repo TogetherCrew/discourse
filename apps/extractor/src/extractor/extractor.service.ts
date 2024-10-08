@@ -86,7 +86,7 @@ export class ExtractorService {
     from: number,
     to: number,
   ): Promise<FlowChildJob[]> {
-    if (to <= from) {
+    if (to < from) {
       throw new Error(`to (${to}) must be greater than from (${from}).`);
     }
     const array = Array.from({ length: to - from + 1 }, (_, i) => from + i);

@@ -13,8 +13,7 @@ import { TagGroupModule } from '../tag-group/tag-group.module';
 import { TagModule } from '../tag/tag.module';
 import { Phase1Module } from '../phase1/phase1.module';
 import { UserModule } from '../user/user.module';
-import { RmqModule, Services } from '@app/common';
-import { AirflowModule } from '../airflow/airflow.module';
+import { Phase2Module } from '../phase2/phase2.module';
 
 @Module({
   imports: [
@@ -32,10 +31,9 @@ import { AirflowModule } from '../airflow/airflow.module';
     TopicModule,
     TagGroupModule,
     TagModule,
-    Phase1Module,
     UserModule,
-    RmqModule.register(Services.mongo),
-    AirflowModule,
+    Phase1Module,
+    Phase2Module,
   ],
   providers: [ExtractorProcessor],
 })

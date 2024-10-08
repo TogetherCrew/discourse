@@ -17,6 +17,7 @@ import { CronModule } from './src/cron/cron.module';
 import { AppController } from './app.controller';
 import { ExtractorModule } from './src/extractor/extractor.module';
 import { AirflowModule } from './src/airflow/airflow.module';
+import { ProcessorsModule } from './src/processors/processors.modules';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { AirflowModule } from './src/airflow/airflow.module';
     ExtractorModule,
     AirflowModule,
     RmqModule.register(Services.mongo),
+    ProcessorsModule,
   ],
   controllers: [AppController],
 })

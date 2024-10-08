@@ -22,7 +22,7 @@ export class Phase1Service {
     private readonly flowProducer: FlowProducer,
   ) { }
 
-  async handleJob(job: Job<any, any, typeof JOBS.GROUP>): Promise<any> {
+  async handleJob(job: Job<any, any, any>): Promise<any> {
     const { endpoint, platform } = job.data;
     this.logger.debug(`endpoint: ${endpoint}`);
     this.logger.debug(`platform: ${platform}`);
