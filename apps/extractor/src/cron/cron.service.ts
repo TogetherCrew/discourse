@@ -11,7 +11,7 @@ export class CronService {
 
   async addJob(data: any): Promise<Job> {
     const job = await this.cronQueue.add('cronJob', data, {
-      repeat: { every: 5 * 60 * 1000 },
+      repeat: { every: 24 * 60 * 60 * 1000 },
     });
     this.logger.log(`Cron job added with ID: ${job.id}`);
     return job;
