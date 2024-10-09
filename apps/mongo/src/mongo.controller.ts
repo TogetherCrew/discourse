@@ -4,7 +4,6 @@ import { MessagePattern, Payload } from '@nestjs/microservices';
 import { Patterns } from '@app/common';
 import { EventsInterceptor } from '@app/common/rmq/interceptors/events.interceptor';
 import { Platform } from './schemas/platform.schema';
-import { log } from 'console';
 
 @Controller()
 @UseInterceptors(EventsInterceptor)
