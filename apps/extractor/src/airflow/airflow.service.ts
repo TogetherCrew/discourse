@@ -17,9 +17,6 @@ export class AirflowService {
     const username = this.configService.get<string>('airflow.username');
     const password = this.configService.get<string>('airflow.password');
     const baseUrl = this.configService.get<string>('airflow.baseUrl');
-    this.logger.debug(`username: ${username}`);
-    this.logger.debug(`password: ${password}`);
-    this.logger.debug(`baseUrl: ${baseUrl}`);
     this.url = `${baseUrl}/api/v1/dags/discourse_analyzer_etl/dagRuns`;
     this.auth = Buffer.from(`${username}:${password}`).toString('base64');
   }

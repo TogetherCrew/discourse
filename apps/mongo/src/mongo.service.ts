@@ -32,9 +32,11 @@ export class MongoService {
   }
 
   async findById(id: string): Promise<PlatformDocument> {
+    this.logger.debug({ id });
     const result = await this.db
       .model(this.platformModel.collection.name)
       .findById(id);
+    this.logger.debug({ result });
     return result;
   }
 
