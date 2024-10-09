@@ -30,14 +30,14 @@ export class ExtractorService {
     from_topic_id = 0,
     from_post_id = 0,
   ): Promise<any> {
-    this.logger.debug(platform_id);
+    this.logger.debug({ platform_id });
 
     const platform: PlatformDocument = await firstValueFrom(
       this.mongoClient.send(Patterns.Mongo.Platform.FindById, {
         id: platform_id,
       }),
     );
-    this.logger.debug(platform);
+    this.logger.debug({ platform });
     const endpoint = platform.metadata.id;
 
     this.mongoClient.emit(Patterns.Mongo.Platform.UpdateOne, {
