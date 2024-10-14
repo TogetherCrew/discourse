@@ -1,5 +1,5 @@
 import { QUEUES, JOBS } from '@app/discourse/constants';
-import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
+import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Logger } from '@nestjs/common';
 import { Job } from 'bullmq';
 import { BadgeService } from '../badge/badge.service';
