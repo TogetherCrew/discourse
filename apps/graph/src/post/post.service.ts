@@ -46,7 +46,7 @@ export class PostService {
     } catch (error) {
       this.logger.error(error);
     }
-    this.logger.log(`Post ${dto.id} created.`);
+    this.logger.debug(`Post ${dto.id} created.`);
   }
 
   async updateRepliedTo(endpoint: string): Promise<void> {
@@ -55,7 +55,7 @@ export class PostService {
     } catch (error) {
       this.logger.error(error);
     }
-    this.logger.log(`Updated REPLIED_TO for ${endpoint}.`);
+    this.logger.debug(`Updated REPLIED_TO for ${endpoint}.`);
   }
 
   async latestById(endpoint: string) {

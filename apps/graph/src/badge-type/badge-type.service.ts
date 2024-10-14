@@ -19,6 +19,6 @@ export class BadgeTypeService {
   async create(dto: BadgeType, endpoint): Promise<void> {
     const obj = this.transformService.transform(dto, { endpoint });
     await this.neo4jService.write(this.CREATE, { obj });
-    this.logger.log(`BadgeType ${dto.id} created.`);
+    this.logger.debug(`BadgeType ${dto.id} created.`);
   }
 }

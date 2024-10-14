@@ -19,6 +19,6 @@ export class GroupService {
   async create(dto: Group, endpoint): Promise<void> {
     const obj = this.transformService.transform(dto, { endpoint });
     await this.neo4jService.write(this.CREATE, { obj });
-    this.logger.log(`Group ${dto.id} created.`);
+    this.logger.debug(`Group ${dto.id} created.`);
   }
 }

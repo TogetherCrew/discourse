@@ -48,6 +48,6 @@ export class UserService {
     } catch (error) {
       this.logger.error(error);
     }
-    this.logger.log(`User ${dto.id} created.`);
+    this.logger.debug(`User ${dto.id} created.`);
   }
 }

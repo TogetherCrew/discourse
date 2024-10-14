@@ -27,7 +27,7 @@ export class AppController {
 
   @Post()
   extract(@Body() dto: ExtractDto): Promise<string> {
-    this.logger.log({ dto });
+    this.logger.debug({ dto });
     return this.extractorService.extract(
       dto.platform_id,
       dto.from_topic_id,
@@ -40,7 +40,7 @@ export class AppController {
     const platform: PlatformDocument = await firstValueFrom(
       this.mongoClient.send(Patterns.Mongo.Platform.FindById, { id }),
     );
-    this.logger.log({ id });
+    this.logger.debug({ id });
     return await this.airflowService.dagRuns(platform);
   }
 }

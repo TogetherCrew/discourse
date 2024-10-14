@@ -10,8 +10,9 @@ import { Job } from 'bullmq';
 import { ExtractorService } from '../extractor/extractor.service';
 
 @Processor(QUEUES.CRON, {
-  removeOnComplete: { age: 60 * 60 * 24 * 1 },
-  removeOnFail: { age: 60 * 60 * 24 * 7 },
+  concurrency: 10,
+  removeOnComplete: { age: 3600, count: 1000 },
+  removeOnFail: { age: 24 * 3600 },
 })
 export class CronProcessor extends WorkerHost implements OnModuleInit {
   private readonly logger = new Logger(CronProcessor.name);

@@ -33,7 +33,7 @@ export class TopicService {
     } catch (error) {
       this.logger.error(error);
     }
-    this.logger.log(`Topic ${dto.id} created.`);
+    this.logger.debug(`Topic ${dto.id} created.`);
   }
 
   async latestById(endpoint: string) {

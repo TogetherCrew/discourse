@@ -13,7 +13,7 @@ export class CronService {
     const job = await this.cronQueue.add('cronJob', data, {
       repeat: { every: 24 * 60 * 60 * 1000 },
     });
-    this.logger.log(`Cron job added with ID: ${job.id}`);
+    this.logger.debug(`Cron job added with ID: ${job.id}`);
     return job;
   }
 }

@@ -40,6 +40,6 @@ export class CategoryService {
     } catch (error) {
       this.logger.error(error);
     }
-    this.logger.log(`Category ${dto.id} created.`);
+    this.logger.debug(`Category ${dto.id} created.`);
   }
 }

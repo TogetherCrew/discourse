@@ -13,7 +13,11 @@ import { Phase1Service } from '../phase1/phase1.service';
 import { UserService } from '../user/user.service';
 import { Phase2Service } from '../phase2/phase2.service';
 
-@Processor(QUEUES.EXTRACT, { concurrency: 200 })
+@Processor(QUEUES.EXTRACT, {
+  concurrency: 100,
+  removeOnComplete: { age: 3600, count: 1000 },
+  removeOnFail: { age: 24 * 3600 },
+})
 export class ExtractorProcessor extends WorkerHost {
   private readonly logger = new Logger(ExtractorProcessor.name);
 
@@ -58,13 +62,6 @@ export class ExtractorProcessor extends WorkerHost {
         return this.phase2Service.handleJob(job);
       default:
         break;
-    }
-  }
-
-  @OnWorkerEvent('completed')
-  async onCompleted(job: Job<any, any, string>) {
-    if (job.name === JOBS.PHASE_1 || job.name === JOBS.PHASE_2) {
-      this.logger.log(`Completed ${job.name} [${job.id}]`);
     }
   }
 }

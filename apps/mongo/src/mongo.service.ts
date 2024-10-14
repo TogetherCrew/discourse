@@ -45,6 +45,7 @@ export class MongoService {
       const result = await this.db
         .model(this.platformModel.collection.name)
         .find(filter, projection, options);
+      this.logger.debug({ result });
       return result;
     } catch (error) {
       this.logger.error(error);

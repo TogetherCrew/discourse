@@ -23,6 +23,6 @@ export class TagGroupService {
   async create(dto: TagGroup, endpoint): Promise<void> {
     const obj = this.transformService.transform(dto, { endpoint });
     await this.neo4jService.write(this.CREATE, { obj });
-    this.logger.log(`TagGroup ${dto.id} created.`);
+    this.logger.debug(`TagGroup ${dto.id} created.`);
   }
 }

@@ -19,6 +19,6 @@ export class TagService {
   async create(dto: Tag, endpoint): Promise<void> {
     const obj = this.transformService.transform(dto, { endpoint });
     await this.neo4jService.write(this.CREATE, { obj });
-    this.logger.log(`Tag ${dto.id} created.`);
+    this.logger.debug(`Tag ${dto.id} created.`);
   }
 }

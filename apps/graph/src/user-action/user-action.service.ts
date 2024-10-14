@@ -25,7 +25,7 @@ export class UserActionService {
         case 1:
           await this.neo4jService.write(this.LIKED, { obj });
         default:
-          this.logger.log(`Created ${obj.actingUserId} LIKED ${obj.postId}`);
+          this.logger.debug(`Created ${obj.actingUserId} LIKED ${obj.postId}`);
           break;
       }
     } catch (error) {
