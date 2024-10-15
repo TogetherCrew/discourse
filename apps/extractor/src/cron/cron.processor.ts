@@ -10,7 +10,7 @@ import { Job } from 'bullmq';
 import { ExtractorService } from '../extractor/extractor.service';
 
 @Processor(QUEUES.CRON, {
-  concurrency: 10,
+  concurrency: 1,
   removeOnComplete: { age: 3600, count: 1000 },
   removeOnFail: { age: 24 * 3600 },
 })
