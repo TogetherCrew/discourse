@@ -30,9 +30,9 @@ export class CronProcessor extends WorkerHost implements OnModuleInit {
     const { id } = job.data;
     const platform = await this.getPlatform(id);
     const endpoint = platform.metadata.id;
-    this.logger.debug('endpoint', endpoint);
     const from_topic_id = await this.getLastestStoredTopicId(endpoint);
     const from_post_id = await this.getLastestStoredPostId(endpoint);
+    this.logger.debug({ endpoint, from_topic_id, from_post_id });
     return await this.extractorService.extract(id, from_topic_id, from_post_id);
   }
 

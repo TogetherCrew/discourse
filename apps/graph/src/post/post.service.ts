@@ -66,7 +66,8 @@ export class PostService {
       });
       return result.records[0]['_fields'][0];
     } catch (error) {
-      this.logger.error(error, endpoint);
+      // this.logger.error(error, endpoint);
+      return 0;
     }
   }
 }
