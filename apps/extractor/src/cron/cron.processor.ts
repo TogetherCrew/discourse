@@ -39,6 +39,7 @@ export class CronProcessor extends WorkerHost implements OnModuleInit {
   async onModuleInit() {
     this.logger.debug('onModuleInit');
     const ids = await this.getAllPlatformIds();
+    this.logger.debug({ ids });
     await this.addJobs(ids);
   }
 
@@ -67,7 +68,7 @@ export class CronProcessor extends WorkerHost implements OnModuleInit {
     if (batch.length < limit) {
       return agg;
     } else {
-      return this.getAllPlatformIds(skip, limit, agg);
+      return this.getAllPlatformIds(skip + limit, limit, agg);
     }
   }
 
